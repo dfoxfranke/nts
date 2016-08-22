@@ -149,17 +149,21 @@
         DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
         <xref target="RFC5746">TLS Renegotiation Indication
         Extension</xref>. Regardless, they MUST NOT initiate or permit
-        insecure renegotiation.
+        insecure renegotiation. (*)
       </t>
       <t>
         DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
         <xref target="RFC7627">TLS Session Hash and Extended Master
-        Secret Extension</xref>.
+        Secret Extension</xref>. (*)
       </t>
       <t>
         Use of the <xref target="RFC7301">Application-Layer Protocol
         Negotation Extension</xref> is integral to NTS and support for
         it is REQUIRED for interoperability.
+      </t>
+      <t>
+        (*): Note that DTLS 1.3 or beyond may render the indicated
+        recommendations inapplicable.
       </t>
     </section>
     <section title="Transport mechanisms for DTLS records"
