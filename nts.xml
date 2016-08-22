@@ -362,7 +362,7 @@
         target="ntske-record"/>. The sequence SHALL be terminated by a
         &quot;End of Message&quot; record, which has a Record Type of
         zero and a zero-length body. Furthermore, requests and
-        non-error responses each SHALL include exactly one Protected
+        non-error responses each SHALL include exactly one NTS Next
         Protocol Negotiation record.
       </t>
       <figure anchor="ntske-record">
@@ -449,7 +449,7 @@
             set.
           </t>
           <t>
-            The Protocol Names listed in the client's Protected
+            The Protocol Names listed in the client's NTS Next
             Protocol Negotiation record denote those protocols which
             the client wishes to speak using the key material
             established through this NTS-KE session. The Protocol
@@ -1084,7 +1084,7 @@
         <c>[[this memo]]</c>
 
         <c>1</c>
-        <c>Protected protocol negotiation</c>
+        <c>NTS next protocol negotiation</c>
         <c>MUST</c>
         <c>[[this memo]]</c>
         
