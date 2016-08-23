@@ -67,18 +67,18 @@
         performance. Symmetric and control modes demand mutual
         authentication and mutual replay protection, and for certain
         message types control mode may require confidentiality as well
-        as authentication. Client/server mode places greater demands
-        on performance than other modes, because servers may have a
-        vast number of clients and be unable to afford to maintain
-        per-client state. However, client/server mode also has more
-        relaxed security needs, because only the client requires
+        as authentication. Client/server mode places more stringent
+        requirements on resource utilization than other modes, because
+        servers may have  vast number of clients and be unable to afford
+        to maintain per-client state. However, client/server mode also
+        has more relaxed security needs, because only the client requires
         replay protection: it is harmless for servers to process
         replayed packets.
       </t>
       <t>
         The security demands of symmetric and control modes are in
-        conflict with the performance demands of client/server mode:
-        any scheme which provides replay protection inherently
+        conflict with the resource-utilization demands of client/server
+        mode any scheme which provides replay protection inherently
         involves maintaining some state to keep track of what messages
         have already been seen. Since therefore no single approach can
         simultaneously satisfy the needs of all modes, Network Time
