@@ -1021,6 +1021,10 @@
           of NTS design essay.
         </t>
         <t>
+          Address strategies for management of AEAD nonces and stress importance
+          of avoiding repetition.
+        </t>
+        <t>
           Give recommendations for validating X.509 certificates
           during the DTLS handshake. Discuss what to expect for the
           CN/SANs, and how to deal with verifying the validity period
