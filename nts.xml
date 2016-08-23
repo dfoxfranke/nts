@@ -889,7 +889,7 @@
           authenticate the request, it SHOULD respond with a
           Kiss-o'-Death packet (see <xref target="RFC5905">RFC 5905,
           Section 7.4)</xref>) with kiss code &quot;NTSN&quot;
-          (meaning &quot;NTS NAK&quot;). Such a response SHOULD
+          (meaning &quot;NTS NAK&quot;). Such a response MUST
           include exactly one Unique Identifier extension whose
           contents SHALL echo those provided by the client.  It MUST
           NOT include any NTS Cookie or NTS Authenticator and
