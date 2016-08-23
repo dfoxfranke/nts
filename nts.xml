@@ -253,16 +253,7 @@
             </t>
             <t>
               All other header fields MUST be ignored by the receiver,
-              and MAY contain arbitrary or bogus values. However,
-              since <xref target="RFC5905">RFC 5905</xref> specifies
-              that valid polling intervals range from 4 to 17
-              inclusive, senders SHOULD set the Poll field to
-              something from this range to avoid being dropped by
-              firewalls performing deep packet inspection. [[Ed. note:
-              actually, we're hopelessly inconsistent on what the value
-              of MINPOLL is supposed to be. RFC 5905 Section 7.2 says
-              it's 4, but Appendix A uses 6 and ntp-4.2.8p8 uses 3.
-              I take the text of the RFC to be normative.]]
+              and MAY contain arbitrary or bogus values.
             </t>
           </list>
         </t>
