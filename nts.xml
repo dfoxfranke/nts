@@ -307,14 +307,14 @@
     </section>
     <section title="The NTS-encapsulated NTPv4 protocol">
       <t>
-        The NTS-encapsulated NTPv4 protocol is carried out by
-        exchanging DTLS records using one of the two transports
-        specified in <xref target="transport-mechanisms"/>. The two
-        endpoints carry out a DTLS handshake in conformance with <xref
+        The NTS-encapsulated NTPv4 protocol proceeds in two parts. 
+        First, DTLS handshake records are exchanged using one of the 
+        two transport mechanisms specified in <xref target="transport-mechanisms"/>.
+        The two endpoints carry out a DTLS handshake in conformance with <xref
         target="dtls-profile"/>, with the client offering (via an <xref
         target="RFC7301">ALPN</xref> extension), and the server
         accepting, an application-layer protocol of &quot;ntp/4&quot;.
-        Once the handshake is successfully completed, the two
+        Second, once the handshake is successfully completed, the two
         endpoints use the established channel to exchange arbitrary
         NTPv4 packets as DTLS-protected Application Data.
       </t>
@@ -341,7 +341,7 @@
     <section title="The NTS Key Establishment protocol">
       <t>
         The NTS Key Establishment (NTS-KE) protocol is carried out by
-        exchanging DTLS records using one of the two transports
+        exchanging DTLS records using one of the two transport mechanisms
         specified in <xref target="transport-mechanisms"/>. The two
         endpoints carry out a DTLS handshake in conformance with <xref
         target="dtls-profile"/>, with the client offering (via an
