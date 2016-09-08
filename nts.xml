@@ -831,9 +831,11 @@
           and Encrypted Extensions extension (therefore authenticated
           but not encrypted), within it (therefore encrypted and
           authenticated), or after it (therefore neither encrypted nor
-          authenticated). However, the server MUST discard any
-          unauthenticated extensions and process the packet as though
-          they were not present.
+          authenticated). In general, however, the server MUST discard
+          any unauthenticated extensions and process the packet as
+          though they were not present. Servers MAY implement
+          exceptions to this requirement for particular extensions
+          if their specification explicitly provides for such.
         </t>
         <t>
           Upon receiving an NTS-protected request, the server SHALL
@@ -871,9 +873,11 @@
           and Encrypted Extensions extension (therefore authenticated
           but not encrypted), within it (therefore encrypted and
           authenticated), or after it (therefore neither encrypted nor
-          authenticated). However, the client MUST discard any
-          unauthenticated extensions and process the packet as though
-          they were not present.
+          authenticated). In general, however, the client MUST discard
+          any unauthenticated extensions and process the packet as
+          though they were not present. Clients MAY implement
+          exceptions to this requirement for particular extensions
+          if their specification explicitly provides for such.
         </t>
         <t>
           If the server is unable to validate the cookie or
