@@ -544,9 +544,9 @@
           <t>
             Server implementations of <xref
             target="nts-extensions-for-ntpv4">NTS extensions for
-            NTPv4</xref> MUST support AEAD_AES_128_GCM (Numeric
-            Identifier 1). That is, if the client includes
-            AEAD_AES_128_GCM in its AEAD Algorithm Negotiation record,
+            NTPv4</xref> MUST support AEAD_AES_SIV_CMAC_256 (Numeric
+            Identifier 15). That is, if the client includes
+            AEAD_AES_SIV_CMAC_256  in its AEAD Algorithm Negotiation record,
             and the server accepts the &quot;ntp/4&quot; protocol in
             its NTS Next Protocol Negotiation record, then the
             server's AEAD Algorithm Negotation record MUST NOT be
