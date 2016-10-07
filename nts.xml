@@ -901,6 +901,14 @@
           checks fails, the packet MUST be discarded without further
           processing.
         </t>
+        <t>
+          Upon receiving an NTS NAK, the client MUST verify that the
+          Unique Identifier matches that of an outstanding request. If
+          this check fails, the packet MUST be discarded without
+          further processing. If this check passes, the client SHOULD
+          discard all cookies and AEAD keys associated with the server
+          which sent the NAK and initiate a fresh NTS-KE handshake.
+        </t>
       </section>
     </section>
     <section title="Recommended format for NTS cookies" anchor="recommended-format-for-nts-cookies">
