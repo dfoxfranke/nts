@@ -3,7 +3,6 @@
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' [
 <!ENTITY rfc2119 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml'> <!--Requirements-->
 <!ENTITY rfc3629 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3629.xml'>
-<!ENTITY rfc4634 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4634.xml'> <!--HMAC-SHA-->
 <!ENTITY rfc5077 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5077.xml'> <!--Session tickets-->
 <!ENTITY rfc5116 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5116.xml'> <!--AEAD-->
 <!ENTITY rfc5297 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5297.xml'> <!--AES-SIV-->
@@ -1011,8 +1010,8 @@
       </t>
       <t>
         Servers should the generate a nonce `N` uniformly at random,
-        and form AEAD output `C` by encrypting `P` under key `K` with nonce `N` and
-        no associated data.
+        and form AEAD output `C` by encrypting `P` under key `K` with
+        nonce `N` and no associated data.
       </t>
       <t>
         The cookie should consist of the tuple `(I,N,C)`.
@@ -1349,7 +1348,6 @@
         <seriesInfo name="IEC" value="61588:2009(E)"/>        
         <seriesInfo name="DOI" value="10.1109/IEEESTD.2009.4839002"/>
       </reference>
-      &rfc4634;
       &rfc5077;
       &rfc7384;
       &rfc7821;
