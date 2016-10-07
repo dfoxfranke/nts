@@ -8,7 +8,7 @@
 <!ENTITY rfc5116 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5116.xml'> <!--AEAD-->
 <!ENTITY rfc5297 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5297.xml'> <!--AES-SIV-->
 <!ENTITY rfc5705 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5705.xml'> <!--Key export-->
-<!ENTITY rfc5746 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5746.xml'> <!--Key export-->
+<!ENTITY rfc5746 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5746.xml'> <!--Renegotition-->
 <!ENTITY rfc5905 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5905.xml'> <!--NTP-->
 <!ENTITY rfc6347 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6347.xml'> <!--DTLS-->
 <!ENTITY rfc7301 PUBLIC '' 'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7301.xml'> <!--ALPN-->
