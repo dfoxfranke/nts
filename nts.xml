@@ -40,6 +40,14 @@
       </address>
     </author>
     <date/>
+    <abstract>
+      <t>
+        This memo specifies Network Time Security (NTS), a mechanism for
+        using Datagram TLS to provide cryptographic security for the
+        Network Time Protocol or other network time synchronization
+        protocols.
+        </t>
+    </abstract>
   </front>
   <middle>
     <section title="Introduction">
@@ -1347,7 +1355,7 @@
         <seriesInfo name="IEEE" value="1588-2008(E)"/>
         <seriesInfo name="IEC" value="61588:2009(E)"/>        
         <seriesInfo name="DOI" value="10.1109/IEEESTD.2009.4839002"/>
-      </reference>
+      </reference> 
       &rfc5077;
       &rfc7384;
       &rfc7821;
