@@ -727,6 +727,28 @@
           whose mode is other than 3 (client) or 4 (server).
         </t>
       </section>
+      <section title="The NTS Cookie Placeholder extension">
+        <t>
+          The NTS Cookie Placeholder extension has a Field Type of [[TBD]].
+          When this extension is included in a client packet (mode 3), it
+          communicates to the server that the client wishes it to send
+          additional cookies in its response. This extension MUST NOT
+          be included in NTP packets whose mode is other than 3.
+        </t>
+        <t>
+          Whenever an NTS Cookie Placeholder extension is present, it
+          MUST be accompanied by an NTS Cookie extension, and the body
+          length of the NTS Cookie Placeholder extension MUST be the
+          same as the body length of the NTS Cookie Extension. (This
+          length requirement serves to ensure that the response will
+          not be larger than the request, in order to improve
+          timekeeping precision and prevent DDoS amplification). The
+          contents of the NTS Cookie Placeholder extension's body are
+          undefined and, aside from checking its length, MUST be
+          ignored by the server.
+        </t>
+      </section>
+
       <section title="The NTS Authenticator and Encrypted Extensions extension">
         <t>
           The NTS Authenticator and Encrypted Extensions extension is
@@ -826,6 +848,18 @@
           </list>
         </t>
         <t>
+          The client MAY include one or more NTS Cookie Placeholder
+          extensions, which MUST be authenticated and MAY be
+          encrypted. The number of NTS Cookie Placeholder extensions
+          that the client includes SHOULD be such that if the client
+          includes N placeholders and the server sends back N+1
+          cookies, the number of unused cookies stored by the client
+          will come to eight. When both the client and server adhere
+          to all cookie-management guidance provided in this memo, the
+          number of placeholder extensions will equal the number of
+          dropped packets since the last successful volley.
+        </t>
+        <t>
           The client MAY include additional (non-NTS-related)
           extensions, which MAY appear prior to the NTS Authenticator
           and Encrypted Extensions extension (therefore authenticated
@@ -859,11 +893,10 @@
             </t>
             <t>
               One or more NTS Cookie extensions, which MUST be
-              authenticated and encrypted. Typically, multiple NTS
-              Cookie extensions SHOULD be included; however, see <xref
-              target="security-considerations"/> for discussion of
-              exceptional cases wherein including multiple cookies
-              could aggravate reflective DDoS attacks.
+              authenticated and encrypted. The number of NTS Cookie
+              extensions included SHOULD be equal to, and MUST NOT
+              exceed, one plus the number of valid NTS Cookie
+              Placeholder extensions included in the request.
             </t>
           </list>
         </t>
@@ -1115,6 +1148,7 @@
         <c>[[TBD]]</c><c>DTLS Record</c><c>[[this memo]]</c>
         <c>[[TBD]]</c><c>Unique Identifier</c><c>[[this memo]]</c>
         <c>[[TBD]]</c><c>NTS Cookie</c><c>[[this memo]]</c>
+        <c>[[TBD]]</c><c>NTS Cookie Placeholder</c><c>[[this memo]]</c>        
         <c>[[TBD]]</c><c>NTS Authenticator and Encrypted Extensions</c><c>[[this memo]]</c>
       </texttable>
       <t>
