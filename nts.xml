@@ -567,6 +567,13 @@
             eight of them, if they accept &quot;ntp/4&quot; as a Next
             Protocol. The Critical Bit SHOULD NOT be set.
           </t>
+          <t>
+            [[Ed. Note: the purpose of sending eight cookies is to
+            allow the client to recover from dropped packets without
+            reusing cookies or starting a new handshake. Discussion of
+            cookie management should probably be broken out into its
+            own section.]]
+          </t>
         </section>
       </section>
       <section title="Key Extraction (generally)">
