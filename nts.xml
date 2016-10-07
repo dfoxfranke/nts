@@ -45,6 +45,11 @@
   <middle>
     <section title="Introduction">
       <t>
+        [[SEE https://github.com/dfoxfranke/nts FOR AN UP-TO-MINUTE
+        DRAFT OF THIS MEMO, AND https://github.com/dfoxfranke/nts/issues
+        FOR A LIST OF OUTSTANDING ISSUES.]]
+      </t>
+      <t>
         This memo specifies Network Time Security (NTS), a mechanism
         for using <xref target="RFC6347">Datagram Transport Layer
         Security</xref> (DTLS) to provide cryptographic security for
