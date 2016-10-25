@@ -445,7 +445,7 @@
         </section>
       </section>
 
-      <section title="The NTS-encapsulated NTPv4 protocol">
+      <section title="The NTS-encapsulated NTPv4 protocol" anchor="dtls-encapsulation">
         <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. First,
         DTLS handshake records are exchanged using one of the two transport
         mechanisms specified in <xref target="transport-mechanisms"/>. The two
@@ -1227,9 +1227,9 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
 
       <?rfc include='reference.RFC.3394'?>
 
-      <?rfc include='reference.RFC.5905'?>
-
       <?rfc include='reference.RFC.4082'?>
+
+      <?rfc include='reference.RFC.4634'?>
 
       <?rfc include='reference.RFC.5652'?>
 
