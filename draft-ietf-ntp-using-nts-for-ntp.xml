@@ -681,85 +681,73 @@
         </section>
       </section>
 
-      <section anchor="recommended-format-for-nts-cookies"
-               title="Recommended format for NTS cookies">
-        <t>This section provides a RECOMMENDED way for servers to construct
-        NTS cookies. Clients MUST NOT examine the cookie under the assumption
-        that it is constructed according to this section.</t>
-
-        <t>The role of cookies in NTS is closely analogous to that of session
-        cookies in TLS. Accordingly, the thematic resemblance of this section
-        to <xref target="RFC5077">RFC 5077</xref> is deliberate, and the
-        reader should likewise take heed of its security considerations.</t>
-
-        <t>Servers should randomly generate and store a master <xref
-        target="AES">AES</xref> key `MEK` and a master <xref
-        target="RFC4634">HMAC-SHA-256</xref> key `MAK`. Servers should
-        additionally choose a non-secret, unique value `I` to identify the
-        pair (MEK,MAK).</t>
-
-        <t>Servers should periodically (e.g., once daily) generate a new
-        triplet (I,MEK,MAK) and immediately switch to using these values for
-        all newly-generated cookies. Immediately following each such key
-        rotation, servers should securely erase any keys generated two or more
-        rotation periods prior. Servers should continue to accept any cookie
-        generated using keys that they have not yet erased, even if those keys
-        are no longer current. Erasing old keys provides for forward secrecy,
-        limiting the scope of what old information can be stolen if a master
-        key is somehow compromised. Holding on to a limited number of old keys
-        allows clients to seamlessly transition from one generation to the
-        next without having to perform a new NTS-KE handshake.</t>
-
-        <t>[[TODO: discuss key management considerations for load-balanced
-        servers]]</t>
-
-        <t>To form a cookie, servers should first form a plaintext `P`
-        consisting of the following fields: <list style="symbols">
+      <section title="Recommended format for NTS cookies" anchor="recommended-format-for-nts-cookies">
+        <t>
+          This section provides a RECOMMENDED way for servers to
+          construct NTS cookies. Clients MUST NOT examine the cookie
+          under the assumption that it is constructed according to this
+          section.
+        </t>
+        <t>
+          The role of cookies in NTS is closely analagous to that of
+          session cookies in TLS. Accordingly, the thematic resemblance
+          of this section to <xref target="RFC5077">RFC 5077</xref> is
+          deliberate, and the reader should likewise take heed of its
+          security considerations.
+        </t>
+        <t>
+          Servers should select an AEAD algorithm which they will use to
+          encrypt and authenticate cookies. The chosen algorithm should
+          be one such as <xref
+          target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which resists
+          accidential nonce reuse, and it need not be the same as the
+          one that was negotiated with the client. Servers should
+          randomly generate and store a master AEAD key `K`. Servers
+          should additionally choose a non-secret, unique value `I` as
+          key-identifier for `K`.
+        </t>
+        <t>
+          Servers should periodically (e.g., once daily) generate a new
+          pair (I,K) and immediately switch to using these values for
+          all newly-generated cookies. Immediately following each such
+          key rotation, servers should securely erase any keys generated
+          two or more rotation periods prior. Servers should continue to
+          accept any cookie generated using keys that they have not yet
+          erased, even if those keys are no longer current. Erasing old
+          keys provides for forward secrecy, limiting the scope of what
+          old information can be stolen if a master key is somehow
+          compromised. Holding on to a limited number of old keys allows
+          clients to seamlessly transition from one generation to the
+          next without having to perform a new NTS-KE handshake.
+        </t>
+        <t>
+          [[TODO: discuss key management considerations for load-balanced
+          servers]]
+        </t>
+        <t>
+          To form a cookie, servers should first form a plaintext `P`
+          consisting of the following fields:
+          <list>
             <t>The AEAD algorithm negotiated during NTS-KE</t>
-
             <t>The S2C key</t>
-
             <t>The C2S key</t>
-          </list></t>
-
-        <t>Servers should then randomly generate an initialization vector
-        `IV`, form ciphertext `C` by encrypting `P` in <xref target="CBC">CBC
-        mode</xref> under key `MEK` with `IV` as the initialization vector,
-        and then MAC the message `IV || C` (with || denoting concatenation)
-        under key `MAK`, obtaining tag `T`.</t>
-
-        <t>The cookie should consist of the tuple `(I,IV,C,T)`.</t>
-
-        <t>[[TODO: explicitly specify how to verify and decrypt a cookie, not
-        just how to form one]]</t>
-
-        <t>Implementors may choose to substitute alternative algorithms in
-        place of AES and SHA-256, but are discouraged from abandoning the
-        combination of CBC and HMAC. CBC has the desirable property that the
-        IV is random, is as wide as the cipher block, and that occasional
-        collisions are unlikely to be fatal to security. In contrast, most
-        IETF-standard AEAD schemes use a 96-bit nonce, and a single collision
-        can break the security of everything ever authenticated under that
-        key. AEAD nonces are generally expected only to be unique, not random,
-        and 96 bits is too small for randomly-generated nonces to necessarily
-        have a negligible risk of collision. However, use of sequential nonces
-        in this context is a threat to privacy: a passive adversary could then
-        count the responses emitted by the server and infer the nonces even
-        though they are encrypted, then use this information to identify the
-        client when it later returns the nonce in plaintext.</t>
-
-        <t>A possible alternative approach, which would enable use of AEAD
-        algorithms with short nonces without risk to security or privacy, is
-        to use sequential nonces but avoid directly including them in the
-        cookie; instead, protect them using a key-wrapping scheme such as
-        <xref target="RFC3394">RFC 3394</xref>. Another possibility is to use
-        a <xref target="FPE">format-preserving encryption</xref> scheme to
-        encrypt a counter, using its output as the nonce; to an adversary such
-        nonces will be indistinguishable from random, yet have no risk of
-        collision so long as the counter does not overflow.</t>
+          </list>
+        </t>
+        <t>
+          Servers should the generate a nonce `N` uniformly at random,
+          and form AEAD output `C` by encrypting `P` under key `K` with
+          nonce `N` and no associated data.
+        </t>
+        <t>
+          The cookie should consist of the tuple `(I,N,C)`.
+        </t>
+        <t>
+          [[TODO: explicitly specify how to verify and decrypt a cookie,
+          not just how to form one]]
+        </t>
       </section>
     </section>
-
+      
     <section title="Protocol Sequence for Time Synchronization Messages in Client-Server Mode">
       <section anchor="clientinunicast" title="The Client">
         <t>For a unicast run, the client performs the following steps: <list
