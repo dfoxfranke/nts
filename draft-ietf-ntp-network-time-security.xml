@@ -1,0 +1,2065 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="std" docName="draft-ietf-ntp-network-time-security-14"
+     ipr="trust200902" submissionType="IETF">
+  <front>
+    <title abbrev="NTS">Network Time Security</title>
+
+    <author fullname="Dieter Sibold" initials="D." surname="Sibold">
+      <organization abbrev="PTB">Physikalisch-Technische
+      Bundesanstalt</organization>
+
+      <address>
+        <postal>
+          <street>Bundesallee 100</street>
+
+          <city>Braunschweig</city>
+
+          <code>D-38116</code>
+
+          <region/>
+
+          <country>Germany</country>
+        </postal>
+
+        <phone>+49-(0)531-592-8420</phone>
+
+        <facsimile>+49-531-592-698420</facsimile>
+
+        <email>dieter.sibold@ptb.de</email>
+      </address>
+    </author>
+
+    <author fullname="Stephen R&ouml;ttger" initials="S."
+            surname="R&ouml;ttger">
+      <organization>Google Inc.</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country/>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>stephen.roettger@googlemail.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Kristof Teichel" initials="K." surname="Teichel">
+      <organization abbrev="PTB">Physikalisch-Technische
+      Bundesanstalt</organization>
+
+      <address>
+        <postal>
+          <street>Bundesallee 100</street>
+
+          <city>Braunschweig</city>
+
+          <region/>
+
+          <code>D-38116</code>
+
+          <country>Germany</country>
+        </postal>
+
+        <phone>+49-(0)531-592-8421</phone>
+
+        <facsimile/>
+
+        <email>kristof.teichel@ptb.de</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <date day="21" month="March" year="2016"/>
+
+    <area>Internet Area</area>
+
+    <workgroup>NTP Working Group</workgroup>
+
+    <keyword>Integrity</keyword>
+
+    <keyword>Authentication</keyword>
+
+    <keyword>NTP</keyword>
+
+    <keyword>PTP</keyword>
+
+    <keyword>Security</keyword>
+
+    <keyword>Time synchronization</keyword>
+
+    <abstract>
+      <t>This document describes Network Time Security (NTS), a collection of
+      measures that enable secure time synchronization with time servers using
+      protocols like the Network Time Protocol (NTP) or the Precision Time
+      Protocol (PTP). Its design considers the special requirements of precise
+      timekeeping which are described in Security Requirements of Time
+      Protocols in Packet Switched Networks <xref target="RFC7384"/>.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>Time synchronization protocols are increasingly utilized to
+      synchronize clocks in networked infrastructures. Successful attacks
+      against the time synchronization protocol can seriously degrade the
+      reliable performance of such infrastructures. Therefore, time
+      synchronization protocols have to be secured if they are applied in
+      environments that are prone to malicious attacks. This can be
+      accomplished either by utilization of external security protocols, like
+      IPsec or TLS, or by intrinsic security measures of the time
+      synchronization protocol.</t>
+
+      <t>The two most popular time synchronization protocols, the Network Time
+      Protocol (NTP) <xref target="RFC5905"/> and the Precision Time Protocol
+      (PTP) <xref target="IEEE1588"/>, currently do not provide adequate
+      intrinsic security precautions. This document specifies generic security
+      measures which enable these and possibly other protocols to verify the
+      authenticity of the time server/master and the integrity of the time
+      synchronization protocol packets. The utilization of these measures for
+      a given specific time synchronization protocol has to be described in a
+      separate document.</t>
+
+      <t><xref target="RFC7384"/> specifies that a security mechanism for
+      timekeeping must be designed in such a way that it does not degrade the
+      quality of the time transfer. This implies that for time keeping the
+      increase in bandwidth and message latency caused by the security
+      measures should be small. Also, NTP as well as PTP work via UDP and
+      connections are stateless on the server/master side. Therefore, all
+      security measures in this document are designed in such a way that they
+      add little demand for bandwidth, that the necessary calculations can be
+      executed in a fast manner, and that the measures do not require a
+      server/master to keep state of a connection.</t>
+    </section>
+
+    <section title="Terminology">
+      <section title="Terms and Abbreviations">
+        <t><list style="hanging">
+            <t hangText="MITM ">Man In The Middle</t>
+
+            <t hangText="NTS  ">Network Time Security</t>
+
+            <t hangText="TESLA">Timed Efficient Stream Loss-tolerant
+            Authentication</t>
+
+            <t hangText="MAC">Message Authentication Code</t>
+          </list></t>
+      </section>
+
+      <section title="Common Terminology for PTP and NTP">
+        <t>This document refers to different time synchronization protocols,
+        in particular to both the PTP and the NTP. Throughout the document the
+        term "server" applies to both a PTP master and an NTP server.
+        Accordingly, the term "client" applies to both a PTP slave and an NTP
+        client.</t>
+      </section>
+    </section>
+
+    <section title="Security Threats">
+      <t>The document "Security Requirements of Time Protocols in Packet
+      Switched Networks" <xref target="RFC7384"/> contains a profound analysis
+      of security threats and requirements for time synchronization
+      protocols.</t>
+    </section>
+
+    <section anchor="sec.objectives" title="Objectives">
+      <t>The objectives of the NTS specification are as follows:<list
+          style="symbols">
+          <t>Authenticity: NTS enables the client to authenticate its time
+          server(s).</t>
+
+          <t>Integrity: NTS protects the integrity of time synchronization
+          protocol packets via a message authentication code (MAC).</t>
+
+          <t>Confidentiality: NTS does not provide confidentiality protection
+          of the time synchronization packets.<?xxe-remark teiche04
+2016-09-08T12:27:55Z
+Possibly confusing interaction with the non-traceability goal.
+Needs language to clear this out, or deletion.?></t>
+
+          <t>Authorization: NTS enables the client to verify its time server's
+          authorization. NTS optionally enables the server to verify the
+          client's authorization as well.</t>
+
+          <t>Request-Response-Consistency: NTS enables a client to match an
+          incoming response to a request it has sent. NTS also enables the
+          client to deduce from the response whether its request to the server
+          has arrived without alteration.</t>
+
+          <t>Client-Side Non-traceability: NTS prevents an attacker from
+          tracing a client device over changes in routing data via any data
+          sent in the course of NTS' own security measures.<list
+              style="hanging">
+              <t hangText="Note:">This objective is still under discussion.
+              The main issue is whether this from of the objective is worth
+              the effort or if it needs to have the appendix "or using data
+              sent by the time synchronization protocol that NTS is applied
+              to".</t>
+            </list></t>
+
+          <t>Applicability to Protocols: NTS can be used to secure different
+          time synchronization protocols, specifically at least NTP and
+          PTP.</t>
+
+          <t>Integration with Protocols: A client or server running an
+          NTS-secured version of a time protocol does not negatively affect
+          other participants who are running unsecured versions of that
+          protocol.</t>
+
+          <t>Server-Side Statelessness: All security measures of NTS work
+          without creating the necessity for a server to keep any long-term
+          state of a connection.</t>
+
+          <t>Prevention of Amplification Attacks: All communication introduced
+          by NTS offers protection against abuse for amplification
+          denial-of-service attacks.</t>
+        </list></t>
+    </section>
+
+    <section anchor="overview" title="NTS Overview">
+      <t>NTS initially verifies the authenticity of the time server and
+      exchanges a symmetric key, the so-called cookie, as well as a key input
+      value (KIV). The KIV can be opaque for the client. After the cookie and
+      the KIV are exchanged, the client then uses them to protect the
+      authenticity and the integrity of subsequent unicast-type time
+      synchronization packets. In order to do this, a Message Authentication
+      Code (MAC) is attached to each time synchronization packet. The
+      calculation of the MAC includes the whole time synchronization packet
+      and the cookie which is shared between client and server.</t>
+
+      <t>The cookie deterministically depends on KIV as long as the server
+      seed stays the same. <?xxe-remark teiche04
+2016-09-08T12:29:09Z
+Is server seed freshness still an objective that should be mentioned here??>The
+      server seed has to be refreshed periodically in order to provide key
+      freshness as required in <xref target="RFC7384"/>. See <xref
+      target="serverseedconsiderations"/> for details on seed refreshing.</t>
+
+      <t>Since the server does not keep a state of the client, it has to
+      recalculate the cookie each time it receives a unicast time
+      synchronization request from the client. To this end, the client has to
+      attach its KIV to each request (see <xref target="timerequest"/>).<list
+          style="hanging">
+          <t hangText="Note:">The communication of the KIV and the cookie can
+          be performed between client and server directly, or via a third
+          party key distribution entity.</t>
+        </list></t>
+
+      <t>For broadcast-type messages, authenticity and integrity of the time
+      synchronization packets are also ensured by a MAC, which is attached to
+      the time synchronization packet by the sender. Verification of the
+      broadcast-type packets' authenticity is based on the TESLA protocol, in
+      particular on its "not re-using keys" scheme, see Section 3.7.2 of <xref
+      target="RFC4082"/>. TESLA uses a one-way chain of keys, where each key
+      is the output of a one-way function applied to the previous key in the
+      chain. The server securely shares the last element of the chain with all
+      clients. The server splits time into intervals of uniform duration and
+      assigns each key to an interval in reverse order. At each time interval,
+      the server sends a broadcast packet appended by a MAC, calculated using
+      the corresponding key, and the key of the previous disclosure interval.
+      The client verifies the MAC by buffering the packet until disclosure of
+      the key in its associated disclosure interval occurs. In order to be
+      able to verify the timeliness of the packets, the client has to be
+      loosely time synchronized with the server. This has to be accomplished
+      before broadcast associations can be used. For checking timeliness of
+      packets, NTS uses another, more rigorous check in addition to just the
+      clock lookup used in the TESLA protocol. For a more detailed description
+      of how NTS employs and customizes TESLA, see <xref
+      target="appBroadcast"/>.</t>
+    </section>
+
+    <section anchor="protsec" title="Protocol Messages">
+      <t>This section describes the types of messages needed for secure time
+      synchronization with NTS.</t>
+
+      <t>For some guidance on how these message types can be realized in
+      practice, and integrated into the communication flow of existing time
+      synchronization protocols, see <xref
+      target="I-D.ietf-ntp-cms-for-nts-message"/>, a companion document for
+      NTS. Said document describes ASN.1 encodings for those message parts
+      that have to be added to a time synchronization protocol for security
+      reasons.</t>
+
+      <section anchor="timerequest"
+               title="Unicast Time Synchronisation Messages">
+        <t>In this message exchange, the usual time synchronization process is
+        executed, with the addition of integrity protection for all messages
+        that the server sends. This message exchange can be repeatedly
+        performed as often as the client desires and as long as the integrity
+        of the server's time responses is verified successfully.</t>
+
+        <section anchor="sssec.preconditions.unicast"
+                 title="Preconditions for the Unicast Time Synchronization Exchange">
+          <t>Before this message exchange is available, there are some
+          requirements that the client and server need to meet:<list
+              style="symbols">
+              <t>They MUST negotiate the algorithm for the MAC used in the
+              time synchronization messages. Authenticity and integrity of the
+              communication MUST be ensured.</t>
+
+              <t>The client MUST know a key input value KIV. Authenticity and
+              integrity of the communication MUST be ensured.</t>
+
+              <t>Client and server MUST exchange the cookie (which depends on
+              the KIV as described in section <xref target="overview"/>).
+              Authenticity, confidentiality and integrity of the communication
+              MUST be ensured.</t>
+            </list></t>
+
+          <t>One way of realizing these requirements is to use the Association
+          and Cookie Message Exchanges described in <xref
+          target="Appendix_Bootstrapping"/>.</t>
+        </section>
+
+        <section title="Goals of the Unicast Time Synchronization Exchange">
+          <t>The unicast time synchronization exchange:<list style="symbols">
+              <t>exchanges time synchronization data as specified by the
+              appropriate time synchronization protocol,</t>
+
+              <t>guarantees authenticity and integrity of the request to the
+              server,</t>
+
+              <t>guarantees authenticity and integrity of the response to the
+              client,</t>
+
+              <t>guarantees request-response-consistency to the client.</t>
+            </list></t>
+        </section>
+
+        <section anchor="time_request"
+                 title="Message Type: &quot;time_request&quot;">
+          <t>This message is sent by the client when it requests a time
+          exchange. It contains<list style="symbols">
+              <t>the NTS message ID "time_request",</t>
+
+              <t>the negotiated version number,</t>
+
+              <t>a nonce,</t>
+
+              <t>the negotiated MAC algorithm,</t>
+
+              <t>the client's key input value (for which the client knows the
+              associated cookie),</t>
+
+              <t>optional: a MAC (generated with the cookie as key) for
+              verification of all of the above data.</t>
+            </list></t>
+        </section>
+
+        <section anchor="time_response"
+                 title="Message Type: &quot;time_response&quot;">
+          <t>This message is sent by the server after it has received a
+          time_request message. Prior to this the server MUST recalculate the
+          client's cookie by using the received key input value and the
+          transmitted MAC algorithm. The message contains<list style="symbols">
+              <t>the NTS message ID "time_response",</t>
+
+              <t>the version number as transmitted in time_request,</t>
+
+              <t>the server's time synchronization response data,</t>
+
+              <t>the nonce transmitted in time_request,</t>
+
+              <t>a MAC (generated with the cookie as key) for verification of
+              all of the above data.</t>
+            </list></t>
+        </section>
+
+        <section title="Procedure Overview of the Unicast Time Synchronization Exchange">
+          <t>For a unicast time synchronization exchange, the following steps
+          are performed:<list style="numbers">
+              <t>The client sends a time_request message to the server. The
+              client MUST save the included nonce and the transmit_timestamp
+              (from the time synchronization data) as a correlated pair for
+              later verification steps. Optionally, the client protects the
+              request message with an appended MAC.</t>
+
+              <t>Upon receipt of a time_request message, the server performs
+              the following steps:<list style="symbols">
+                  <t>It re-calculates the cookie.</t>
+
+                  <t>If the request message contains a MAC the server
+                  re-calculates the MAC and compares this value with the MAC
+                  in the received data.<list style="symbols">
+                      <t>If the re-calculated MAC does not match the MAC in
+                      the received data the server MUST stop the processing of
+                      the request.</t>
+
+                      <t>If the re-calculated MAC matches the MAC in the
+                      received data the server continues to process the
+                      request.</t>
+                    </list></t>
+
+                  <t>The server computes the necessary time synchronization
+                  data and constructs a time_response message as given in
+                  <xref target="time_response"/>.</t>
+                </list></t>
+
+              <t>The client awaits a reply in the form of a time_response
+              message. Upon receipt, it checks: <list style="symbols">
+                  <t>that the transmitted version number matches the one
+                  negotiated previously,</t>
+
+                  <t>that the transmitted nonce belongs to a previous
+                  time_request message,</t>
+
+                  <t>that the transmit_timestamp in that time_request message
+                  matches the corresponding time stamp from the
+                  synchronization data received in the time_response, and</t>
+
+                  <t>that the appended MAC verifies the received
+                  synchronization data, version number and nonce.</t>
+                </list>If at least one of the first three checks fails (i.e.
+              if the version number does not match, if the client has never
+              used the nonce transmitted in the time_response message, or if
+              it has used the nonce with initial time synchronization data
+              different from that in the response), then the client MUST
+              ignore this time_response message. If the MAC is invalid, the
+              client MUST do one of the following: abort the run or send
+              another cookie request (because the cookie might have changed
+              due to a server seed refresh). If both checks are successful,
+              the client SHOULD continue time synchronization.</t>
+            </list></t>
+
+          <figure>
+            <artwork><![CDATA[         +-----------------------+
+         | o Re-generate cookie  |
+         | o Assemble response   |
+         | o Generate MAC        |
+         +-----------+-----------+
+                     |
+                   <-+->
+
+ Server ----------------------------------------------->
+                 /|     \                
+        time_    /       \  time_   
+        request /         \ response
+               /          \|            
+ Client ----------------------------------------------->
+
+        <------ Unicast time ------>  <- Client-side ->
+               synchronization            validity 
+                  exchange                checks
+]]></artwork>
+
+            <postamble>Procedure for unicast time synchronization
+            exchange.</postamble>
+          </figure>
+        </section>
+      </section>
+
+      <section anchor="broadmessage"
+               title="Broadcast Time Synchronization Exchange">
+        <section anchor="sssec.preconditions.broadcasttimesync"
+                 title="Preconditions for the Broadcast Time Synchronization Exchange">
+          <t>Before this message exchange is available, there are some
+          requirements that the client and server need to meet:<list
+              style="symbols">
+              <t>The client MUST receive all the information necessary to
+              process broadcast time synchronization messages from the server.
+              This includes<list style="symbols">
+                  <t>the one-way functions used for building the key
+                  chain,</t>
+
+                  <t>the last key of the key chain,</t>
+
+                  <t>time interval duration,</t>
+
+                  <t>the disclosure delay (number of intervals between use and
+                  disclosure of a key),</t>
+
+                  <t>the time at which the next time interval will start,
+                  and</t>
+
+                  <t>the next interval's associated index.</t>
+                </list></t>
+
+              <t>The communication of the data listed above MUST guarantee
+              authenticity of the server, as well as integrity and freshness
+              of the broadcast parameters to the client.</t>
+            </list></t>
+        </section>
+
+        <section title="Goals of the Broadcast Time Synchronization Exchange">
+          <t>The broadcast time synchronization exchange:<list style="symbols">
+              <t>transmits (broadcast) time synchronization data from the
+              server to the client as specified by the appropriate time
+              synchronization protocol,</t>
+
+              <t>guarantees to the client that the received synchronization
+              data has arrived in a timely manner as required by the TESLA
+              protocol and is trustworthy enough to be stored for later
+              checks,</t>
+
+              <t>additionally guarantees authenticity of a certain broadcast
+              synchronization message in the client's storage.</t>
+            </list></t>
+        </section>
+
+        <section anchor="server_broad"
+                 title="Message Type: &quot;server_broad&quot;">
+          <t>This message is sent by the server over the course of its
+          broadcast schedule. It is part of any broadcast association. It
+          contains<list style="symbols">
+              <t>the NTS message ID "server_broad",</t>
+
+              <t>the version number that the server is working under,</t>
+
+              <t>time broadcast data,</t>
+
+              <t>the index that belongs to the current interval (and therefore
+              identifies the current, yet undisclosed, key),</t>
+
+              <t>the disclosed key of the previous disclosure interval
+              (current time interval minus disclosure delay),</t>
+
+              <t>a MAC, calculated with the key for the current time interval,
+              verifying <list style="symbols">
+                  <t>the message ID,</t>
+
+                  <t>the version number, and</t>
+
+                  <t>the time data.</t>
+                </list></t>
+            </list></t>
+        </section>
+
+        <section title="Procedure Overview of Broadcast Time Synchronization Exchange">
+          <t>A broadcast time synchronization message exchange consists of the
+          following steps:<list style="numbers">
+              <t>The server follows the TESLA protocol by regularly sending
+              server_broad messages as described in <xref
+              target="server_broad"/>, adhering to its own disclosure
+              schedule.</t>
+
+              <t>The client awaits time synchronization data in the form of a
+              server_broadcast message. Upon receipt, it performs the
+              following checks: <list style="symbols">
+                  <t>Proof that the MAC is based on a key that is not yet
+                  disclosed (packet timeliness). This is achieved via a
+                  combination of checks. First, the disclosure schedule is
+                  used, which requires loose time synchronization. If this is
+                  successful, the client obtains a stronger guarantee via a
+                  key check exchange (see below). If its timeliness is
+                  verified, the packet will be buffered for later
+                  authentication. Otherwise, the client MUST discard it. Note
+                  that the time information included in the packet will not be
+                  used for synchronization until its authenticity could also
+                  be verified.</t>
+
+                  <t>The client checks that it does not already know the
+                  disclosed key. Otherwise, the client SHOULD discard the
+                  packet to avoid a buffer overrun. If this check is
+                  successful, the client ensures that the disclosed key
+                  belongs to the one-way key chain by applying the one-way
+                  function until equality with a previous disclosed key is
+                  shown. If it is falsified, the client MUST discard the
+                  packet.</t>
+
+                  <t>If the disclosed key is legitimate, then the client
+                  verifies the authenticity of any packet that it has received
+                  during the corresponding time interval. If authenticity of a
+                  packet is verified, then it is released from the buffer and
+                  its time information can be utilized. If the verification
+                  fails, then authenticity is not given. In this case, the
+                  client MUST request authentic time from the server by means
+                  other than broadcast messages. Also, the client MUST
+                  re-initialize the broadcast sequence with a "client_bpar"
+                  message if the one-way key chain expires, which it can check
+                  via the disclosure schedule.</t>
+                </list>See RFC 4082<xref target="RFC4082"/> for a detailed
+              description of the packet verification process.</t>
+            </list></t>
+
+          <figure>
+            <artwork><![CDATA[ Server ---------------------------------->
+         \                 
+          \  server_    
+           \ broad       
+           \|                
+ Client ---------------------------------->
+
+         < Broadcast >  <- Client-side  ->
+           time sync.      validity and
+            exchange        timeliness
+                              checks
+]]></artwork>
+
+            <postamble>Procedure for broadcast time synchronization
+            exchange.</postamble>
+          </figure>
+        </section>
+      </section>
+
+      <section title="Broadcast Keycheck">
+        <t>This message exchange is performed for an additional check of
+        packet timeliness in the course of the TESLA scheme, see <xref
+        target="appBroadcast"/>.</t>
+
+        <section anchor="sssec.preconditions.broadcastkeycheck"
+                 title="Preconditions for the Broadcast Keycheck Exchange">
+          <t>Before this message exchange is available, there are some
+          requirements that the client and server need to meet:<list
+              style="symbols">
+              <t>They MUST negotiate the algorithm for the MAC used in the
+              time synchronization messages. Authenticity and integrity of the
+              communication MUST be ensured.</t>
+
+              <t>The client MUST know a key input value KIV. Authenticity and
+              integrity of the communication MUST be ensured.</t>
+
+              <t>Client and server MUST exchange the cookie (which depends on
+              the KIV as described in section <xref target="overview"/>).
+              Authenticity, confidentiality and integrity of the communication
+              MUST be ensured.</t>
+            </list></t>
+
+          <t>These requirements conform to those for the unicast time
+          synchronization exchange. Accordingly, they too can be realized via
+          the Association and Cookie Message Exchanges described in <xref
+          target="Appendix_Bootstrapping">Appendix B</xref>.</t>
+        </section>
+
+        <section title="Goals of the Broadcast Keycheck Exchange">
+          <t>The keycheck exchange:<list style="symbols">
+              <t>guarantees to the client that the key belonging to the
+              respective TESLA interval communicated in the exchange had not
+              been disclosed before the client_keycheck message was sent.</t>
+
+              <t>guarantees to the client the timeliness of any broadcast
+              packet secured with this key if it arrived before
+              client_keycheck was sent.</t>
+            </list></t>
+        </section>
+
+        <section title="Message Type: &quot;client_keycheck&quot;">
+          <t>A message of this type is sent by the client in order to initiate
+          an additional check of packet timeliness for the TESLA scheme. It
+          contains<list style="symbols">
+              <t>the NTS message ID "client_keycheck",</t>
+
+              <t>the NTS version number negotiated during association,</t>
+
+              <t>a nonce,</t>
+
+              <t>an interval number from the TESLA disclosure schedule,</t>
+
+              <t>the MAC algorithm negotiated during association,</t>
+
+              <t>the client's key input value KIV, and</t>
+
+              <t>optional: a MAC (generated with the cookie as key) for
+              verification of all of the above data.</t>
+            </list></t>
+        </section>
+
+        <section anchor="server_keycheck"
+                 title="Message Type: &quot;server_keycheck&quot;">
+          <t>A message of this type is sent by the server upon receipt of a
+          client_keycheck message during the broadcast loop of the server.
+          Prior to this, the server MUST recalculate the client's cookie by
+          using the received key input value and the transmitted MAC
+          algorithm. It contains<list style="symbols">
+              <t>the NTS message ID "server_keycheck"</t>
+
+              <t>the version number as transmitted in "client_keycheck,</t>
+
+              <t>the nonce transmitted in the client_keycheck message,</t>
+
+              <t>the interval number transmitted in the client_keycheck
+              message, and</t>
+
+              <t>a MAC (generated with the cookie as key) for verification of
+              all of the above data.</t>
+            </list></t>
+        </section>
+
+        <section title="Procedure Overview of the Broadcast Keycheck Exchange">
+          <t>A broadcast keycheck message exchange consists of the following
+          steps: <list style="numbers">
+              <t>The client sends a client_keycheck message. It MUST memorize
+              the nonce and the time interval number that it sends as a
+              correlated pair.</t>
+
+              <t>Upon receipt of a client_keycheck message the server performs
+              as follows: If the client_keycheck message contains a MAC the
+              server re-calculates the MAC and compares this value with the
+              MAC in the received data.<list style="symbols">
+                  <t>If the re-calculated MAC does not match the MAC in the
+                  received data the server MUST stop the processing of the
+                  request.</t>
+
+                  <t>If the re-calculated MAC matches the MAC in the received
+                  data the server continues to process the request: It looks
+                  up whether it has already disclosed the key associated with
+                  the interval number transmitted in that message. If it has
+                  not disclosed it, it constructs and sends the appropriate
+                  server_keycheck message as described in <xref
+                  target="server_keycheck"/>. For more details, see also <xref
+                  target="appBroadcast"/>.</t>
+                </list></t>
+
+              <t>The client awaits a reply in the form of a server_keycheck
+              message. On receipt, it performs the following checks:<list
+                  style="symbols">
+                  <t>that the transmitted version number matches the one
+                  negotiated previously,</t>
+
+                  <t>that the transmitted nonce belongs to a previous
+                  client_keycheck message,</t>
+
+                  <t>that the TESLA interval number in that client_keycheck
+                  message matches the corresponding interval number from the
+                  server_keycheck, and</t>
+
+                  <t>that the appended MAC verifies the received data.</t>
+                </list></t>
+            </list></t>
+
+          <figure>
+            <artwork><![CDATA[                          +----------------------+
+                          | o Assemble response  |                      
+                          | o Re-generate cookie |      
+                          | o Generate MAC       |
+                          +-----------+----------+
+                                      |
+                                    <-+->
+ Server --------------------------------------------->
+         \                        /|     \
+          \  server_    client_   /       \  server_
+           \ broad      keycheck /         \ keycheck
+           \|                   /          \|
+ Client --------------------------------------------->
+          <-------- Extended broadcast time  ------->
+                   synchronization exchange 
+               
+                         <---- Keycheck exchange ---> 
+]]></artwork>
+
+            <postamble>Procedure for extended broadcast time synchronization
+            exchange.</postamble>
+          </figure>
+        </section>
+      </section>
+    </section>
+
+    <section anchor="serverseedconsiderations"
+             title="Server Seed, MAC Algorithms and Generating MACs">
+      <section title="Server Seed">
+        <t>The server has to calculate a random seed which has to be kept
+        secret. The server MUST generate a seed for each supported MAC
+        algorithm, see <xref target="hash"/>.</t>
+
+        <t>According to the requirements in <xref target="RFC7384"/>, the
+        server MUST refresh each server seed periodically. Consequently, the
+        cookie memorized by the client becomes obsolete. In this case, the
+        client cannot verify the MAC attached to subsequent time response
+        messages and has to respond accordingly by re-initiating the protocol
+        with a cookie request (<xref target="cookiemessage"/>).</t>
+      </section>
+
+      <section anchor="hash" title="MAC Algorithms">
+        <t>MAC algorithms are used for calculation of the cookie and the
+        actual MAC. The client and the server negotiate a MAC algorithm during
+        the association phase at the beginning. The selected algorithm MUST be
+        used for all cookie and MAC creation processes in that run.</t>
+
+        <t><list style="hanging">
+            <t hangText="Note:">Any MAC algorithm is prone to be compromised
+            in the future. A successful attack on a MAC algorithm would enable
+            any NTS client to derive the server seed from its own cookie.
+            Therefore, the server MUST have separate seed values for its
+            different supported MAC algorithms. This way, knowledge gained
+            from an attack on a MAC algorithm can at least only be used to
+            compromise such clients who use this algorithm as well.</t>
+          </list></t>
+      </section>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>As mentioned, this document generically specifies security measures
+      whose utilization for any given specific time synchronization protocol
+      requires a separate document. Consequently, this document itself does
+      not have any IANA actions (TO BE REVIEWED).</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Aspects of security for time synchronization protocols are treated
+      throughout this document. For a comprehensive discussion of security
+      requirements in time synchronization contexts, refer to <xref
+      target="RFC7384"/>. See <xref target="appSecurityRequirements"/> for a
+      tabular overview of how NTS deals with those requirements.</t>
+
+      <t>Additional NTS specific discussion of security issues can be found in
+      the following subsections. <list style="hanging">
+          <t hangText="Note:">Any separate document describing the utilization
+          of NTS to a specific time synchronization protocol may additionally
+          introduce discussion of its own specific security
+          considerations.</t>
+        </list></t>
+
+      <section title="Privacy">
+        <t>The payload of time synchronization protocol packets of two-way
+        time transfer approaches like NTP and PTP consists basically of time
+        stamps, which are not considered secret <xref target="RFC7384"/>.
+        Therefore, encryption of the time synchronization protocol packet's
+        payload is not considered in this document. However, an attacker can
+        exploit the exchange of time synchronization protocol packets for
+        topology detection and inference attacks as described in <xref
+        target="RFC7624"/>. To make such attacks more difficult, that draft
+        recommends the encryption of the packet payload. Yet, in the case of
+        time synchronization protocols the confidentiality protection of time
+        synchronization packet's payload is of secondary importance since the
+        packet's meta data (IP addresses, port numbers, possibly packet size
+        and regular sending intervals) carry more information than the
+        payload. To enhance the privacy of the time synchronization partners,
+        the usage of tunnel protocols such as IPsec and MACsec, where
+        applicable, is therefore more suited than confidentiality protection
+        of the payload.</t>
+      </section>
+
+      <section title="Initial Verification of the Server Certificates">
+        <t>The client may wish to verify the validity of certificates during
+        the initial association phase. Since it generally has no reliable time
+        during this initial communication phase, it is impossible to verify
+        the period of validity of the certificates. To solve this
+        chicken-and-egg problem, the client has to rely on external means.</t>
+      </section>
+
+      <section title="Revocation of Server Certificates">
+        <t>According to <xref target="serverseedconsiderations"/>, it is the
+        client's responsibility to initiate a new association with the server
+        after the server's certificate expires. To this end, the client reads
+        the expiration date of the certificate during the certificate message
+        exchange (<xref target="server_assoc"/>). Furthermore, certificates
+        may also be revoked prior to the normal expiration date. To increase
+        security the client MAY periodically verify the state of the server's
+        certificate via Online Certificate Status Protocol (OCSP) <xref
+        target="RFC6960">Online Certificate Status Protocol (OCSP)</xref>.</t>
+      </section>
+
+      <section anchor="secBroadcast"
+               title="Mitigating Denial-of-Service for broadcast packets">
+        <t>TESLA authentication buffers packets for delayed authentication.
+        This makes the protocol vulnerable to flooding attacks, causing the
+        client to buffer excessive numbers of packets. To add stronger DoS
+        protection to the protocol, the client and the server use the "not
+        re-using keys" scheme of TESLA as pointed out in Section 3.7.2 of
+        <xref target="RFC4082">RFC 4082</xref>. In this scheme the server
+        never uses a key for the MAC generation more than once. Therefore, the
+        client can discard any packet that contains a disclosed key it already
+        knows, thus preventing memory flooding attacks.</t>
+
+        <t><list style="hanging">
+            <t hangText="Discussion:">Note that an alternative approach to
+            enhance TESLA's resistance against DoS attacks involves the
+            addition of a group MAC to each packet. This requires the exchange
+            of an additional shared key common to the whole group. This adds
+            additional complexity to the protocol and hence is currently not
+            considered in this document.</t>
+          </list></t>
+      </section>
+
+      <section anchor="DelayAttack" title="Delay Attack">
+        <t>In a packet delay attack, an adversary with the ability to act as a
+        MITM delays time synchronization packets between client and server
+        asymmetrically <xref target="RFC7384"/>. This prevents the client from
+        accurately measuring the network delay, and hence its time offset to
+        the server <xref target="Mizrahi"/>. The delay attack does not modify
+        the content of the exchanged synchronization packets. Therefore,
+        cryptographic means do not provide a feasible way to mitigate this
+        attack. However, several non-cryptographic precautions can be taken in
+        order to detect this attack.</t>
+
+        <t><list style="numbers">
+            <t>Usage of multiple time servers: this enables the client to
+            detect the attack, provided that the adversary is unable to delay
+            the synchronization packets between the majority of servers. This
+            approach is commonly used in NTP to exclude incorrect time servers
+            <xref target="RFC5905"/>.</t>
+
+            <t>Multiple communication paths: The client and server utilize
+            different paths for packet exchange as described in the I-D <xref
+            target="I-D.ietf-tictoc-multi-path-synchronization"/>. The client
+            can detect the attack, provided that the adversary is unable to
+            manipulate the majority of the available paths <xref
+            target="Shpiner"/>. Note that this approach is not yet available,
+            neither for NTP nor for PTP.</t>
+
+            <t>Usage of an encrypted connection: the client exchanges all
+            packets with the time server over an encrypted connection (e.g.
+            IPsec). This measure does not mitigate the delay attack, but it
+            makes it more difficult for the adversary to identify the time
+            synchronization packets.</t>
+
+            <t>For unicast-type messages: Introduction of a threshold value
+            for the delay time of the synchronization packets. The client can
+            discard a time server if the packet delay time of this time server
+            is larger than the threshold value.</t>
+          </list></t>
+
+        <t>Additional provision against delay attacks has to be taken for
+        broadcast-type messages. This mode relies on the TESLA scheme which is
+        based on the requirement that a client and the broadcast server are
+        loosely time synchronized. Therefore, a broadcast client has to
+        establish time synchronization with its broadcast server before it
+        starts utilizing broadcast messages for time synchronization.</t>
+
+        <t>One possible way to achieve this initial synchronization is to
+        establish a unicast association with its broadcast server until time
+        synchronization and calibration of the packet delay time is achieved.
+        After that, the client can establish a broadcast association with the
+        broadcast server and utilizes TESLA to verify integrity and
+        authenticity of any received broadcast packets.</t>
+
+        <t>An adversary who is able to delay broadcast packets can cause a
+        time adjustment at the receiving broadcast clients. If the adversary
+        delays broadcast packets continuously, then the time adjustment will
+        accumulate until the loose time synchronization requirement is
+        violated, which breaks the TESLA scheme. To mitigate this
+        vulnerability the security condition in TESLA has to be supplemented
+        by an additional check in which the client, upon receipt of a
+        broadcast message, verifies the status of the corresponding key via a
+        unicast message exchange with the broadcast server (see <xref
+        target="authenticateRxPackets"/> for a detailed description of this
+        check). Note that a broadcast client should also apply the
+        above-mentioned precautions as far as possible.</t>
+      </section>
+
+      <section title="Random Number Generation">
+        <t>At various points of the protocol, the generation of random numbers
+        is required. The employed methods of generation need to be
+        cryptographically secure. See <xref target="RFC4086"/> for guidelines
+        concerning this topic.</t>
+      </section>
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>The authors would like to thank Tal Mizrahi, Russ Housley, Steven
+      Bellovin, David Mills, Kurt Roeckx, Rainer Bermbach, Martin Langer and
+      Florian Weimer for discussions and comments on the design of NTS. Also,
+      thanks go to Harlan Stenn and Richard Welty for their technical review
+      and specific text contributions to this document.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="reference.RFC.2119"?>
+
+      <?rfc include='reference.RFC.4082'?>
+
+      <?rfc include='reference.RFC.2104'?>
+
+      <?rfc include='reference.RFC.7384'?>
+    </references>
+
+    <references title="Informative References">
+      <reference anchor="Mizrahi" target="">
+        <front>
+          <title>A game theoretic analysis of delay attacks against time
+          synchronization protocols</title>
+
+          <author fullname="Tal Mizrahi" initials="T" surname="Mizrahi">
+            <organization abbrev=""/>
+          </author>
+
+          <date day="" month="September" year="2012"/>
+        </front>
+
+        <seriesInfo name="in Proceedings of"
+                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6"/>
+      </reference>
+
+      <reference anchor="Shpiner">
+        <front>
+          <title>Multi-path Time Protocols</title>
+
+          <author fullname="Alexander Shpiner" initials="A" surname="Shpiner">
+            <organization/>
+          </author>
+
+          <author fullname="Yoram Revah" initials="Y" surname="Revah">
+            <organization/>
+
+            <address>
+              <postal>
+                <street/>
+
+                <city/>
+
+                <region/>
+
+                <code/>
+
+                <country/>
+              </postal>
+
+              <phone/>
+
+              <facsimile/>
+
+              <email/>
+
+              <uri/>
+            </address>
+          </author>
+
+          <author fullname="Tal Mizrahi" initials="T" surname="Mizrahi">
+            <organization/>
+
+            <address>
+              <postal>
+                <street/>
+
+                <city/>
+
+                <region/>
+
+                <code/>
+
+                <country/>
+              </postal>
+
+              <phone/>
+
+              <facsimile/>
+
+              <email/>
+
+              <uri/>
+            </address>
+          </author>
+
+          <date month="September" year="2013"/>
+        </front>
+
+        <seriesInfo name="in Proceedings of"
+                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2013, pp. 1-6"/>
+      </reference>
+
+      <reference anchor="IEEE1588">
+        <front>
+          <title>IEEE standard for a precision clock synchronization protocol
+          for networked measurement and control systems</title>
+
+          <author fullname="IEEE Instrumentation and Measurement Society TC-9 Sensor Technology">
+            <organization>IEEE Instrumentation and Measurement Society. TC-9
+            Sensor Technology</organization>
+          </author>
+
+          <date year="2008"/>
+        </front>
+      </reference>
+
+      <?rfc include='reference.RFC.4086'?>
+
+      <?rfc include='reference.RFC.5905'?>
+
+      <?rfc include='reference.RFC.6960'?>
+
+      <?rfc include='reference.RFC.7624'?>
+
+      <?rfc include='reference.I-D.draft-ietf-tictoc-multi-path-synchronization-02'?>
+
+      <?rfc include='reference.I-D.draft-ietf-ntp-cms-for-nts-message-04'?>
+    </references>
+
+    <section anchor="appSecurityRequirements"
+             title="(informative) TICTOC Security Requirements">
+      <t>The following table compares the NTS specifications against the
+      TICTOC security requirements <xref target="RFC7384"/>.</t>
+
+      <texttable align="left" style="all" suppress-title="false"
+                 title="Comparison of NTS specification against Security Requirements of Time Protocols in Packet Switched Networks (RFC 7384)">
+        <ttcol align="left">Section</ttcol>
+
+        <ttcol>Requirement from RFC 7384</ttcol>
+
+        <ttcol>Requirement level</ttcol>
+
+        <ttcol width="">NTS</ttcol>
+
+        <c>5.1.1</c>
+
+        <c>Authentication of Servers</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c>5.1.1</c>
+
+        <c>Authorization of Servers</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c>5.1.2</c>
+
+        <c>Recursive Authentication of Servers (Stratum 1)</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c>5.1.2</c>
+
+        <c>Recursive Authorization of Servers (Stratum 1)</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c>5.1.3</c>
+
+        <c>Authentication and Authorization of Clients</c>
+
+        <c>MAY</c>
+
+        <c>Optional, Limited</c>
+
+        <c>5.2</c>
+
+        <c>Integrity protection</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c>5.3</c>
+
+        <c>Spoofing Prevention</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c>5.4</c>
+
+        <c>Protection from DoS attacks against the time protocol</c>
+
+        <c>SHOULD</c>
+
+        <c>OK</c>
+
+        <c>5.5</c>
+
+        <c>Replay protection</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c>5.6</c>
+
+        <c>Key freshness</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c/>
+
+        <c>Security association</c>
+
+        <c>SHOULD</c>
+
+        <c>OK</c>
+
+        <c/>
+
+        <c>Unicast and multicast associations</c>
+
+        <c>SHOULD</c>
+
+        <c>OK</c>
+
+        <c>5.7</c>
+
+        <c>Performance: no degradation in quality of time transfer</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c/>
+
+        <c>Performance: lightweight computation</c>
+
+        <c>SHOULD</c>
+
+        <c>OK</c>
+
+        <c/>
+
+        <c>Performance: storage</c>
+
+        <c>SHOULD</c>
+
+        <c>OK</c>
+
+        <c/>
+
+        <c>Performance: bandwidth</c>
+
+        <c>SHOULD</c>
+
+        <c>OK</c>
+
+        <c>5.8</c>
+
+        <c>Confidentiality protection</c>
+
+        <c>MAY</c>
+
+        <c>NO</c>
+
+        <c>5.9</c>
+
+        <c>Protection against Packet Delay and Interception Attacks</c>
+
+        <c>MUST</c>
+
+        <c>Limited*)</c>
+
+        <c>5.10</c>
+
+        <c>Secure mode</c>
+
+        <c>MUST</c>
+
+        <c>OK</c>
+
+        <c/>
+
+        <c>Hybrid mode</c>
+
+        <c>SHOULD</c>
+
+        <c>-</c>
+
+        <postamble>*) See discussion in <xref
+        target="DelayAttack"/>.</postamble>
+      </texttable>
+    </section>
+
+    <section anchor="Appendix_Bootstrapping"
+             title="(normative) Inherent Association Protocol Messages">
+      <t>This appendix presents a procedure that performs the association, the
+      cookie, and also the broadcast parameter message exchanges between a
+      client and a server. This procedure is one possible way to achieve the
+      preconditions listed in Sections <xref
+      target="sssec.preconditions.unicast"/>, <xref
+      target="sssec.preconditions.broadcasttimesync"/>, and <xref
+      target="sssec.preconditions.broadcastkeycheck"/> while taking into
+      account the objectives given in Section <xref
+      target="sec.objectives"/>.</t>
+
+      <section title="Overview of NTS with Inherent Association Protocol">
+        <t>This inherent association protocol applies X.509 certificates to
+        verify the authenticity of the time server and to exchange the cookie.
+        This is done in two separate message exchanges, described below. An
+        additional required exchange in advance serves to limit the
+        amplification potential of the association message exchange.</t>
+
+        <t>A client needs a public/private key pair for encryption, with the
+        public key enclosed in a certificate. A server needs a public/private
+        key pair for signing, with the public key enclosed in a certificate.
+        If a participant intends to act as both a client and a server, it MUST
+        have two different key pairs for these purposes.</t>
+
+        <t>If this protocol is employed, the hash value of the client's
+        certificate is used as the client's key input value, i.e. the cookie
+        is calculated according to:<list style="hanging">
+            <t>cookie = MSB_&lt;b&gt; (MAC(server seed, H(certificate of
+            client))),</t>
+          </list>Where the hash function H is the one used in the MAC
+        algorithm. The client's certificate contains the client's public key
+        and enables the server to identify the client, if client authorization
+        is desired.</t>
+      </section>
+
+      <section title="Access Message Exchange">
+        <t>This message exchange serves only to prevent the next (association)
+        exchange from being abusable for amplification denial-of-service
+        attacks.</t>
+
+        <section title="Goals of the Access Message Exchange">
+          <t>The access message exchange:<list style="symbols">
+              <t>transfers a secret value from the server to the client
+              (initiator),</t>
+
+              <t>the secret value permits the client to initiate an
+              association message exchange.</t>
+            </list></t>
+        </section>
+
+        <section title="Message Type: &quot;client_access&quot;">
+          <t>This message is sent by a client who intends to perform an
+          association exchange with the server in the future. It
+          contains:<list style="symbols">
+              <t>the NTS message ID "client_access".</t>
+            </list></t>
+        </section>
+
+        <section title="Message Type: &quot;server_access&quot;">
+          <t>This message is sent by the server on receipt of a client_access
+          message. It contains:<list style="symbols">
+              <t>the NTS message ID "server_access",</t>
+
+              <t>an access key.</t>
+            </list></t>
+        </section>
+
+        <section title="Procedure Overview of the Access Exchange">
+          <t>For an access exchange, the following steps are performed:<list
+              style="numbers">
+              <t>The client sends a client_access message to the server.</t>
+
+              <t>Upon receipt of a client_access, the server calculates the
+              access key. It then sends a reply in the form of a server_access
+              message. The server must either memorize the access key or
+              alternatively apply a means by which it can reconstruct the
+              access key. Note that in both cases the access key must be
+              correlated with the address of the requester. Note also that if
+              the server memorizes the access key for a requester, it has to
+              keep state for a certain amount of time.</t>
+
+              <t>The client waits for a response in the form of a
+              server_access message. Upon receipt of one, it MUST memorize the
+              included access key.</t>
+            </list></t>
+        </section>
+      </section>
+
+      <section anchor="assoc" title="Association Message Exchange">
+        <t>In this message exchange, the participants negotiate the MAC and
+        encryption algorithms that are used throughout the protocol. In
+        addition, the client receives the certification chain up to a trusted
+        anchor. With the established certification chain the client is able to
+        verify the server's signatures and, hence, the authenticity of future
+        NTS messages from the server is ensured.</t>
+
+        <section title="Goals of the Association Exchange">
+          <t>The association exchange:</t>
+
+          <t><list style="symbols">
+              <t>enables the client to verify any communication with the
+              server as authentic,</t>
+
+              <t>lets the participants negotiate NTS version and
+              algorithms,</t>
+
+              <t>guarantees authenticity and integrity of the negotiation
+              result to the client,</t>
+
+              <t>guarantees to the client that the negotiation result is based
+              on the client's original, unaltered request.</t>
+            </list></t>
+        </section>
+
+        <section anchor="client_assoc"
+                 title="Message Type: &quot;client_assoc&quot;">
+          <t>This message is sent by the client if it wants to perform
+          association with a server. It contains <list style="symbols">
+              <t>the NTS message ID "client_assoc",</t>
+
+              <t>a nonce,</t>
+
+              <t>the access key obtained earlier via an access message
+              exchange,</t>
+
+              <t>the version number of NTS that the client wants to use (this
+              SHOULD be the highest version number that it supports),</t>
+
+              <t>a selection of accepted MAC algorithms, and</t>
+
+              <t>a selection of accepted encryption algorithms.</t>
+            </list></t>
+        </section>
+
+        <section anchor="server_assoc"
+                 title="Message Type: &quot;server_assoc&quot;">
+          <t>This message is sent by the server upon receipt of client_assoc.
+          It contains <list style="symbols">
+              <t>the NTS message ID "server_assoc",</t>
+
+              <t>the nonce transmitted in client_assoc,</t>
+
+              <t>the client's proposal for the version number, selection of
+              accepted MAC algorithms and selection of accepted encryption
+              algorithms, as transmitted in client_assoc,</t>
+
+              <t>the version number used for the rest of the protocol (which
+              SHOULD be determined as the minimum over the client's suggestion
+              in the client_assoc message and the highest supported by the
+              server),</t>
+
+              <t>the server's choice of algorithm for encryption and for MAC
+              creation, all of which MUST be chosen from the client's
+              proposals,</t>
+
+              <t>a signature, calculated over the data listed above, with the
+              server's private key and according to the signature algorithm
+              which is also used for the certificates that are included (see
+              below), and</t>
+
+              <t>a chain of certificates, which starts at the server and goes
+              up to a trusted authority; each certificate MUST be certified by
+              the one directly following it.</t>
+            </list></t>
+        </section>
+
+        <section title="Procedure Overview of the Association Exchange">
+          <t>For an association exchange, the following steps are performed:
+          <list style="numbers">
+              <t>The client sends a client_assoc message to the server. It
+              MUST keep the transmitted values for the version number and
+              algorithms available for later checks.</t>
+
+              <t>Upon receipt of a client_assoc message, the server checks the
+              validity of the included access key. If it is not valid, the
+              server MUST abort communication. If it is valid, the server
+              constructs and sends a reply in the form of a server_assoc
+              message as described in <xref target="server_assoc"/>. Upon
+              unsuccessful negotiation for version number or algorithms the
+              server_assoc message MUST contain an error code.</t>
+
+              <t>The client waits for a reply in the form of a server_assoc
+              message. After receipt of the message it performs the following
+              checks: <list style="symbols">
+                  <t>The client checks that the message contains a conforming
+                  version number.</t>
+
+                  <t>It checks that the nonce sent back by the server matches
+                  the one transmitted in client_assoc,</t>
+
+                  <t>It also verifies that the server has chosen the
+                  encryption and MAC algorithms from its proposal sent in the
+                  client_assoc message and that this proposal was not
+                  altered.</t>
+
+                  <t>Furthermore, it performs authenticity checks on the
+                  certificate chain and the signature.</t>
+                </list>If one of the checks fails, the client MUST abort the
+              run.</t>
+            </list></t>
+
+          <figure>
+            <artwork><![CDATA[         +------------------------+
+         | o Check access key     |
+         +------------------------+
+         | o Choose version       |
+         | o Choose algorithms    |
+         | o Acquire certificates |
+         | o Assemble response    |
+         | o Create signature     |
+         +-----------+------------+
+                     |
+                   <-+->
+
+ Server --------------------------->
+                 /|     \            
+        client_  /       \ server_   
+        assoc   /         \ assoc    
+               /          \|          
+ Client --------------------------->
+
+        <------ Association ----->   
+                 exchange
+]]></artwork>
+
+            <postamble>Procedure for association and cookie
+            exchange.</postamble>
+          </figure>
+        </section>
+      </section>
+
+      <section anchor="cookiemessage" title="Cookie Message Exchange">
+        <t>During this message exchange, the server transmits a secret cookie
+        to the client securely. The cookie will later be used for integrity
+        protection during unicast time synchronization.</t>
+
+        <section title="Goals of the Cookie Exchange">
+          <t>The cookie exchange:<list style="symbols">
+              <t>enables the server to check the client's authorization via
+              its certificate (optional),</t>
+
+              <t>supplies the client with the correct cookie and corresponding
+              KIV for its association to the server,</t>
+
+              <t>guarantees to the client that the cookie originates from the
+              server and that it is based on the client's original, unaltered
+              request.</t>
+
+              <t>guarantees that the received cookie is unknown to anyone but
+              the server and the client.</t>
+            </list></t>
+        </section>
+
+        <section anchor="client_cook"
+                 title="Message Type: &quot;client_cook&quot;">
+          <t>This message is sent by the client upon successful authentication
+          of the server. In this message, the client requests a cookie from
+          the server. The message contains <list style="symbols">
+              <t>the NTS message ID "client_cook",</t>
+
+              <t>a nonce,</t>
+
+              <t>the negotiated version number,</t>
+
+              <t>the negotiated signature algorithm,</t>
+
+              <t>the negotiated encryption algorithm,</t>
+
+              <t>the negotiated MAC algorithm,</t>
+
+              <t>the client's certificate.</t>
+            </list></t>
+        </section>
+
+        <section anchor="server_cook"
+                 title="Message Type: &quot;server_cook&quot;">
+          <t>This message is sent by the server upon receipt of a client_cook
+          message. The server generates the hash (the used hash function is
+          the one used for the MAC algorithm) of the client's certificate, as
+          conveyed during client_cook, in order to calculate the cookie
+          according to <xref target="overview"/>. This message contains <list
+              style="symbols">
+              <t>the NTS message ID "server_cook"</t>
+
+              <t>the version number as transmitted in client_cook,</t>
+
+              <t>a concatenated datum which is encrypted with the client's
+              public key, according to the encryption algorithm transmitted in
+              the client_cook message. The concatenated datum contains <list
+                  style="symbols">
+                  <t>the nonce transmitted in client_cook, and</t>
+
+                  <t>the cookie.</t>
+                </list></t>
+
+              <t>a signature, created with the server's private key,
+              calculated over all of the data listed above. This signature
+              MUST be calculated according to the transmitted signature
+              algorithm from the client_cook message.</t>
+            </list></t>
+        </section>
+
+        <section title="Procedure Overview of the Cookie Exchange">
+          <t>For a cookie exchange, the following steps are performed: <list
+              style="numbers">
+              <t>The client sends a client_cook message to the server. The
+              client MUST save the included nonce until the reply has been
+              processed.</t>
+
+              <t>Upon receipt of a client_cook message, the server checks
+              whether it supports the given cryptographic algorithms. It then
+              calculates the cookie according to the formula given in <xref
+              target="overview"/>. The server MAY use the client's certificate
+              to check that the client is authorized to use the secure time
+              synchronization service. With this, it MUST construct a
+              server_cook message as described in <xref
+              target="server_cook"/>.</t>
+
+              <t>The client awaits a reply in the form of a server_cook
+              message; upon receipt it executes the following actions: <list
+                  style="symbols">
+                  <t>It verifies that the received version number matches the
+                  one negotiated beforehand.</t>
+
+                  <t>It verifies the signature using the server's public key.
+                  The signature has to authenticate the encrypted data.</t>
+
+                  <t>It decrypts the encrypted data with its own private
+                  key.</t>
+
+                  <t>It checks that the decrypted message is of the expected
+                  format: the concatenation of a nonce and a cookie of the
+                  expected bit lengths.</t>
+
+                  <t>It verifies that the received nonce matches the nonce
+                  sent in the client_cook message.</t>
+                </list>If one of those checks fails, the client MUST abort the
+              run.</t>
+            </list></t>
+
+          <figure>
+            <artwork><![CDATA[     +----------------------------+
+     | o OPTIONAL: Check client's |
+     |             authorization  |
+     | o Generate cookie          |
+     | o Encrypt inner message    |
+     | o Generate signature       |
+     +-------------+--------------+
+                   |
+                 <-+-> 
+
+ Server --------------------------->
+               /|     \
+       client_ /       \ server_
+       cook   /         \ cook
+             /          \|              
+ Client --------------------------->
+
+        <--- Cookie exchange --> 
+]]></artwork>
+
+            <postamble>Procedure for association and cookie
+            exchange.</postamble>
+          </figure>
+        </section>
+
+        <section anchor="broadparam" title="Broadcast Parameter Messages">
+          <t>In this message exchange, the client receives the necessary
+          information to execute the TESLA protocol in a secured broadcast
+          association. The client can only initiate a secure broadcast
+          association after successful association and cookie exchanges and
+          only if it has made sure that its clock is roughly synchronized to
+          the server's.</t>
+
+          <t>See Appendix <xref format="counter" target="appBroadcast"/> for
+          more details on TESLA.</t>
+
+          <section title="Goals of the Broadcast Parameter Exchange">
+            <t>The broadcast parameter exchange<list style="symbols">
+                <t>provides the client with all the information necessary to
+                process broadcast time synchronization messages from the
+                server, and</t>
+
+                <t>guarantees authenticity, integrity and freshness of the
+                broadcast parameters to the client.</t>
+              </list></t>
+          </section>
+
+          <section anchor="client_bpar"
+                   title="Message Type: &quot;client_bpar&quot;">
+            <t>This message is sent by the client in order to establish a
+            secured time broadcast association with the server. It
+            contains<list style="symbols">
+                <t>the NTS message ID "client_bpar",</t>
+
+                <t>the NTS version number negotiated during association,</t>
+
+                <t>a nonce, and</t>
+
+                <t>the signature algorithm negotiated during association.</t>
+              </list></t>
+          </section>
+
+          <section anchor="server_bpar"
+                   title="Message Type: &quot;server_bpar&quot;">
+            <t>This message is sent by the server upon receipt of a
+            client_bpar message during the broadcast loop of the server. It
+            contains<list style="symbols">
+                <t>the NTS message ID "server_bpar",</t>
+
+                <t>the version number as transmitted in the client_bpar
+                message,</t>
+
+                <t>the nonce transmitted in client_bpar,</t>
+
+                <t>the one-way functions used for building the key chain,
+                and</t>
+
+                <t>the disclosure schedule of the keys. This contains:<list
+                    style="symbols">
+                    <t>the last key of the key chain,</t>
+
+                    <t>time interval duration,</t>
+
+                    <t>the disclosure delay (number of intervals between use
+                    and disclosure of a key),</t>
+
+                    <t>the time at which the next time interval will start,
+                    and</t>
+
+                    <t>the next interval's associated index.</t>
+                  </list></t>
+
+                <t>The message also contains a signature signed by the server
+                with its private key, verifying all the data listed above.</t>
+              </list></t>
+          </section>
+
+          <section title="Procedure Overview of the Broadcast Parameter Exchange">
+            <t>A broadcast parameter exchange consists of the following steps:
+            <list style="numbers">
+                <t>The client sends a client_bpar message to the server. It
+                MUST remember the transmitted values for the nonce, the
+                version number and the signature algorithm.</t>
+
+                <t>Upon receipt of a client_bpar message, the server
+                constructs and sends a server_bpar message as described in
+                <xref target="server_bpar"/>.</t>
+
+                <t>The client waits for a reply in the form of a server_bpar
+                message, on which it performs the following checks: <list
+                    style="symbols">
+                    <t>The message must contain all the necessary information
+                    for the TESLA protocol, as listed in <xref
+                    target="server_bpar"/>.</t>
+
+                    <t>The message must contain a nonce belonging to a
+                    client_bpar message that the client has previously
+                    sent.</t>
+
+                    <t>Verification of the message's signature.</t>
+                  </list>If any information is missing or if the server's
+                signature cannot be verified, the client MUST abort the
+                broadcast run. If all checks are successful, the client MUST
+                remember all the broadcast parameters received for later
+                checks.</t>
+              </list></t>
+
+            <figure>
+              <artwork><![CDATA[         +---------------------+
+         | o Assemble response |
+         | o Create public-key |
+         |   signature         |
+         +----------+----------+
+                    |
+                  <-+->
+
+ Server --------------------------------------------->
+                /|     \                
+        client_ /       \  server_   
+        bpar   /         \ bpar
+              /          \|            
+ Client --------------------------------------------->
+
+        <------- Broadcast ------>  <- Client-side ->
+                 parameter              validity
+                 exchange                checks
+]]></artwork>
+
+              <postamble>Procedure for unicast time synchronization
+              exchange.</postamble>
+            </figure>
+          </section>
+        </section>
+      </section>
+    </section>
+
+    <section anchor="appBroadcast"
+             title="(normative) Using TESLA for Broadcast-Type Messages">
+      <t>For broadcast-type messages, NTS adopts the TESLA protocol with some
+      customizations. This appendix provides details on the generation and
+      usage of the one-way key chain collected and assembled from <xref
+      target="RFC4082"/>. Note that NTS uses the "not re-using keys" scheme of
+      TESLA as described in Section 3.7.2. of <xref target="RFC4082"/>.</t>
+
+      <section title="Server Preparation">
+        <t>Server setup:<list style="numbers">
+            <t>The server determines a reasonable upper bound B on the network
+            delay between itself and an arbitrary client, measured in
+            milliseconds.</t>
+
+            <t>It determines the number n+1 of keys in the one-way key chain.
+            This yields the number n of keys that are usable to authenticate
+            broadcast packets. This number n is therefore also the number of
+            time intervals during which the server can send authenticated
+            broadcast messages before it has to calculate a new key chain.</t>
+
+            <t>It divides time into n uniform intervals I_1, I_2, ..., I_n.
+            Each of these time intervals has length L, measured in
+            milliseconds. In order to fulfill the requirement 3.7.2. of RFC
+            4082, the time interval L has to be shorter than the time interval
+            between the broadcast messages.</t>
+
+            <t>The server generates a random key K_n.</t>
+
+            <t>Using a one-way function F, the server generates a one-way
+            chain of n+1 keys K_0, K_1, ..., K_{n} according to <list
+                style="hanging">
+                <t hangText="">K_i = F(K_{i+1}).</t>
+              </list></t>
+
+            <t>Using another one-way function F', it generates a sequence of n
+            MAC keys K'_0, K'_1, ..., K'_{n-1} according to<list
+                style="hanging">
+                <t>K'_i = F'(K_i).</t>
+              </list></t>
+
+            <t>Each MAC key K'_i is assigned to the time interval I_i.</t>
+
+            <t>The server determines the key disclosure delay d, which is the
+            number of intervals between using a key and disclosing it. Note
+            that although security is provided for all choices d&gt;0, the
+            choice still makes a difference: <list style="symbols">
+                <t>If d is chosen too short, the client might discard packets
+                because it fails to verify that the key used for its MAC has
+                not yet been disclosed.</t>
+
+                <t>If d is chosen too long, the received packets have to be
+                buffered for an unnecessarily long time before they can be
+                verified by the client and be subsequently utilized for time
+                synchronization.</t>
+              </list>It is RECOMMENDED that the server calculate d according
+            to<list style="hanging">
+                <t>d = ceil( 2*B / L) + 1,</t>
+              </list>where ceil yields the smallest integer greater than or
+            equal to its argument.</t>
+          </list></t>
+
+        <figure title="A schematic explanation of the TESLA protocol's one-way key chain">
+          <artwork><![CDATA[< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                      Generation of Keys
+
+          F              F               F                 F
+ K_0  <-------- K_1  <--------  ...  <-------- K_{n-1} <------- K_n
+  |              |                              |                |
+  |              |                              |                |
+  | F'           | F'                           | F'             | F'
+  |              |                              |                |
+  v              v                              v                v
+ K'_0           K'_1            ...           K'_{n-1}         K'_n
+          [______________|____       ____|_________________|_______]
+                I_1             ...            I_{n-1}          I_n
+
+                  Course of Time/Usage of Keys
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ->]]></artwork>
+        </figure>
+      </section>
+
+      <section title="Client Preparation">
+        <t>A client needs the following information in order to participate in
+        a TESLA broadcast:<list style="symbols">
+            <t>One key K_i from the one-way key chain, which has to be
+            authenticated as belonging to the server. Typically, this will be
+            K_0.</t>
+
+            <t>The disclosure schedule of the keys. This consists of:<list
+                style="symbols">
+                <t>the length n of the one-way key chain,</t>
+
+                <t>the length L of the time intervals I_1, I_2, ..., I_n,</t>
+
+                <t>the starting time T_i of an interval I_i. Typically this is
+                the starting time T_1 of the first interval;</t>
+
+                <t>the disclosure delay d.</t>
+              </list></t>
+
+            <t>The one-way function F used to recursively derive the keys in
+            the one-way key chain,</t>
+
+            <t>The second one-way function F' used to derive the MAC keys
+            K'_0, K'_1, ... , K'_n from the keys in the one-way chain.</t>
+
+            <t>An upper bound D_t on how far its own clock is "behind" that of
+            the server.</t>
+          </list>Note that if D_t is greater than (d - 1) * L, then some
+        authentic packets might be discarded. If D_t is greater than d * L,
+        then all authentic packets will be discarded. In the latter case, the
+        client SHOULD NOT participate in the broadcast, since there will be no
+        benefit in doing so.</t>
+      </section>
+
+      <section title="Sending Authenticated Broadcast Packets">
+        <t>During each time interval I_i, the server sends at most one
+        authenticated broadcast packet P_i. Such a packet consists of: <list
+            style="symbols">
+            <t>a message M_i,</t>
+
+            <t>the index i (in case a packet arrives late),</t>
+
+            <t>a MAC authenticating the message M_i, with K'_i used as
+            key,</t>
+
+            <t>the key K_{i-d}, which is included for disclosure.</t>
+          </list></t>
+      </section>
+
+      <section anchor="authenticateRxPackets"
+               title="Authentication of Received Packets">
+        <t>When a client receives a packet P_i as described above, it first
+        checks that it has not already received a packet with the same
+        disclosed key. This is done to avoid replay/flooding attacks. A packet
+        that fails this test is discarded.</t>
+
+        <t>Next, the client begins to check the packet's timeliness by
+        ensuring that according to the disclosure schedule and with respect to
+        the upper bound D_t determined above, the server cannot have disclosed
+        the key K_i yet. Specifically, it needs to check that the server's
+        clock cannot read a time that is in time interval I_{i+d} or later.
+        Since it works under the assumption that the server's clock is not
+        more than D_t "ahead" of the client's clock, the client can calculate
+        an upper bound t_i for the server's clock at the time when P_i
+        arrived. This upper bound t_i is calculated according to <list
+            style="hanging">
+            <t>t_i = R + D_t,</t>
+          </list></t>
+
+        <t>where R is the client's clock at the arrival of P_i. This implies
+        that at the time of arrival of P_i, the server could have been in
+        interval I_x at most, with<list style="hanging">
+            <t>x = floor((t_i - T_1) / L) + 1,</t>
+          </list>where floor gives the greatest integer less than or equal to
+        its argument. The client now needs to verify that <list
+            style="hanging">
+            <t>x &lt; i+d</t>
+          </list>is valid (see also Section 3.5 of <xref target="RFC4082"/>).
+        If it is falsified, it is discarded.</t>
+
+        <t>If the check above is successful, the client performs another more
+        rigorous check: it sends a key check request to the server (in the
+        form of a client_keycheck message), asking explicitly if K_i has
+        already been disclosed. It remembers the time stamp t_check of the
+        sending time of that request as well as the nonce it used correlated
+        with the interval number i. If it receives an answer from the server
+        stating that K_i has not yet been disclosed and it is able to verify
+        the HMAC on that response, then it deduces that K_i was undisclosed at
+        t_check and therefore also at R. In this case, the client accepts P_i
+        as timely.</t>
+
+        <t>Next the client verifies that a newly disclosed key K_{i-d} belongs
+        to the one-way key chain. To this end, it applies the one-way function
+        F to K_{i-d} until it can verify the identity with an earlier
+        disclosed key (see Clause 3.5 in RFC 4082, item 3).</t>
+
+        <t>Next the client verifies that the transmitted time value s_i
+        belongs to the time interval I_i, by checking <list style="hanging">
+            <t>T_i =&lt; s_i, and</t>
+
+            <t>s_i &lt; T_{i+1}.</t>
+          </list>If it is falsified, the packet MUST be discarded and the
+        client MUST reinitialize its broadcast module by performing time
+        synchronization by other means than broadcast messages, and it MUST
+        perform a new broadcast parameter exchange (because a falsification of
+        this check yields that the packet was not generated according to
+        protocol, which suggests an attack).</t>
+
+        <t>If a packet P_i passes all the tests listed above, it is stored for
+        later authentication. Also, if at this time there is a package with
+        index i-d already buffered, then the client uses the disclosed key
+        K_{i-d} to derive K'_{i-d} and uses that to check the MAC included in
+        package P_{i-d}. Upon success, it regards M_{i-d} as
+        authenticated.</t>
+      </section>
+    </section>
+
+    <section anchor="appDependencies" title="(informative) Dependencies">
+      <figure>
+        <artwork><![CDATA[+---------+--------------+--------+-------------------------------+
+| Issuer  |  Type        | Owner  | Description                   |
++---------+--------------+--------+-------------------------------+
+| Server  | private key  | server | Used for server_assoc,        |
+| PKI     | (signature)  |        | server_cook, server_bpar.     |
+|         +--------------+--------+ The server uses the private   |
+|         | public key   | client | key to sign these messages.   |
+|         | (signature)  |        | The client uses the public    |
+|         +--------------+--------+ key to verify them.           |
+|         | certificate  | server | The certificate is used in    |
+|         |              |        | server_assoc messages, for    |
+|         |              |        | verifying authentication and  |
+|         |              |        | (optionally) authorization.   |
++---------+--------------+--------+-------------------------------+
+| Client  | private key  | client | The server uses the client's  |
+| PKI     | (encryption) |        | public key to encrypt the     |
+|         +--------------+--------+ content of server_cook        |
+|         | public key   | server | messages. The client uses     |
+|         | (encryption) |        | the private key to decrypt    |
+|         +--------------+--------+ them. The certificate is      |
+|         | certificate  | client | sent in client_cook messages, |
+|         |              |        | where it is used for trans-   |
+|         |              |        | portation of the public key   |
+|         |              |        | as well as (optionally) for   |
+|         |              |        | verification of client        |
+|         |              |        | authorization.                |
++---------+--------------+--------+-------------------------------+
+]]></artwork>
+
+        <postamble>This table shows the kind of cryptographic resources that
+        NTS participants of server and client role should have ready before
+        NTS communication starts.</postamble>
+      </figure>
+
+      <figure>
+        <artwork><![CDATA[
+++===========================================++    
+||                                           ||                 
+|| Secure Authentication and Cookie Exchange ||               
+||                                           ||               
+++=======_ _=================================++               
+          |
+          |  At least one
+          |  successful
+          V
+++=======[ ]=======++
+|| Unicast Time    |>-----\   As long as further 
+|| Synchronization ||      |  synchronization
+|| Exchange(s)     |<-----/   is desired
+++=======_ _=======++
+          |
+           \                               Other (unspecified)
+Sufficient  \                          /   methods which give 
+accuracy     \   either         or    /    sufficient accuracy
+              \----------\ /---------/   
+                          |
+                          |         
+                          V
+               ++========[ ]=========++
+               || Broadcast          ||
+               || Parameter Exchange ||
+               ++========_ _=========++
+                          |  
+                          |  One successful
+                          |  per client
+                          V 
+                ++=======[ ]=======++
+                || Broadcast Time  |>--------\   As long as further
+                || Synchronization ||         |  synchronization
+                || Reception       |<--------/   is desired
+                ++=======_ _=======++
+                          |
+                         / \
+               either   /   \       or
+            /----------/     \-------------\
+           |                               |
+           V                               V
+++========[ ]========++         ++========[ ]========++
+|| Keycheck Exchange ||         || Keycheck Exchange ||
+++===================++         || with TimeSync     ||
+                                ++===================++
+                       ]]></artwork>
+
+        <postamble>This diagram shows the dependencies between the different
+        message exchanges and procedures which NTS offers.</postamble>
+      </figure>
+    </section>
+  </back>
+</rfc>

@@ -1,0 +1,1405 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-06"
+     ipr="trust200902" submissionType="IETF">
+  <front>
+    <title abbrev="NTS4NTP">Using the Network Time Security Specification to
+    Secure the Network Time Protocol</title>
+
+    <author fullname="Daniel Fox Franke" initials="D." surname="Franke">
+      <organization/>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country/>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email/>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Dieter Sibold" initials="D." surname="Sibold">
+      <organization abbrev="PTB">Physikalisch-Technische
+      Bundesanstalt</organization>
+
+      <address>
+        <postal>
+          <street>Bundesallee 100</street>
+
+          <city>Braunschweig</city>
+
+          <code>D-38116</code>
+
+          <region/>
+
+          <country>Germany</country>
+        </postal>
+
+        <phone>+49-(0)531-592-8420</phone>
+
+        <facsimile>+49-531-592-698420</facsimile>
+
+        <email>dieter.sibold@ptb.de</email>
+      </address>
+    </author>
+
+    <author fullname="Kristof Teichel" initials="K." surname="Teichel">
+      <organization abbrev="PTB">Physikalisch-Technische
+      Bundesanstalt</organization>
+
+      <address>
+        <postal>
+          <street>Bundesallee 100</street>
+
+          <city>Braunschweig</city>
+
+          <region/>
+
+          <code>D-38116</code>
+
+          <country>Germany</country>
+        </postal>
+
+        <phone>+49-(0)531-592-8421</phone>
+
+        <facsimile/>
+
+        <email>kristof.teichel@ptb.de</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <date day="05" month="September" year="2016"/>
+
+    <area>Internet Area</area>
+
+    <workgroup>NTP Working Group</workgroup>
+
+    <keyword>Integrity</keyword>
+
+    <keyword>Authentication</keyword>
+
+    <keyword>NTP</keyword>
+
+    <keyword>Security</keyword>
+
+    <keyword>DTLS</keyword>
+
+    <abstract>
+      <t>This document describes how to reach the objectives described in the
+      Network Time Security (NTS) specification when securing time
+      synchronization with servers using the Network Time Protocol (NTP).</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>The Network Time Security (NTS) draft <xref
+      target="I-D.ietf-ntp-network-time-security"/> specifies security
+      measures which can be used to enable time synchronization protocols to
+      verify authenticity of the time server and integrity of the time
+      synchronization protocol packets.</t>
+
+      <t>This document provides detail on how to specifically use those
+      measures to secure time synchronization between NTP clients and
+      servers.</t>
+    </section>
+
+    <section title="Objectives">
+      <t>The specific objectives for applying the NTS specification to the NTP
+      are as follows:<list style="symbols">
+          <t>Authenticity: NTS enables an NTP client to authenticate its time
+          server(s).</t>
+
+          <t>Integrity: NTS protects the integrity of NTP time synchronization
+          protocol packets via a message authentication code (MAC).</t>
+
+          <t>Confidentiality: NTS does not provide confidentiality protection
+          of the time synchronization packets.<list style="hanging">
+              <t hangText="Note:">Depending on discussion regarding
+              non-traceability (see below), this item should be deleted.</t>
+            </list></t>
+
+          <t>Authorization: NTS optionally enables the server to verify the
+          client's authorization.</t>
+
+          <t>Client-Side Non-traceability: NTS prevents an attacker from
+          tracing an NTP client device over changes in routing data via any
+          data sent in the course of NTS' own security measures.<list
+              style="hanging">
+              <t hangText="Note:">This objective is still under discussion.
+              The main issue is whether this from of the objective is worth
+              the effort or if it needs to have the appendix "or using data
+              sent by the underlying NTP implementation". The current proposal
+              from Daniel does not address this and it remains to be seen how
+              much of an issue the NTP data is in this regard.</t>
+            </list></t>
+
+          <t>Request-Response-Consistency: NTS enables a client to match an
+          incoming response to a request it has sent. NTS also enables the
+          client to deduce from the response whether its request to the server
+          has arrived without alteration.</t>
+
+          <t>Modes of operation: Both the client-server mode and the symmetric
+          peer mode of NTP are supported. The broadcast mode of NTP can NOT be
+          secured with measures within this document.</t>
+
+          <t>Hybrid mode: Both secure and insecure communication modes are
+          possible for both NTP servers and clients.</t>
+
+          <t>Compatibility:<list style="symbols">
+              <t>NTP associations which are not secured by NTS are not
+              affected by NTS-secured communication.</t>
+
+              <t>An NTP server that does not support NTS is not affected by
+              NTS-secured authentication requests.</t>
+            </list></t>
+        </list></t>
+    </section>
+
+    <section title="Terms and Abbreviations">
+      <t><list style="hanging">
+          <t hangText="MAC">Message Authentication Code</t>
+
+          <t hangText="NTP  ">Network Time Protocol (<xref
+          target="RFC5905">RFC 5905</xref>)</t>
+
+          <t hangText="NTS  ">Network Time Security</t>
+
+          <t hangText="DTLS">Datagram Transport Layer Security</t>
+
+          <t hangText="AEAD">Authenticated Encryption with Associated Data
+          (<xref target="RFC5116">RFC 5116</xref>)</t>
+        </list></t>
+    </section>
+
+    <section title="Overview of NTS-Secured NTP">
+      <t>The Network Time Protocol includes many different operating modes to
+      support various network topologies. In addition to its best-known and
+      most-widely-used client-server mode, it also includes modes for
+      synchronization between symmetric peers, a control mode for server
+      monitoring and administration and a broadcast mode. These various modes
+      have differing and contradictory requirements for security and
+      performance. Symmetric and control modes demand mutual authentication
+      and mutual replay protection, and for certain message types control mode
+      may require confidentiality as well as authentication. Client-server
+      mode places more stringent requirements on resource utilization than
+      other modes, because servers may have vast number of clients and be
+      unable to afford to maintain per-client state. However, client-server
+      mode also has more relaxed security needs, because only the client
+      requires replay protection: it is harmless for servers to process
+      replayed packets. The security demands of symmetric and control modes,
+      on the other hand, are in conflict with the resource-utilization demands
+      of client-server mode: any scheme which provides replay protection
+      inherently involves maintaining some state to keep track of what
+      messages have already been seen.</t>
+
+      <t>This document does not discuss how to add security to NTP's broadcast
+      mode.</t>
+
+      <section anchor="overview" title="Client-Server Mode">
+        <t>The server does not keep a long-term state of the client. NTS
+        initially verifies the authenticity of the time server and exchanges
+        one or more symmetric keys. The DTLS-based key exchange procedure
+        described in <xref target="key-exchange"/> can be used for this
+        exchange. An implementation MUST support the use of this procedure. It
+        MAY additionally support the use of any alternative secure
+        communication for this purpose, as long as it fulfills the
+        preconditions given in <xref
+        target="I-D.ietf-ntp-network-time-security"/>, Section 6.1.1.</t>
+
+        <t>After the keys have been exchanged, the participants then use them
+        to protect the authenticity and the integrity of subsequent
+        unicast-type time synchronization packets. In order to do this, the
+        server attaches a Message Authentication Code (MAC) to each time
+        synchronization packet. The calculation of the MAC includes the whole
+        time synchronization packet and the symmetric key which is stored on
+        the client side. Therefore, the client can perform a validity check
+        for this MAC on reception of a time synchronization packet.</t>
+      </section>
+
+      <section title="Symmetric/Peer Mode and Control Modes">
+        <t>In the symmetric ("peer") mode as well as in control modes, there
+        is no requirement for statelessness on either side. Both sides
+        exchange and memorize one or more shared secrets. The shared secrets
+        exchanged are then used to secure NTP peer mode or control packets by
+        providing at least authenticity and integrity protection and possibly
+        also confidentiality. The DTLS-based key exchange procedure described
+        in <xref target="dtls-encapsulation"/> can be used for such
+        communication. An implementation MUST support the use of this
+        procedure.</t>
+      </section>
+    </section>
+
+    <section anchor="key-exchange" title="Employing DTLS for NTP Security">
+      <t>Since (as discussed in <xref target="overview"/>) no single approach
+      can simultaneously satisfy the needs of all modes, this specification
+      consists of not one protocol but a suite of them: <list style="symbols">
+          <t>The "NTS-encapsulated NTPv4" protocol is little more than "NTP
+          over DTLS": the two endpoints perform a DTLS handshake and then
+          exchange NTP packets encapsulated as DTLS Application Data. It is
+          suitable for symmetric and control modes, and is also secure for
+          client/server mode but relatively wasteful of server resources.</t>
+
+          <t>The "NTS Key Establishment" protocol (NTS-KE) uses DTLS to
+          establish key material and negotiate some additional protocol
+          options, but then quickly closes the DTLS channel and does not use
+          it for the exchange of time packets. NTS-KE is designed to be
+          extensible, and might be extended to support key establishment for
+          other protocols such as PTP.</t>
+
+          <t>The "NTS extensions for NTPv4" are a collection of NTP extension
+          fields for cryptographically securing NTPv4 using key material
+          previously negotiated using NTS-KE. They are suitable for securing
+          client/server mode because the server can implement them without
+          retaining per-client state, but on the other hand are suitable
+          *only* for client/server mode because only the client, and not the
+          server, is protected from replay.</t>
+        </list></t>
+
+      <section anchor="dtls-profile"
+               title="DTLS profile for Network Time Security">
+        <t>Since securing time protocols is (as of 2016) a novel application
+        of DTLS, no backward-compatibility concerns exist to justify using
+        obsolete, insecure, or otherwise broken DTLS features or versions. We
+        therefore put forward the following requirements and guidelines,
+        roughly representing 2016's best practices.</t>
+
+        <t>Implementations MUST NOT negotiate DTLS versions earlier than
+        1.2.</t>
+
+        <t>Implementations willing to negotiate more than one possible version
+        of DTLS SHOULD NOT respond to handshake failures by retrying with a
+        downgraded protocol version. If they do, they MUST implement <xref
+        target="RFC7507"/>.</t>
+
+        <t>DTLS clients MUST NOT offer, and DTLS servers MUST not select, RC4
+        cipher suites. <xref target="RFC7465"/></t>
+
+        <t>DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
+        <xref target="RFC5746">TLS Renegotiation Indication Extension</xref>.
+        Regardless, they MUST NOT initiate or permit insecure renegotiation.
+        (*)</t>
+
+        <t>DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
+        <xref target="RFC7627">TLS Session Hash and Extended Master Secret
+        Extension</xref>. (*)</t>
+
+        <t>Use of the <xref target="RFC7301">Application-Layer Protocol
+        Negotiation Extension</xref> is integral to NTS and support for it is
+        REQUIRED for interoperability.</t>
+
+        <t>(*): Note that DTLS 1.3 or beyond may render the indicated
+        recommendations inapplicable.</t>
+      </section>
+
+      <section anchor="transport-mechanisms"
+               title="Transport mechanisms for DTLS records">
+        <t>This section specifies two mechanisms, one REQUIRED and one
+        OPTIONAL, for exchanging NTS-related DTLS records. It is intended that
+        the choice of transport mechanism be orthogonal to any concerns at the
+        application layer: DTLS records SHOULD receive identical disposition
+        regardless of which mechanism they arrive by.</t>
+
+        <section title="Transport via NTS port">
+          <t>In this transport mechanism, DTLS records, formatted according to
+          <xref target="RFC6347">RFC 6347</xref> or a subsequent revision
+          thereof, are exchanged directly on UDP port [[TBD]], with one DTLS
+          record per UDP packet and no additional layer of encapsulation
+          between the UDP header and the DTLS record. Servers which implement
+          NTS MUST support this mechanism.</t>
+        </section>
+
+        <section title="Transport via NTP extension field">
+          <t>In this transport mechanism, DTLS records are exchanged within
+          extension fields of specially-formed NTP packets, which are
+          themselves exchanged via the usual NTP service port (123/udp). NTP
+          packets conveying DTLS records SHALL be formatted as in <xref
+          target="dtls-packet-layout"/>. They MUST NOT contain any other
+          extensions or a legacy MAC field.</t>
+
+          <figure anchor="dtls-packet-layout"
+                  title="Format of NTP packets conveying DTLS records">
+            <artwork><![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+.                                                               .
+.                     NTP Header (48 octets)                    .
+.                                                               .
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Extension Type         |       Extension Length      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+.                                                               .
+.                     DTLS Record (variable)                    .
+.                                                               .
+|                                                               |
++               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|               |                                               |
++-+-+-+-+-+-+-+-+                                               +
+|                                                               |
+.                                                               .
+.                    Padding (1-24 octets)                      .
+.                                                               .
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+          ]]></artwork>
+          </figure>
+
+          <t>Within the NTP header, <list style="symbols">
+              <t>The Leap Indicator field SHALL be set to 3
+              (unsynchronized).</t>
+
+              <t>The Version Number field SHALL be set to 4.</t>
+
+              <t>DTLS clients SHALL set the Mode field to 3, and DTLS servers
+              SHALL set the Mode field to 4, even if the DTLS record is being
+              used (in the full-encapsulation protocol) to protect some NTP
+              mode other than client/server.</t>
+
+              <t>The Stratum field SHALL be set to 0 (unspecified or
+              invalid).</t>
+
+              <t>The Reference ID field (conveying a kiss code) SHALL be set
+              to "DTLS"</t>
+
+              <t>DTLS servers SHALL set the origin timestamp field from the
+              transmit timestamp field of the packet most recently received
+              from the client.</t>
+
+              <t>All other header fields MUST be ignored by the receiver, and
+              MAY contain arbitrary or bogus values.</t>
+            </list></t>
+
+          <t>The Extension Type field SHALL be set to [[TBD]]. The Extension
+          Length field SHALL be computed and set as per <xref
+          target="RFC7822">RFC 7822</xref>.</t>
+
+          <t>The DTLS Record field SHALL contain a DTLS Record formatted as
+          per <xref target="RFC6347">RFC 6347</xref> or a subsequent revision
+          thereof.</t>
+
+          <t>The Padding field SHALL contain between 1 and 24 octets of
+          padding, with every octet set to the number of padding octets
+          included, e.g., "01", "02 02", or "03 03 03". The number of padding
+          bytes should be chosen in order to comply with the <xref
+          target="RFC7822">RFC 7822</xref> requirement that (in the absence of
+          a legacy MAC) extensions have a total length in octets (including
+          the four octets for the type and length fields) which is at least 28
+          and divisible by 4. Furthermore, since future revisions of DTLS may
+          employ record formats that are not self-delimiting, at least one
+          octet of padding MUST be included so that receivers can
+          unambiguously determine where the DTLS record ends and the padding
+          begins. If the length of the DTLS record is already at least 24 and
+          a multiple of 4, then the correct amount of padding to include is 4
+          octets.</t>
+
+          <t>The NTP header values specified above are selected such that NTP
+          implementations which do not understand NTS will interpret the
+          packet as an innocuous no-op and not attempt to use it for time
+          synchronization. To NTS-aware implementations, however, these
+          packets are best understood as not being NTP packets at all, but
+          simply a means of "smuggling" arbitrary DTLS records across port
+          123/udp. Indeed, these records need not be pertinent to NTP at all
+          &mdash; for example, they could be NTS-KE messages eventually
+          intended for securing PTP traffic.</t>
+
+          <t>This transport mechanism is intended for use as a fallback in
+          situations where firewalls or other middleboxes are preventing
+          communication on the NTS port. Support for it is OPTIONAL.</t>
+        </section>
+      </section>
+
+      <section title="The NTS-encapsulated NTPv4 protocol">
+        <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. First,
+        DTLS handshake records are exchanged using one of the two transport
+        mechanisms specified in <xref target="transport-mechanisms"/>. The two
+        endpoints carry out a DTLS handshake in conformance with <xref
+        target="dtls-profile"/>, with the client offering (via an <xref
+        target="RFC7301">ALPN</xref> extension), and the server accepting, an
+        application-layer protocol of "ntp/4". Second, once the handshake is
+        successfully completed, the two endpoints use the established channel
+        to exchange arbitrary NTPv4 packets as DTLS-protected Application
+        Data.</t>
+
+        <t>In addition to the requirements specified in <xref
+        target="dtls-profile"/>, implementations MUST enforce the anti-replay
+        mechanism specified in <xref target="RFC6347"> Section 4.1.2.6 of RFC
+        6347</xref> (or an equivalent mechanism specified in a subsequent
+        revision of DTLS). Servers wishing to enforce access control SHOULD
+        either demand a client certificate or use a PSK-based handshake in
+        order to establish the client's identity.</t>
+
+        <t>The NTS-encapsulated NTPv4 protocol is the RECOMMENDED mechanism
+        for cryptographically securing mode 1 (symmetric active), 2 (symmetric
+        passive), and 6 (control) NTPv4 traffic. It is equally safe for mode
+        3/4 (client/server) traffic, but is NOT RECOMMENDED for this purpose
+        because it scales poorly compared to using <xref
+        target="nts-extensions-for-ntpv4">NTS Extensions for NTPv4</xref>.</t>
+      </section>
+
+      <section anchor="dtls-key-establishment"
+               title="The NTS Key Establishment protocol">
+        <t>The NTS Key Establishment (NTS-KE) protocol is carried out by
+        exchanging DTLS records using one of the two transport mechanisms
+        specified in <xref target="transport-mechanisms"/>. The two endpoints
+        carry out a DTLS handshake in conformance with <xref
+        target="dtls-profile"/>, with the client offering (via an <xref
+        target="RFC7301">ALPN</xref> extension), and the server accepting, an
+        application-layer protocol of "ntske/1". Immediately following a
+        successful handshake, the client SHALL send a single request (as
+        Application Data encapsulated in the DTLS-protected channel), then the
+        server SHALL send a single response followed by a "Close notify" alert
+        and then discard the channel state.</t>
+
+        <t>The client's request and the server's response each SHALL consist
+        of a sequence of records formatted according to <xref
+        target="ntske-record"/>. The sequence SHALL be terminated by a "End of
+        Message" record, which has a Record Type of zero and a zero-length
+        body. Furthermore, requests and non-error responses each SHALL include
+        exactly one NTS Next Protocol Negotiation record.</t>
+
+        <figure anchor="ntske-record">
+          <artwork><![CDATA[
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|C|         Record Type         |          Body Length          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+.                                                               .
+.                           Record Body                         .
+.                                                               .
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        ]]></artwork>
+        </figure>
+
+        <t>[[Ed. Note: this ad-hoc binary format should be fine as long as we
+        continue to keep things very simple. However, if we think there's any
+        reasonable probability of wanting to include more complex data
+        structures, we should consider using some semi-structured data format
+        such as JSON, Protocol Buffers, or (ugh) ASN.1]]</t>
+
+        <t>The requirement that all NTS-KE messages be terminated by an End of
+        Message record makes them self-delimiting. One DTLS record MAY, and
+        typically will, contain multiple NTS-KE records. NTS-KE records MAY be
+        split across DTLS record boundaries. If, likely due to packet loss, an
+        incomplete NTS-KE message is received, implementations MUST treat this
+        an error, which clients SHOULD handle by restarting with a fresh DTLS
+        handshake and trying again.</t>
+
+        <t>The fields of an NTS-KE record are defined as follows: <list
+            style="symbols">
+            <t>C (Critical Bit): Determines the disposition of unrecognized
+            Record Types. Implementations which receive a record with an
+            unrecognized Record Type MUST ignore the record if the Critical
+            Bit is 0, and MUST treat it as an error if the Critical Bit is
+            1.</t>
+
+            <t>Record Type: A 15-bit integer in network byte order (from
+            most-to-least significant, its bits are record bits 7&ndash;1 and
+            then 15&ndash;8). The semantics of record types 0&ndash;5 are
+            specified in this memo; additional type numbers SHALL be tracked
+            through the IANA Network Time Security Key Establishment Record
+            Types registry.</t>
+
+            <t>Body Length: the length of the Record Body field, in octets, as
+            a 16-bit integer in network byte order. Record bodies may have any
+            representable length and need not be aligned to a word
+            boundary.</t>
+
+            <t>Record Body: the syntax and semantics of this field shall be
+            determined by the Record Type.</t>
+          </list></t>
+
+        <section title="NTS-KE record types">
+          <t>The following NTS-KE Record Types are defined.</t>
+
+          <section title="End of Message">
+            <t>The End of Message record has a Record Type number of 0 and an
+            zero-length body. It MUST occur exactly once as the final record
+            of every NTS-KE request and response. The Critical Bit MUST be
+            set.</t>
+          </section>
+
+          <section title="NTS Next Protocol Negotiation">
+            <t>The NTS Next Protocol Negotiation record has a record type of
+            1. It MUST occur exactly once in every NTS-KE request and
+            response. Its body consists of a sequence of 16-octet strings.
+            Each 16-octet string represents a Protocol Name from the IANA
+            Network Time Security Next Protocols registry. The Critical Bit
+            MUST be set.</t>
+
+            <t>The Protocol Names listed in the client's NTS Next Protocol
+            Negotiation record denote those protocols which the client wishes
+            to speak using the key material established through this NTS-KE
+            session. The Protocol Names listed in the server's response MUST
+            comprise a subset of those listed in the request, and denote those
+            protocols which the server is willing and able to speak using the
+            key material established through this NTS-KE session. The client
+            MAY proceed with one or more of them. The request MUST list at
+            least one protocol, but the response MAY be empty.</t>
+          </section>
+
+          <section title="Error">
+            <t>The Error record has a Record Type number of 2. Its body is
+            exactly two octets long, consisting of an unsigned 16-bit integer
+            in network byte order, denoting an error code. The Critical Bit
+            MUST be set.</t>
+
+            <t>Clients MUST NOT include Error records in their request. If
+            clients receive a server response which includes an Error record,
+            they MUST discard any negotiated key material and MUST NOT proceed
+            to the Next Protocol.</t>
+
+            <t>The following error code are defined. <list style="symbols">
+                <t>Error code 0 means "Unrecognized Critical Record". The
+                server MUST respond with this error code if the request
+                included a record which the server did not understand and
+                which had its Critical Bit set. The client SHOULD NOT retry
+                its request without modification.</t>
+
+                <t>Error code 1 means "Bad Request". The server MUST respond
+                with this error if, upon the expiration of an
+                implementation-defined timeout, it has not yet received a
+                complete and syntactically well-formed request from the
+                client. This error is likely to be the result of a dropped
+                packet, so the client SHOULD start over with a new DTLS
+                handshake and retry its request.</t>
+              </list></t>
+          </section>
+
+          <section title="Warning">
+            <t>The Warning record has a Record Type number of 3. Its body is
+            exactly two octets long, consisting of an unsigned 16-bit integer
+            in network byte order, denoting a warning code. The Critical Bit
+            MUST be set.</t>
+
+            <t>Clients MUST NOT include Warning records in their request. If
+            clients receive a server response which includes an Warning
+            record, they MAY discard any negotiated key material and abort
+            without proceeding to the Next Protocol. Unrecognized warning
+            codes MUST be treated as errors.</t>
+
+            <t>This memo defines no warning codes.</t>
+          </section>
+
+          <section title="AEAD Algorithm Negotiation">
+            <t>The AEAD Algorithm Negotiation record has a Record Type number
+            of 4. Its body consists of a sequence of unsigned 16-bit integers
+            in network byte order, denoting Numeric Identifiers from the IANA
+            <xref target="RFC5116">AEAD registry</xref>. The Critical Bit MAY
+            be set.</t>
+
+            <t>If the NTS Next Protocol Negotiation record offers "ntp/4",this
+            record MUST be included exactly once. Other protocols MAY require
+            it as well.</t>
+
+            <t>When included in a request, this record denotes which AEAD
+            algorithms the client is willing to use to secure the Next
+            Protocol, in decreasing preference order. When included in a
+            response, this record denotes which algorithm the server chooses
+            to use, or is empty if the server supports none of the algorithms
+            offered.. In requests, the list MUST include at least one
+            algorithm. In responses, it MUST include at most one. Honoring the
+            client's preference order is OPTIONAL: servers may select among
+            any of the client's offered choices, even if they are able to
+            support some other algorithm which the client prefers more.</t>
+
+            <t>Server implementations of <xref
+            target="nts-extensions-for-ntpv4">NTS extensions for NTPv4</xref>
+            MUST support AEAD_AES_128_GCM (Numeric Identifier 1). That is, if
+            the client includes AEAD_AES_128_GCM in its AEAD Algorithm
+            Negotiation record, and the server accepts the "ntp/4" protocol in
+            its NTS Next Protocol Negotiation record, then the server's AEAD
+            Algorithm Negotiation record MUST NOT be empty.</t>
+          </section>
+
+          <section title="New Cookie for NTPv4">
+            <t>The New Cookie for NTPv4 record has a Record Type number of 5.
+            The contents of its body SHALL be implementation-defined and
+            clients MUST NOT attempt to interpret them. See [[TODO]] for a
+            RECOMMENDED construction.</t>
+
+            <t>Clients MUST NOT send records of this type. Servers MUST send
+            at least one record of this type, and SHOULD send eight of them,
+            if they accept "ntp/4" as a Next Protocol. The Critical Bit SHOULD
+            NOT be set.</t>
+          </section>
+        </section>
+
+        <section title="Key Extraction (generally)">
+          <t>Following a successful run of the NTS-KE protocol, key material
+          SHALL be extracted according to <xref target="RFC5705">RFC
+          5705</xref>. Inputs to the exporter function are to be constructed
+          in a manner specific to the negotiated Next Protocol. However, all
+          protocols which utilize NTS-KE MUST conform to the following two
+          rules: <list style="symbols">
+              <t>The disambiguating label string MUST be
+              "EXPORTER-network-time-security/1".</t>
+
+              <t>The per-association context value MUST be provided, and MUST
+              begin with the 16-octet Protocol Name which was negotiated as a
+              Next Protocol.</t>
+            </list></t>
+        </section>
+      </section>
+
+      <section anchor="recommended-format-for-nts-cookies"
+               title="Recommended format for NTS cookies">
+        <t>This section provides a RECOMMENDED way for servers to construct
+        NTS cookies. Clients MUST NOT examine the cookie under the assumption
+        that it is constructed according to this section.</t>
+
+        <t>The role of cookies in NTS is closely analogous to that of session
+        cookies in TLS. Accordingly, the thematic resemblance of this section
+        to <xref target="RFC5077">RFC 5077</xref> is deliberate, and the
+        reader should likewise take heed of its security considerations.</t>
+
+        <t>Servers should randomly generate and store a master <xref
+        target="AES">AES</xref> key `MEK` and a master <xref
+        target="RFC4634">HMAC-SHA-256</xref> key `MAK`. Servers should
+        additionally choose a non-secret, unique value `I` to identify the
+        pair (MEK,MAK).</t>
+
+        <t>Servers should periodically (e.g., once daily) generate a new
+        triplet (I,MEK,MAK) and immediately switch to using these values for
+        all newly-generated cookies. Immediately following each such key
+        rotation, servers should securely erase any keys generated two or more
+        rotation periods prior. Servers should continue to accept any cookie
+        generated using keys that they have not yet erased, even if those keys
+        are no longer current. Erasing old keys provides for forward secrecy,
+        limiting the scope of what old information can be stolen if a master
+        key is somehow compromised. Holding on to a limited number of old keys
+        allows clients to seamlessly transition from one generation to the
+        next without having to perform a new NTS-KE handshake.</t>
+
+        <t>[[TODO: discuss key management considerations for load-balanced
+        servers]]</t>
+
+        <t>To form a cookie, servers should first form a plaintext `P`
+        consisting of the following fields: <list style="symbols">
+            <t>The AEAD algorithm negotiated during NTS-KE</t>
+
+            <t>The S2C key</t>
+
+            <t>The C2S key</t>
+          </list></t>
+
+        <t>Servers should then randomly generate an initialization vector
+        `IV`, form ciphertext `C` by encrypting `P` in <xref target="CBC">CBC
+        mode</xref> under key `MEK` with `IV` as the initialization vector,
+        and then MAC the message `IV || C` (with || denoting concatenation)
+        under key `MAK`, obtaining tag `T`.</t>
+
+        <t>The cookie should consist of the tuple `(I,IV,C,T)`.</t>
+
+        <t>[[TODO: explicitly specify how to verify and decrypt a cookie, not
+        just how to form one]]</t>
+
+        <t>Implementors may choose to substitute alternative algorithms in
+        place of AES and SHA-256, but are discouraged from abandoning the
+        combination of CBC and HMAC. CBC has the desirable property that the
+        IV is random, is as wide as the cipher block, and that occasional
+        collisions are unlikely to be fatal to security. In contrast, most
+        IETF-standard AEAD schemes use a 96-bit nonce, and a single collision
+        can break the security of everything ever authenticated under that
+        key. AEAD nonces are generally expected only to be unique, not random,
+        and 96 bits is too small for randomly-generated nonces to necessarily
+        have a negligible risk of collision. However, use of sequential nonces
+        in this context is a threat to privacy: a passive adversary could then
+        count the responses emitted by the server and infer the nonces even
+        though they are encrypted, then use this information to identify the
+        client when it later returns the nonce in plaintext.</t>
+
+        <t>A possible alternative approach, which would enable use of AEAD
+        algorithms with short nonces without risk to security or privacy, is
+        to use sequential nonces but avoid directly including them in the
+        cookie; instead, protect them using a key-wrapping scheme such as
+        <xref target="RFC3394">RFC 3394</xref>. Another possibility is to use
+        a <xref target="FPE">format-preserving encryption</xref> scheme to
+        encrypt a counter, using its output as the nonce; to an adversary such
+        nonces will be indistinguishable from random, yet have no risk of
+        collision so long as the counter does not overflow.</t>
+      </section>
+    </section>
+
+    <section title="Protocol Sequence for Time Synchronization Messages in Client-Server Mode">
+      <section anchor="clientinunicast" title="The Client">
+        <t>For a unicast run, the client performs the following steps: <list
+            style="hanging">
+            <t hangText="Step 1:">It performs a key exchange with the server.
+            This SHOULD be done according to the description in <xref
+            target="dtls-key-establishment"/>.</t>
+
+            <t hangText="Step 2:">The client sends a time_request message to
+            the server. The client MUST append a MAC to the time_request
+            message. The client SHOULD save the included nonce and the
+            transmit_timestamp (from the time synchronization data) as a
+            correlated pair for later verification steps.</t>
+
+            <t hangText="Step 3:">It awaits a reply in the form of a
+            time_response message. Upon receipt, it performs the necessary
+            checks, specifically that the appended MAC verifies the received
+            synchronization data, version number and nonce. If at least one of
+            the checks fails, then the client MUST ignore this time_response
+            message.</t>
+          </list>The client's behavior in unicast mode is also expressed in
+        <xref target="fig_flow_unicast"/>.</t>
+      </section>
+
+      <section title="The Server">
+        <t>To support unicast mode, the server MUST be ready to perform the
+        following actions: <list style="symbols">
+            <t>Upon receipt of a key establishment message, the server SHOULD
+            respond accordingly. If the incoming message is on of those
+            described in <xref target="dtls-key-establishment"/>, the server
+            MUST respond.</t>
+
+            <t>Upon receipt of a time_request message, the server
+            re-calculates the key and the MAC for that time_request packet and
+            compares this value with the MAC in the received data.<list
+                style="symbols">
+                <t>If the re-calculated MAC does not match the MAC in the
+                received data the server MUST stop the processing of the
+                request.</t>
+
+                <t>If the re-calculated MAC matches the MAC in the received
+                data the server computes the necessary time synchronization
+                data and constructs a time_response message.</t>
+              </list></t>
+          </list></t>
+      </section>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <section title="Field Type Registry">
+        <t>Within the "NTP Extensions Field Types" registry table, add the
+        field types:</t>
+
+        <figure>
+          <artwork><![CDATA[Field Type  Meaning                              References     
+----------  ------------------------------------ ----------
+TBD1        NTS-Related Content                  [this doc]
+TBD2        NTS-Related Content                  [this doc]
+TBD3        NTS-Related Content                  [this doc]]]></artwork>
+        </figure>
+      </section>
+
+      <section title="SMI Security for S/MIME CMS Content Type Registry">
+        <t>Within the "SMI Security for S/MIME CMS Content Type
+        (1.2.840.113549.1.9.16.1)" table, add one content type identifier:</t>
+
+        <figure>
+          <artwork><![CDATA[Decimal  Description                                   References
+-------  --------------------------------------------  ----------
+TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
+        </figure>
+      </section>
+
+      <section title="DTLS-Based Key Exchange">
+        <t>IANA is requested to allocate an entry in the Service Name and
+        Transport Protocol Port Number Registry as follows: <list>
+            <t>Service Name: nts</t>
+
+            <t>Transport Protocol: udp</t>
+
+            <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
+
+            <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
+
+            <t>Description: Network Time Security</t>
+
+            <t>Reference: [[this memo]]</t>
+
+            <t>Port Number: selected by IANA from the user port range</t>
+          </list></t>
+
+        <t>IANA is requested to allocate the following two entries in the
+        Application-Layer Protocol Negotiation (ALPN) Protocol IDs registry:
+        <list>
+            <t>Protocol: Network Time Security Key Establishment, version
+            1</t>
+
+            <t>Identification
+            Sequence:<vspace/>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x73&nbsp;0x6B&nbsp;0x65&nbsp;0x2F&nbsp;0x31&nbsp;("ntske/1")</t>
+
+            <t>Reference: [[this memo]]</t>
+          </list> <vspace/> <list>
+            <t>Protocol: Network Time Protocol, version 4</t>
+
+            <t>Identification
+            Sequence:<vspace/>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x34&nbsp;("ntp/4")</t>
+
+            <t>Reference: [[this memo]]</t>
+          </list></t>
+
+        <t>IANA is requested to allocate the following entry in the TLS
+        Exporter Label Registry:</t>
+
+        <texttable>
+          <ttcol>Value</ttcol>
+
+          <ttcol>DTLS-OK</ttcol>
+
+          <ttcol>Reference</ttcol>
+
+          <ttcol>Note</ttcol>
+
+          <c>EXPORTER-network-time-security/1</c>
+
+          <c>Y</c>
+
+          <c>[[this memo]]</c>
+
+          <c/>
+        </texttable>
+
+        <t>IANA is requested to allocate the following entries in the registry
+        of NTP Kiss-o'-Death codes:</t>
+
+        <texttable>
+          <ttcol>Code</ttcol>
+
+          <ttcol>Meaning</ttcol>
+
+          <c>DTLS</c>
+
+          <c>Packet conveys a DTLS record</c>
+
+          <c>NTSN</c>
+
+          <c>NTS NAK</c>
+        </texttable>
+
+        <t>IANA is requested to allocate the following entries in the NTP
+        Extensions Field Types registry:</t>
+
+        <texttable>
+          <ttcol>Field Type</ttcol>
+
+          <ttcol>Meaning</ttcol>
+
+          <ttcol>Reference</ttcol>
+
+          <c>[[TBD]]</c>
+
+          <c>DTLS Record</c>
+
+          <c>[[this memo]]</c>
+
+          <c>[[TBD]]</c>
+
+          <c>Unique Identifier</c>
+
+          <c>[[this memo]]</c>
+
+          <c>[[TBD]]</c>
+
+          <c>NTS Cookie</c>
+
+          <c>[[this memo]]</c>
+
+          <c>[[TBD]]</c>
+
+          <c>NTS Authenticator and Encrypted Extensions</c>
+
+          <c>[[this memo]]</c>
+        </texttable>
+
+        <t>IANA is requested to create a new registry entitled "Network Time
+        Security Key Establishment Record Types". Entries SHALL have the
+        following fields: <list>
+            <t>Type Number (REQUIRED): An integer in the range 0&ndash;32767
+            inclusive</t>
+
+            <t>Description (REQUIRED): short text description of the purpose
+            of the field</t>
+
+            <t>Set Critical Bit (REQUIRED): One of "MUST", "SHOULD", "MAY",
+            "SHOULD NOT", or "MUST NOT"</t>
+
+            <t>Reference (REQUIRED): A reference to a document specifying the
+            semantics of the record.</t>
+          </list></t>
+
+        <t>The policy for allocation of new entries in this registry SHALL
+        vary by the Type Number, as follows: <list>
+            <t>0&ndash;1023: Standards Action</t>
+
+            <t>1024&ndash;16383: Specification Required</t>
+
+            <t>16384&ndash;32767: Private and Experimental Use</t>
+          </list></t>
+
+        <t>Applications for new entries SHALL specify the contents of the
+        Description, Set Critical Bit and Reference fields and which of the
+        above ranges the Type Number should be allocated from. Applicants MAY
+        request a specific Type Number, and such requests MAY be granted at
+        the registrar's discretion.</t>
+
+        <t>The initial contents of this registry SHALL be as follows:</t>
+
+        <texttable>
+          <ttcol>Field Number</ttcol>
+
+          <ttcol>Description</ttcol>
+
+          <ttcol>Critical</ttcol>
+
+          <ttcol>Reference</ttcol>
+
+          <c>0</c>
+
+          <c>End of message</c>
+
+          <c>MUST</c>
+
+          <c>[[this memo]]</c>
+
+          <c>1</c>
+
+          <c>NTS next protocol negotiation</c>
+
+          <c>MUST</c>
+
+          <c>[[this memo]]</c>
+
+          <c>2</c>
+
+          <c>Error</c>
+
+          <c>MUST</c>
+
+          <c>[[this memo]]</c>
+
+          <c>3</c>
+
+          <c>Warning</c>
+
+          <c>MUST</c>
+
+          <c>[[this memo]]</c>
+
+          <c>4</c>
+
+          <c>AEAD algorithm negotation</c>
+
+          <c>MAY</c>
+
+          <c>[[this memo]]</c>
+
+          <c>5</c>
+
+          <c>New cookie for NTPv4</c>
+
+          <c>SHOULD NOT</c>
+
+          <c>[[this memo]]</c>
+
+          <c>16384&ndash;32767</c>
+
+          <c>Reserved for Private &amp; Experimental Use</c>
+
+          <c>MAY</c>
+
+          <c>[[this memo]]</c>
+        </texttable>
+
+        <t>IANA is requested to create a new registry entitled "Network Time
+        Security Next Protocols". Entries SHALL have the following fields:
+        <list>
+            <t>Protocol Name (REQUIRED): a sequence of 16 octets. Shorter
+            sequences SHALL implicitly be right-padded with null octets
+            (0x00).</t>
+
+            <t>Human-Readable Name (OPTIONAL): if the sequence of octets
+            making up the protocol name intentionally represent a valid <xref
+            target="RFC3629">UTF-8</xref> string, this field SHALL consist of
+            that string.</t>
+
+            <t>Reference (RECOMMENDED): a reference to a relevant
+            specification document. If no relevant document exists, a
+            point-of-contact for questions regarding the entry SHOULD be
+            listed here in lieu.</t>
+          </list></t>
+
+        <t>Applications for new entries in this registry SHALL specify all
+        desired fields, and SHALL be granted on a First Come, First Serve
+        basis. Protocol Names beginning with 0x78 0x2D ("x-") SHALL be
+        reserved for Private or Experimental Use, and SHALL NOT be registered.
+        The reserved entry "ptp/2" may be updated or released by a future
+        Standards Action.</t>
+
+        <t>The initial contents of this registry SHALL be as follows:</t>
+
+        <texttable>
+          <ttcol>Protocol Name</ttcol>
+
+          <ttcol>Human-Readable Name</ttcol>
+
+          <ttcol>Reference</ttcol>
+
+          <c>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x34&nbsp;</c>
+
+          <c>ntp/4</c>
+
+          <c>[[this memo]]</c>
+
+          <c>&nbsp;&nbsp;0x70&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x32&nbsp;</c>
+
+          <c>ptp/2</c>
+
+          <c>Reserved by [[this memo]]</c>
+        </texttable>
+
+        <t>IANA is requested to create two new registries entitled "Network
+        Time Security Error Codes" and "Network Time Security Warning Codes".
+        Entries in each SHALL have the following fields: <list>
+            <t>Number (REQUIRED): a 16-bit unsigned integer</t>
+
+            <t>Description (REQUIRED): a short text description of the
+            condition.</t>
+
+            <t>Reference (REQUIRED): a reference to a relevant specification
+            document.</t>
+          </list> The policy for allocation of new entries in these registries
+        SHALL vary by their Number, as follows: <list>
+            <t>0&ndash;1023: Standards Action</t>
+
+            <t>1024&ndash;32767: Specification Required</t>
+
+            <t>32768&ndash;65535: Private and Experimental Use</t>
+          </list></t>
+
+        <t>The initial contents of the Network Time Security Error Codes
+        Registry SHALL be as follows:</t>
+
+        <texttable>
+          <ttcol>Number</ttcol>
+
+          <ttcol>Description</ttcol>
+
+          <ttcol>Reference</ttcol>
+
+          <c>0</c>
+
+          <c>Unrecognized Critical Extension</c>
+
+          <c>[[this memo]]</c>
+
+          <c>1</c>
+
+          <c>Bad Request</c>
+
+          <c>[[this memo]]</c>
+        </texttable>
+
+        <t>The Network Time Security Warning Codes Registry SHALL initially be
+        empty.</t>
+      </section>
+    </section>
+
+    <section title="Security Considerations">
+      <t>All security considerations described in <xref
+      target="I-D.ietf-ntp-network-time-security"/> have to be taken into
+      account. The application of NTS to NTP requires the following additional
+      considerations.</t>
+
+      <section title="Usage of NTP Pools">
+        <t>The certification-based authentication scheme described in <xref
+        target="I-D.ietf-ntp-network-time-security"/> is not applicable to the
+        concept of NTP pools. Therefore, NTS is unable to provide secure usage
+        of NTP pools.</t>
+      </section>
+
+      <section title="Initial Verification of the Server Certificates">
+        <t>The client may wish to verify the validity of certificates during
+        the initial association phase. Since it generally has no reliable time
+        during this initial communication phase, it is impossible to verify
+        the period of validity of the certificates.</t>
+      </section>
+
+      <section title="Treatment of Initial Messages">
+        <t>NTP packets which contains extension fields with key exchange
+        messages do not provide integrity and authenticity protection of the
+        included time stamps. Therefore these NTP packets MUST NOT be used for
+        clock synchronization. Otherwise an initial attack on the client's
+        clock <xref target="attacking-ntp"/> can potentially circumvent the
+        employed security measures of later messages <xref
+        target="delorean"/>.</t>
+      </section>
+
+      <section title="DTLS-Related Issues">
+        <t>... TBD</t>
+      </section>
+
+      <section anchor="DelayAttack" title="Delay Attack">
+        <t>In a packet delay attack, an adversary with the ability to act as a
+        MITM delays time synchronization packets between client and server
+        asymmetrically <xref target="RFC7384"/>. This prevents the client from
+        accurately measuring the network delay, and hence its time offset to
+        the server <xref target="Mizrahi"/>. The delay attack does not modify
+        the content of the exchanged synchronization packets. Therefore,
+        cryptographic means do not provide a feasible way to mitigate this
+        attack. However, the maximum error that an adversary can introduced is
+        bounded by half of the round trip delay. Also, several
+        non-cryptographic precautions can be taken in order to detect this
+        attack.</t>
+
+        <t><list style="numbers">
+            <t>Usage of multiple time servers: this enables the client to
+            detect the attack, provided that the adversary is unable to delay
+            the synchronization packets between the majority of servers. This
+            approach is commonly used in NTP to exclude incorrect time servers
+            <xref target="RFC5905"/>.</t>
+
+            <t>Multiple communication paths: The client and server utilize
+            different paths for packet exchange as described in the I-D <xref
+            target="I-D.ietf-tictoc-multi-path-synchronization"/>. The client
+            can detect the attack, provided that the adversary is unable to
+            manipulate the majority of the available paths <xref
+            target="Shpiner"/>. Note that this approach is not yet available,
+            neither for NTP nor for PTP.</t>
+
+            <t>Usage of an encrypted connection: the client exchanges all
+            packets with the time server over an encrypted connection (e.g.
+            IPsec). This measure does not mitigate the delay attack, but it
+            makes it more difficult for the adversary to identify the time
+            synchronization packets.</t>
+
+            <t>Introduction of a threshold value for the delay time of the
+            synchronization packets. The client can discard a time server if
+            the packet delay time of this time server is larger than the
+            threshold value.</t>
+          </list></t>
+      </section>
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>The authors would like to thank Russ Housley, Steven Bellovin, David
+      Mills and Kurt Roeckx for discussions and comments on the design of NTS.
+      Also, thanks to Harlan Stenn, Danny Mayer, Richard Welty and Martin
+      Langer for their technical review and specific text contributions to
+      this document.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include='reference.RFC.2119'?>
+
+      <?rfc include='reference.RFC.3394'?>
+
+      <?rfc include='reference.RFC.5905'?>
+
+      <?rfc include='reference.RFC.4082'?>
+
+      <?rfc include='reference.RFC.5652'?>
+
+      <?rfc include='reference.I-D.draft-ietf-ntp-cms-for-nts-message-06'?>
+
+      <?rfc include='reference.I-D.draft-ietf-ntp-network-time-security-13'?>
+
+      <?rfc include='reference.I-D.draft-ietf-ntp-extension-field-07'?>
+
+      <?rfc include='reference.RFC.3629'?>
+
+      <?rfc include='reference.RFC.5116'?>
+
+      <?rfc include='reference.RFC.5297'?>
+
+      <?rfc include='reference.RFC.5705'?>
+
+      <?rfc include='reference.RFC.5746'?>
+
+      <?rfc include='reference.RFC.5905'?>
+
+      <?rfc include='reference.RFC.6347'?>
+
+      <?rfc include='reference.RFC.7465'?>
+
+      <?rfc include='reference.RFC.7507'?>
+
+      <?rfc include='reference.RFC.7627'?>
+
+      <?rfc include='reference.RFC.7301'?>
+
+      <?rfc include='reference.RFC.7822'?>
+    </references>
+
+    <references title="Informative References">
+      <?rfc include='reference.RFC.7384'?>
+
+      <?rfc include='reference.RFC.5077'?>
+
+      <?rfc include='reference.RFC.7821'?>
+
+      <reference anchor="IEC.61588_2009"
+                 target="http://ieeexplore.ieee.org/servlet/opac?punumber=4839000">
+        <front>
+          <title>Precision clock synchronization protocol for networked
+          measurement and control systems</title>
+
+          <author>
+            <organization>IEEE/IEC</organization>
+          </author>
+
+          <date day="2" month="February" year="2009"/>
+
+          <abstract>
+            <t>A protocol is provided in this standard that enables precise
+            synchronization of clocks in measurement and control systems
+            implemented with technologies such as network communication, local
+            computing, and distributed objects. The protocol is applicable to
+            systems communicating via packet networks. Heterogeneous systems
+            are enabled that include clocks of various inherent precision,
+            resolution, and stability to synchronize. System-wide
+            synchronization accuracy and precision in the sub-microsecond
+            range are supported with minimal network and local clock computing
+            resources. Simple systems are installed and operated without
+            requiring the management attention of users because the default
+            behavior of the protocol allows for it.</t>
+          </abstract>
+        </front>
+
+        <seriesInfo name="IEEE" value="1588-2008(E)"/>
+
+        <seriesInfo name="IEC" value="61588:2009(E)"/>
+
+        <seriesInfo name="DOI" value="10.1109/IEEESTD.2009.4839002"/>
+      </reference>
+
+      <reference anchor="Mizrahi" target="">
+        <front>
+          <title>A game theoretic analysis of delay attacks against time
+          synchronization protocols</title>
+
+          <author fullname="Tal Mizrahi" initials="T" surname="Mizrahi">
+            <organization abbrev=""/>
+          </author>
+
+          <date day="" month="September" year="2012"/>
+        </front>
+
+        <seriesInfo name="in Proceedings of"
+                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6"/>
+      </reference>
+
+      <reference anchor="delorean">
+        <front>
+          <title>Bypassing HTTP Strict Transport Security</title>
+
+          <author fullname="Jose Selvi">
+            <organization/>
+          </author>
+
+          <date year="2014"/>
+
+          <abstract>
+            <t>For the last few years, some different attacks against SSL/TLS
+            have been released. Some of them based on cryptography or protocol
+            weaknesses such as BEAST, CRIME, BREACH, etc, and some others,
+            such as SSLStrip, based on rewriting HTTPS links into HTTP ones
+            and keep user communications always in HTTP. In order to protect
+            users against SSLStrip attacks, a new protection called HTTP
+            Strict Transport Security (HSTS) has been developed and it&rsquo;s
+            currently supported by most widely used browsers. However, under
+            certain circumstances, an attacker could exploit an
+            inter-operation vulnerability in order to bypass HTTP Strict
+            Transport Security protection and use other well-known attack
+            techniques such as SSLStrip. In this paper, we review the HSTS
+            strengths and weaknesses, and we go in-depth on this
+            inter-operation vulnerability and how it could be exploited.</t>
+          </abstract>
+        </front>
+      </reference>
+
+      <reference anchor="attacking-ntp">
+        <front>
+          <title>Attacking the Network Time Protocol</title>
+
+          <author fullname="Aanchal Malhotra, Isaac E. Cohen, Erik Brakke, and Sharon Goldberg">
+            <organization/>
+          </author>
+
+          <date day="21" month="October" year="2015"/>
+        </front>
+      </reference>
+    </references>
+
+    <section title="Flow Diagrams of Client Behaviour">
+      <figure anchor="fig_flow_unicast"
+              title="The client's behavior in NTS unicast mode.">
+        <artwork><![CDATA[+------------------------------>o
+|                               |
+|                               v
+|                        +-------------+
+|                        |Key Exchange |
+|                        +------+------+
+|                               |
+|                               o<------------------------------+
+|                               |                               |
+|                               v                               |
+|                     +-------------------+                     |
+|                     |Time Sync. Messages|                     |
+|                     +---------+---------+                     |
+|                               |                               |
+|                               v                               |
+|                            +-----+                            |
+|                            |Check|                            |
+|                            +--+--+                            |
+|                               |                               |
+|            /------------------+------------------\            |
+|           v                   v                   v           |
+|     .-----------.      .-------------.        .-------.       |
+|    ( MAC Failure )    ( Nonce Failure )      ( Success )      |
+|     '-----+-----'      '------+------'        '---+---'       |
+|           |                   |                   |           |
+|           v                   v                   v           |
+|    +-------------+     +-------------+     +--------------+   |
+|    |Discard Data |     |Discard Data |     |Sync. Process |   |
+|    +-------------+     +------+------+     +------+-------+   |
+|           |                   |                   |           |
+|           |                   |                   v           |
++-----------+                   +------------------>o-----------+]]></artwork>
+      </figure>
+    </section>
+  </back>
+</rfc>
