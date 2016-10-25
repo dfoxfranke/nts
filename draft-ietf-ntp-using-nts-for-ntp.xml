@@ -17,28 +17,17 @@
     Secure the Network Time Protocol</title>
 
     <author fullname="Daniel Fox Franke" initials="D." surname="Franke">
-      <organization/>
-
+      <organization abbrev="Akamai">Akamai Technologies, Inc.</organization>
       <address>
         <postal>
-          <street/>
-
-          <city/>
-
-          <region/>
-
-          <code/>
-
-          <country/>
+          <street>150 Broadway</street>
+          <city>Cambridge</city>
+          <region>MA</region>
+          <code>02142</code>
+          <country>United States</country>
         </postal>
-
-        <phone/>
-
-        <facsimile/>
-
-        <email/>
-
-        <uri/>
+        <email>dafranke@akamai.com</email>
+        <uri>https://www.dfranke.us</uri>
       </address>
     </author>
 
