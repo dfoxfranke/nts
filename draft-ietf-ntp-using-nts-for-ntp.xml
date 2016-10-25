@@ -681,6 +681,13 @@
         </section>
       </section>
 
+      <section title="NTS Extensions for NTPv4" anchor="nts-extensions-for-ntpv4">
+        <t>
+          [TO BE MERGED]
+        </t>
+      </section>
+        
+
       <section title="Recommended format for NTS cookies" anchor="recommended-format-for-nts-cookies">
         <t>
           This section provides a RECOMMENDED way for servers to
@@ -1227,6 +1234,8 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
 
       <?rfc include='reference.I-D.draft-ietf-ntp-extension-field-07'?>
 
+      <?rfc include='reference.I-D.draft-ietf-tictoc-multi-path-synchronization-06'?>
+
       <?rfc include='reference.RFC.3629'?>
 
       <?rfc include='reference.RFC.5116'?>
@@ -1337,6 +1346,19 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
             inter-operation vulnerability and how it could be exploited.</t>
           </abstract>
         </front>
+      </reference>
+
+      <reference anchor="Shpiner">
+        <front>
+          <title>Multi-path Time Protocols</title>
+          <author fullname="Alexander Shpiner, Yoram Revah, and Tal Mizrahi">
+            <organization/>
+          </author>
+          <date year="2013" month="September"/>
+        </front>
+
+        <seriesInfo name="in Proceedings of"
+                    value="IEEE International Symposium on Precision Clock Synchronization for Measurement, Control and Communication (ISPCS)"/>
       </reference>
 
       <reference anchor="attacking-ntp">
