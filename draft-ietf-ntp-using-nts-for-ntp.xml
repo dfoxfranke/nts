@@ -135,20 +135,15 @@
           <t>Integrity: NTS protects the integrity of NTP time synchronization
           protocol packets via a message authentication code (MAC).</t>
 
-          <t>Confidentiality: NTS does not provide confidentiality protection
-          of the time synchronization packets.<list style="hanging">
-              <t hangText="Note:">Depending on discussion regarding
-              non-traceability (see below), this item should be deleted.</t>
-            </list></t>
-
           <t>Authorization: NTS optionally enables the server to verify the
           client's authorization.</t>
+		  
+		  <t>Confidentiality: NTS does not provide confidentiality protection
+          of the time synchronization data.</t>
 
-		  <t>Privacy: NTS shall not provide hat allows a passive attacker to
-          track a mobile NTP clients when switching the network, without
-          assuming that the clients are able to reliably detect the change in
-          their IP address.
-		  <!--This objective is still under discussion. The main issue is whether this from of the objective is worth the effort or if it needs to have the appendix "or using data sent by the underlying NTP implementation". The current proposal from Daniel does not address this and it remains to be seen how much of an issue the NTP data is in this regard.--></t>
+		  <t>Privacy: NTS preserves unlinkability, i. e. it does not leak data
+		  that would allow a passive attacker to track mobile NTP clients when
+		  they move between networks. 
 
           <t>Request-Response-Consistency: NTS enables a client to match an
           incoming response to a request it has sent. NTS also enables the
