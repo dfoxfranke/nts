@@ -129,8 +129,14 @@
       synchronization protocol packets.</t>
 
       <t>This document provides detail on how to specifically use those
-      measures to secure time synchronization between NTP clients and
-      servers.</t>
+      measures to secure time synchronization between NTP clients and servers.
+      In particular, it describes a mechanism for using <xref
+      target="RFC6347">Datagram Transport Layer Security</xref> (DTLS) to
+      provide cryptographic security for NTP. Certain sections, are not
+      inherently NTP-specific and can be taken as guidance on how future work
+      may apply the described techniques to other time synchronization
+      protocols such as the <xref target="IEC.61588_2009">Precision Time
+      Protocol</xref>.</t>
     </section>
 
     <section title="Objectives">
@@ -669,7 +675,279 @@
 
       <section anchor="nts-extensions-for-ntpv4"
                title="NTS Extensions for NTPv4">
-        <t>[TO BE MERGED]</t>
+        <section title="Key Extraction (for NTPv4)">
+          <t>Following a successful run of the NTS-KE protocol wherein "ntp/4"
+          is selected as a Next Protocol, two AEAD keys SHALL be extracted: a
+          client-to-server (C2S) key and a server-to-client (S2C) key. These
+          keys SHALL be computed according to <xref target="RFC5705">RFC
+          5705</xref>, using the following inputs. <list>
+              <t>The disambiguating label string SHALL be
+              "EXPORTER-network-time-security/1".</t>
+
+              <t>The per-association context value SHALL consist of the
+              following 19 octets: <list>
+                  <t>The first 16 octets SHALL be (in hexadecimal):<vspace
+                  blankLines="1"/>
+                  &nbsp;&nbsp;6E&nbsp;74&nbsp;70&nbsp;2F&nbsp;34&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00</t>
+
+                  <t>The next two octets SHALL be the Numeric Identifier of
+                  the negotiated AEAD Algorithm, in network byte order.</t>
+
+                  <t>The final octet SHALL be 0x00 for the C2S key and 0x01
+                  for the S2C key.</t>
+                </list></t>
+            </list> Implementations wishing to derive additional keys for
+          private or experimental use MUST NOT do so by extending the
+          above-specified syntax for per-association context values. Instead,
+          they SHOULD use their own disambiguating label string. Note that RFC
+          5705 provides that disambiguating label strings beginning with
+          "EXPERIMENTAL" MAY be used without IANA registration.</t>
+        </section>
+
+        <section title="Packet structure overview">
+          <t>In general, an NTS-protected NTPv4 packet consists of: <list>
+              <t>The usual 48-octet NTP header, which is authenticated but not
+              encrypted.</t>
+
+              <t>Some extensions which are authenticated but not
+              encrypted.</t>
+
+              <t>An NTS extension which contains AEAD output (i.e., an
+              authentication tag and possible ciphertext). The corresponding
+              plaintext, if non-empty, consists of some extensions which
+              benefit from both encryption and authentication.</t>
+
+              <t>Possibly, some additional extensions which are neither
+              encrypted nor authenticated. These are discarded by the
+              receiver. [[Ed. Note: right now there's no good reason for the
+              sender to include anything here, but eventually there might be.
+              We've seen <xref target="RFC7821">Checksum Complement</xref> and
+              LAST-EF as two examples of semantically-void extensions that are
+              included to satsify constraints imposed lower on the protocol
+              stack, and while there's no reason to use either of these on
+              NTS-protected packets, I think we could see similar examples in
+              the future. So, rejecting packets with unauthenticated
+              extensions could cause interoperability problems, while
+              accepting and processing those extensions would of course be a
+              security risk. Thus, I think "allow and discard" is the correct
+              policy.]]</t>
+            </list></t>
+
+          <t>Always included among the authenticated or
+          authenticated-and-encrypted extensions are a cookie extension and a
+          unique-identifier extension. The purpose of the cookie extension is
+          to enable the server to offload storage of session state onto the
+          client. The purpose of the unique-identifier extension is to protect
+          the client from replay attacks.</t>
+        </section>
+
+        <section title="The Unique Identifier extension">
+          <t>The Unique Identifier extension has a Field Type of [[TBD]]. When
+          the extension is included in a client packet (mode 3), its body
+          SHALL consist of a string of octets generated uniformly at random.
+          The string SHOULD be 32 octets long. When the extension is included
+          in a server packet (mode 4), its body SHALL contain the same octet
+          string as was provided in the client packet to which the server is
+          responding. Its use in modes other than client/server is not
+          defined.</t>
+
+          <t>The Unique Identifier extension provides the client with a
+          cryptographically strong means of detecting replayed packets. It may
+          also be used standalone, without NTS, in which case it provides the
+          client with a means of detecting spoofed packets from off-path
+          attackers. Historically, NTP's origin timestamp field has played
+          both these roles, but for cryptographic purposes this is suboptimal
+          because it is only 64 bits long and, depending on implementation
+          details, most of those bits may be predictable. In contrast, the
+          Unique Identifier extension enables a degree of unpredictability and
+          collision-resistance more consistent with cryptographic best
+          practice.</t>
+
+          <t>[[TODO: consider using separate extension types for request and
+          response, thus allowing for use in symmetric mode. But proper
+          handling in the presence of dropped packets needs to be documented
+          and involves a lot of subtlety.]]</t>
+        </section>
+
+        <section title="The NTS Cookie extension">
+          <t>The NTS Cookie extension has a Field Type of [[TBD]]. Its purpose
+          is to carry information which enables the server to recompute keys
+          and other session state without having to store any per-client
+          state. The contents of its body SHALL be implementation-defined and
+          clients MUST NOT attempt to interpret them. See [[TODO]] for a
+          RECOMMENDED construction. The NTS Cookie extension MUST NOT be
+          included in NTP packets whose mode is other than 3 (client) or 4
+          (server).</t>
+        </section>
+
+        <section title="The NTS Cookie Placeholder extension">
+          <t>The NTS Cookie Placeholder extension has a Field Type of [[TBD]].
+          When this extension is included in a client packet (mode 3), it
+          communicates to the server that the client wishes it to send
+          additional cookies in its response. This extension MUST NOT be
+          included in NTP packets whose mode is other than 3.</t>
+
+          <t>Whenever an NTS Cookie Placeholder extension is present, it MUST
+          be accompanied by an NTS Cookie extension, and the body length of
+          the NTS Cookie Placeholder extension MUST be the same as the body
+          length of the NTS Cookie Extension. (This length requirement serves
+          to ensure that the response will not be larger than the request, in
+          order to improve timekeeping precision and prevent DDoS
+          amplification). The contents of the NTS Cookie Placeholder
+          extension's body are undefined and, aside from checking its length,
+          MUST be ignored by the server.</t>
+        </section>
+
+        <section title="The NTS Authenticator and Encrypted Extensions extension">
+          <t>The NTS Authenticator and Encrypted Extensions extension is the
+          central cryptographic element of an NTS-protected NTP packet. Its
+          Field Type is [[TBD]] and the format of its body SHALL be as
+          follows: <list>
+              <t>Nonce length: two octets in network byte order, giving the
+              length of the Nonce field.</t>
+
+              <t>Nonce: a nonce as required by the negotiated AEAD
+              Algorithm.</t>
+
+              <t>Ciphertext: the output of the negotiated AEAD Algorithm. The
+              structure of this field is determined by the negotiated
+              algorithm, but it typically contains an authentication tag in
+              addition to the actual ciphertext.</t>
+
+              <t>Padding: between 1 and 24 octets of padding, with every octet
+              set to the number of padding octets included, e.g., "01", "02
+              02", or "03 03 03". The number of padding bytes should be chosen
+              in order to comply with the <xref target="RFC7822">RFC
+              7822</xref> requirement that (in the absence of a legacy MAC)
+              extensions have a total length in octets (including the four
+              octets for the type and length fields) which is at least 28 and
+              divisible by 4. At least one octet of padding MUST be included,
+              so that implementations can unambiguously delimit the end of the
+              ciphertext from the start of the padding.</t>
+            </list></t>
+
+          <t>The Ciphertext field SHALL be formed by providing the following
+          inputs to the negotiated AEAD Algorithm: <list>
+              <t>K: For packets sent from the client to the server, the C2S
+              key SHALL be used. For packets sent from the server to the
+              client, the S2C key SHALL be used.</t>
+
+              <t>A: The associated data SHALL consist of the portion of the
+              NTP packet beginning from the start of the NTP header and ending
+              at the end of the last extension which precedes the NTS
+              Authenticator and Encrypted Extensions extension.</t>
+
+              <t>P: The plaintext SHALL consist of all (if any) extensions to
+              be encrypted.</t>
+
+              <t>N: The nonce SHALL be formed however required by the
+              negotiated AEAD Algorithm.</t>
+            </list></t>
+
+          <t>The NTS Authenticator and Encrypted Extensions extension MUST NOT
+          be included in NTP packets whose mode is other than 3 (client) or 4
+          (server).</t>
+        </section>
+
+        <section title="Protocol details">
+          <t>A client sending an NTS-protected request SHALL include the
+          following extensions: <list>
+              <t>Exactly one Unique Identifier extension, which MUST be
+              authenticated and MUST NOT be encrypted [[Ed. Note: so that if
+              the server can't decrypt the request, it can still echo back the
+              Unique Identifier in the NTS NAK it sends]]. MUST NOT duplicate
+              those of any previous request.</t>
+
+              <t>Exactly one NTS Cookie extension, which MUST be authenticated
+              and MUST NOT be encrypted. The cookie MUST be one which the
+              server previously provided the client; it may have been provided
+              during the NTS-KE handshake or in response to a previous
+              NTS-protected NTP request. To protect client's privacy, the same
+              cookie SHOULD NOT be included in multiple requests. If the
+              client does not have any cookies that it has not already sent,
+              it SHOULD re-run the NTS-KE protocol before continuing.</t>
+
+              <t>Exactly one NTS Authenticator and Encrypted Extensions
+              extension, generated using an AEAD Algorithm and C2S key
+              established through NTS-KE.</t>
+            </list></t>
+
+          <t>The client MAY include one or more NTS Cookie Placeholder
+          extensions, which MUST be authenticated and MAY be encrypted. The
+          number of NTS Cookie Placeholder extensions that the client includes
+          SHOULD be such that if the client includes N placeholders and the
+          server sends back N+1 cookies, the number of unused cookies stored
+          by the client will come to eight. When both the client and server
+          adhere to all cookie-management guidance provided in this memo, the
+          number of placeholder extensions will equal the number of dropped
+          packets since the last successful volley.</t>
+
+          <t>The client MAY include additional (non-NTS-related) extensions,
+          which MAY appear prior to the NTS Authenticator and Encrypted
+          Extensions extension (therefore authenticated but not encrypted),
+          within it (therefore encrypted and authenticated), or after it
+          (therefore neither encrypted nor authenticated). In general,
+          however, the server MUST discard any unauthenticated extensions and
+          process the packet as though they were not present. Servers MAY
+          implement exceptions to this requirement for particular extensions
+          if their specification explicitly provides for such.</t>
+
+          <t>Upon receiving an NTS-protected request, the server SHALL
+          (through some implementation-defined mechanism) use the cookie to
+          recover the AEAD Algorithm, C2S key, and S2C key associated with the
+          request, and then use the C2S key to authenticate the packet and
+          decrypt the ciphertext. If the cookie is valid and authentication
+          and decryption succeed, then the server SHALL include the following
+          extensions in its response: <list>
+              <t>Exactly one Unique Identifier extension, which MUST be
+              authenticated, MUST NOT be encrypted, and whose contents SHALL
+              echo those provided by the client.</t>
+
+              <t>Exactly one NTS Authenticator and Encrypted Extensions
+              extension, generated using the AEAD algorithm and S2C key
+              recovered from the cookie provided by the client.</t>
+
+              <t>One or more NTS Cookie extensions, which MUST be
+              authenticated and encrypted. The number of NTS Cookie extensions
+              included SHOULD be equal to, and MUST NOT exceed, one plus the
+              number of valid NTS Cookie Placeholder extensions included in
+              the request.</t>
+            </list></t>
+
+          <t>The server MAY include additional (non-NTS-related) extensions,
+          which MAY appear prior to the NTS Authenticator and Encrypted
+          Extensions extension (therefore authenticated but not encrypted),
+          within it (therefore encrypted and authenticated), or after it
+          (therefore neither encrypted nor authenticated). In general,
+          however, the client MUST discard any unauthenticated extensions and
+          process the packet as though they were not present. Clients MAY
+          implement exceptions to this requirement for particular extensions
+          if their specification explicitly provides for such.</t>
+
+          <t>If the server is unable to validate the cookie or authenticate
+          the request, it SHOULD respond with a Kiss-o'-Death packet (see
+          <xref target="RFC5905">RFC 5905, Section 7.4)</xref>) with kiss code
+          "NTSN" (meaning "NTS NAK"). Such a response MUST include exactly one
+          Unique Identifier extension whose contents SHALL echo those provided
+          by the client. It MUST NOT include any NTS Cookie or NTS
+          Authenticator and Encrypted Extensions extension. [[Ed. Note: RFC
+          5905 already provides the kiss code "CRYP" meaning "Cryptographic
+          authentication or identification failed" but I think this is meant
+          to be Autokey-specific.]]</t>
+
+          <t>Upon receiving an NTS-protected response, the client MUST verify
+          that the Unique Identifier matches that of an outstanding request,
+          and that the packet is authentic under the S2C key associated with
+          that request. If either of these checks fails, the packet MUST be
+          discarded without further processing.</t>
+
+          <t>Upon receiving an NTS NAK, the client MUST verify that the Unique
+          Identifier matches that of an outstanding request. If this check
+          fails, the packet MUST be discarded without further processing. If
+          this check passes, the client SHOULD discard all cookies and AEAD
+          keys associated with the server which sent the NAK and initiate a
+          fresh NTS-KE handshake.</t>
+        </section>
       </section>
 
       <section anchor="recommended-format-for-nts-cookies"
@@ -724,53 +1002,58 @@
         <t>[[TODO: explicitly specify how to verify and decrypt a cookie, not
         just how to form one]]</t>
       </section>
-    </section>
 
-    <section title="Protocol Sequence for Time Synchronization Messages in Client-Server Mode">
-      <section anchor="clientinunicast" title="The Client">
-        <t>For a unicast run, the client performs the following steps: <list
-            style="hanging">
-            <t hangText="Step 1:">It performs a key exchange with the server.
-            This SHOULD be done according to the description in <xref
-            target="dtls-key-establishment"/>.</t>
+      <section anchor="recommended-format-for-nts-cookies"
+               title="Recommended format for NTS cookies">
+        <t>This section provides a RECOMMENDED way for servers to construct
+        NTS cookies. Clients MUST NOT examine the cookie under the assumption
+        that it is constructed according to this section.</t>
 
-            <t hangText="Step 2:">The client sends a time_request message to
-            the server. The client MUST append a MAC to the time_request
-            message. The client SHOULD save the included nonce and the
-            transmit_timestamp (from the time synchronization data) as a
-            correlated pair for later verification steps.</t>
+        <t>The role of cookies in NTS is closely analagous to that of session
+        cookies in TLS. Accordingly, the thematic resemblance of this section
+        to <xref target="RFC5077">RFC 5077</xref> is deliberate, and the
+        reader should likewise take heed of its security considerations.</t>
 
-            <t hangText="Step 3:">It awaits a reply in the form of a
-            time_response message. Upon receipt, it performs the necessary
-            checks, specifically that the appended MAC verifies the received
-            synchronization data, version number and nonce. If at least one of
-            the checks fails, then the client MUST ignore this time_response
-            message.</t>
-          </list>The client's behavior in unicast mode is also expressed in
-        <xref target="fig_flow_unicast"/>.</t>
-      </section>
+        <t>Servers should select an AEAD algorithm which they will use to
+        encrypt and authenticate cookies. The chosen algorithm should be one
+        such as <xref target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which
+        resists accidential nonce reuse, and it need not be the same as the
+        one that was negotiated with the client. Servers should randomly
+        generate and store a master AEAD key `K`. Servers should additionally
+        choose a non-secret, unique value `I` as key-identifier for `K`.</t>
 
-      <section title="The Server">
-        <t>To support unicast mode, the server MUST be ready to perform the
-        following actions: <list style="symbols">
-            <t>Upon receipt of a key establishment message, the server SHOULD
-            respond accordingly. If the incoming message is on of those
-            described in <xref target="dtls-key-establishment"/>, the server
-            MUST respond.</t>
+        <t>Servers should periodically (e.g., once daily) generate a new pair
+        (I,K) and immediately switch to using these values for all
+        newly-generated cookies. Immediately following each such key rotation,
+        servers should securely erase any keys generated two or more rotation
+        periods prior. Servers should continue to accept any cookie generated
+        using keys that they have not yet erased, even if those keys are no
+        longer current. Erasing old keys provides for forward secrecy,
+        limiting the scope of what old information can be stolen if a master
+        key is somehow compromised. Holding on to a limited number of old keys
+        allows clients to seamlessly transition from one generation to the
+        next without having to perform a new NTS-KE handshake.</t>
 
-            <t>Upon receipt of a time_request message, the server
-            re-calculates the key and the MAC for that time_request packet and
-            compares this value with the MAC in the received data.<list
-                style="symbols">
-                <t>If the re-calculated MAC does not match the MAC in the
-                received data the server MUST stop the processing of the
-                request.</t>
+        <t>[[TODO: discuss key management considerations for load-balanced
+        servers]]</t>
 
-                <t>If the re-calculated MAC matches the MAC in the received
-                data the server computes the necessary time synchronization
-                data and constructs a time_response message.</t>
-              </list></t>
+        <t>To form a cookie, servers should first form a plaintext `P`
+        consisting of the following fields: <list>
+            <t>The AEAD algorithm negotiated during NTS-KE</t>
+
+            <t>The S2C key</t>
+
+            <t>The C2S key</t>
           </list></t>
+
+        <t>Servers should the generate a nonce `N` uniformly at random, and
+        form AEAD output `C` by encrypting `P` under key `K` with nonce `N`
+        and no associated data.</t>
+
+        <t>The cookie should consist of the tuple `(I,N,C)`.</t>
+
+        <t>[[TODO: explicitly specify how to verify and decrypt a cookie, not
+        just how to form one]]</t>
       </section>
     </section>
 
