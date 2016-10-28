@@ -1481,18 +1481,27 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
         never represents recognizable data in the sense outlined above.</t>
 
         <t>Note that the objective of NTS regarding unlinkability is merely to
-        not leak any additional data that would cause linkability. What NTS
-        does not do is to deal with any legacy linkability issues that might
-        already be in NTP.</t>
+        not leak any additional data that would cause linkability. NTS does
+        not rectify legacy linkability issues that are already present in NTP.
+        To minimize the risk of being tracked by a passive adversary the NTP
+        client has to minimize the information it transmits within a client
+        request (mode 3 packet) as described in the draft <xref
+        target="I-D.draft-dfranke-ntp-data-minimization"/>.</t>
+
+        <t>Also note that normal NTP clients should not act as NTP servers.
+        Otherwise, an active adversary may be able to abuse the client's
+        server responses (mode 4 packets) for its tracking. This is done by
+        [tbd].</t>
       </section>
     </section>
 
     <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>The authors would like to thank Russ Housley, Steven Bellovin, David
-      Mills and Kurt Roeckx for discussions and comments on the design of NTS.
-      Also, thanks to Harlan Stenn, Danny Mayer, Richard Welty and Martin
-      Langer for their technical review and specific text contributions to
-      this document.</t>
+      <t>The authors would like to thank Richard Barnes, Steven Bellovin,
+      Sharon Goldberg, Russ Housley, Martin Langer, Miroslav Lichvar, Aanchal
+      Malhotra, Dave Mills, Danny Mayer, Karen O'Donoghue, Eric K. Rescorla,
+      Stephen Roettger, Kurt Roeckx, Kyle Rose, Rich Salz, Brian Sniffen,
+      Susan Sons, Douglas Stebila, Harlan Stenn, Martin Thomson, and Richard
+      Welty for contributions to this document. on the design of NTS.</t>
     </section>
   </middle>
 
@@ -1539,6 +1548,8 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
       <?rfc include='reference.RFC.7301'?>
 
       <?rfc include='reference.RFC.7822'?>
+
+      <?rfc include='reference.I-D.draft-dfranke-ntp-data-minimization-00'?>
     </references>
 
     <references title="Informative References">
