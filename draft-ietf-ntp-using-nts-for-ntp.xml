@@ -169,14 +169,15 @@
 
               <t>Privacy: NTS preserves unlinkability, i. e. it does not leak
               data that would allow a passive attacker to track mobile NTP
-              clients when they move between networks. Note unlinkability is
-              not guaranteed in the presence of active attackers, see <xref
+              clients when they move between networks. Note that unlinkability
+              is not guaranteed in the presence of active attackers, see <xref
               target="privacy_considerations_unlinkability"/>.</t>
 
               <t>Request-Response-Consistency: NTS enables a client to match
               an incoming response to a request it has sent. NTS also enables
               the client to deduce from the response whether its request to
-              the server has arrived without alteration.</t>
+              the server has arrived without alteration. This is to prevent
+              attacks employing replays of valid server responses.</t>
             </list></t>
 
           <t>Additional protection for key exchange messages:<list
@@ -1442,22 +1443,19 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
         not rectify legacy linkability issues that are already present in NTP.
         To minimize the risk of being tracked by a passive adversary the NTP
         client has to minimize the information it transmits within a client
-        request (mode 3 packet) as described in the draft
-        "I-D.draft-dfranke-ntp-data-minimization".</t>
+        request (mode 3 packet) as described in the draft <xref
+        target="I-D.draft-dfranke-ntp-data-minimization"/>.</t>
 
         <t>Also note that generally, NTP clients should not unnecessarily act
         as NTP servers. Otherwise, an active adversary may be able to abuse
-        the client's server responses for its tracking. </t>
-
-        <t>In the case where the participant in question offers services of an
-        NTS-secured NTP server, the active adversary can identify it by simply
-        asking for authentication in the course of a key exchange for
-        NTS-secured NTP.</t>
-
-        <t>But even in the case where the above is not possible, the active
-        adversary can use mode 4 packets for tracking the device in question,
-        by evaluating combinations of the given fields Poll, Precision, Root
-        Delay, Root Dispersion, Reference ID, and Reference Timestamp.</t>
+        the client's server responses for its tracking. In the case where the
+        participant in question offers services as an NTS-secured NTP server,
+        an active adversary can identify it via the received certificate from
+        a key exchange for NTS-secured NTP. But even in the case where this is
+        not possible, an active adversary can use mode 4 packets for tracking
+        the device in question, by evaluating combinations of the given fields
+        Precision, Root Delay, Root Dispersion, Reference ID, and Reference
+        Timestamp.</t>
       </section>
     </section>
 
@@ -1514,8 +1512,6 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
       <?rfc include='reference.RFC.7301'?>
 
       <?rfc include='reference.RFC.7822'?>
-
-      <?rfc include='reference.I-D.draft-dfranke-ntp-data-minimization-00'?>
     </references>
 
     <references title="Informative References">
