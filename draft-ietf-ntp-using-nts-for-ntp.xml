@@ -139,47 +139,6 @@
       Protocol</xref>.</t>
     </section>
 
-    <section title="Objectives">
-      <t>The specific objectives for applying the NTS specification to the NTP
-      are as follows:<list style="symbols">
-          <t>Authenticity: NTS enables an NTP client to authenticate its time
-          server(s).</t>
-
-          <t>Integrity: NTS protects the integrity of NTP time synchronization
-          protocol packets via a message authentication code (MAC).</t>
-
-          <t>Authorization: NTS optionally enables the server to verify the
-          client's authorization.</t>
-
-          <t>Confidentiality: NTS does not provide confidentiality protection
-          of the time synchronization data.</t>
-
-          <t>Privacy: NTS preserves unlinkability, i. e. it does not leak data
-          that would allow a passive attacker to track mobile NTP clients when
-          they move between networks.</t>
-
-          <t>Request-Response-Consistency: NTS enables a client to match an
-          incoming response to a request it has sent. NTS also enables the
-          client to deduce from the response whether its request to the server
-          has arrived without alteration.</t>
-
-          <t>Modes of operation: Both the client-server mode and the symmetric
-          peer mode of NTP are supported. The broadcast mode of NTP can NOT be
-          secured with measures within this document.</t>
-
-          <t>Hybrid mode: Both secure and insecure communication modes are
-          possible for both NTP servers and clients.</t>
-
-          <t>Compatibility:<list style="symbols">
-              <t>NTP associations which are not secured by NTS are not
-              affected by NTS-secured communication.</t>
-
-              <t>An NTP server that does not support NTS is not affected by
-              NTS-secured authentication requests.</t>
-            </list></t>
-        </list></t>
-    </section>
-
     <section title="Terms and Abbreviations">
       <t><list style="hanging">
           <t hangText="MAC">Message Authentication Code</t>
@@ -193,6 +152,57 @@
 
           <t hangText="AEAD">Authenticated Encryption with Associated Data
           (<xref target="RFC5116">RFC 5116</xref>)</t>
+        </list></t>
+    </section>
+
+    <section title="Objectives">
+      <t>The specific objectives for applying the NTS specification to the NTP
+      are as follows:<list style="symbols">
+          <t>Protection for time synchronization messages:<list
+              style="symbols">
+              <t>Integrity: NTS protects the integrity of NTP time
+              synchronization protocol packets via a MAC.</t>
+
+              <t>Confidentiality: NTS does not generally provide
+              confidentiality protection of the time synchronization data. It
+              does so only in the case of NTP's symmetric/peer mode.</t>
+
+              <t>Privacy: NTS preserves unlinkability, i. e. it does not leak
+              data that would allow a passive attacker to track mobile NTP
+              clients when they move between networks. Note unlinkability is
+              not guaranteed in the presence of active attackers, see <xref
+              target="privacy_considerations_unlinkability"/>.</t>
+
+              <t>Request-Response-Consistency: NTS enables a client to match
+              an incoming response to a request it has sent. NTS also enables
+              the client to deduce from the response whether its request to
+              the server has arrived without alteration.</t>
+            </list></t>
+
+          <t>Additional protection for key exchange messages:<list
+              style="symbols">
+              <t>Authenticity: NTS enables an NTP client to authenticate its
+              time server(s) during key exchange procedures.</t>
+
+              <t>Authorization: NTS optionally enables the server to verify
+              the client's authorization.</t>
+            </list></t>
+
+          <t>Modes of operation: Both the client-server mode and the symmetric
+          peer mode of NTP are supported. The broadcast mode of NTP can NOT be
+          secured with measures within this document.</t>
+
+          <t>Hybrid mode: For all supported modes, both secure and insecure
+          communication modes can be used at the same time, for both NTP
+          servers and clients.</t>
+
+          <t>Compatibility:<list style="symbols">
+              <t>NTS-secured communication does not affect NTP associations
+              which are not secured by NTS.</t>
+
+              <t>NTS-secured authentication requests do not affect any NTP
+              servers that do not support NTS.</t>
+            </list></t>
         </list></t>
     </section>
 
@@ -1432,13 +1442,22 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
         not rectify legacy linkability issues that are already present in NTP.
         To minimize the risk of being tracked by a passive adversary the NTP
         client has to minimize the information it transmits within a client
-        request (mode 3 packet) as described in the draft <xref
-        target="I-D.draft-dfranke-ntp-data-minimization"/>.</t>
+        request (mode 3 packet) as described in the draft
+        "I-D.draft-dfranke-ntp-data-minimization".</t>
 
-        <t>Also note that normal NTP clients should not act as NTP servers.
-        Otherwise, an active adversary may be able to abuse the client's
-        server responses (mode 4 packets) for its tracking. This is done by
-        [tbd].</t>
+        <t>Also note that generally, NTP clients should not unnecessarily act
+        as NTP servers. Otherwise, an active adversary may be able to abuse
+        the client's server responses for its tracking. </t>
+
+        <t>In the case where the participant in question offers services of an
+        NTS-secured NTP server, the active adversary can identify it by simply
+        asking for authentication in the course of a key exchange for
+        NTS-secured NTP.</t>
+
+        <t>But even in the case where the above is not possible, the active
+        adversary can use mode 4 packets for tracking the device in question,
+        by evaluating combinations of the given fields Poll, Precision, Root
+        Delay, Root Dispersion, Reference ID, and Reference Timestamp.</t>
       </section>
     </section>
 
