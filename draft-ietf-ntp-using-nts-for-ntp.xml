@@ -13,8 +13,8 @@
 <rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-07"
      ipr="trust200902" submissionType="IETF">
   <front>
-    <title abbrev="NTS4NTP">Using the Network Time Security Specification to
-    Secure the Network Time Protocol</title>
+    <title abbrev="NTS4NTP">Network Time Security for the Network Time
+    Protocol</title>
 
     <author fullname="Daniel Fox Franke" initials="D." surname="Franke">
       <organization abbrev="Akamai">Akamai Technologies, Inc.</organization>
@@ -90,7 +90,7 @@
       </address>
     </author>
 
-    <date day="31" month="October" year="2016"/>
+    <date day="02" month="February" year="2017"/>
 
     <area>Internet Area</area>
 
@@ -107,9 +107,12 @@
     <keyword>DTLS</keyword>
 
     <abstract>
-      <t>This document describes how to reach the objectives described in the
-      Network Time Security (NTS) specification when securing time
-      synchronization with servers using the Network Time Protocol (NTP).</t>
+      <t>This memo specifies Network Time Security (NTS) measures with which
+      to protect the Network Time Protocol (NTP). This includes mechanisms for
+      using TLS for key exchange, in combination with Message Authentication
+      Codes (MACs) in extension fields to protect client-server mode time
+      synchronization packets as well as mechanisms to directly apply Datagram
+      TLS to provide cryptographic security for NTP packets.</t>
     </abstract>
 
     <note title="Requirements Language">
@@ -122,21 +125,21 @@
 
   <middle>
     <section title="Introduction">
-      <t>The Network Time Security (NTS) draft <xref
-      target="I-D.ietf-ntp-network-time-security"/> specifies security
-      measures which can be used to enable time synchronization protocols to
-      verify authenticity of the time server and integrity of the time
-      synchronization protocol packets.</t>
+      <t>This document provides detail on what measures to use specifically to
+      secure time synchronization between NTP participants. In particular, it
+      describes two main techniques. The first is a mechanism that uses TLS
+      (over a connection on TCP port 123) to exchange key data and that
+      afterwards allows to secure NTP mode 3 and 4 packets using Message
+      Authentication Codes embedded in extension fields of those packets. The
+      second is a mechanism for using <xref target="RFC6347">Datagram
+      Transport Layer Security</xref> (DTLS) to provide cryptographic security
+      for NTP mode 1, 2 and 6 packets.</t>
 
-      <t>This document provides detail on how to specifically use those
-      measures to secure time synchronization between NTP clients and servers.
-      In particular, it describes a mechanism for using <xref
-      target="RFC6347">Datagram Transport Layer Security</xref> (DTLS) to
-      provide cryptographic security for NTP. Certain sections, are not
-      inherently NTP-specific and can be taken as guidance on how future work
-      may apply the described techniques to other time synchronization
-      protocols such as the <xref target="IEC.61588_2009">Precision Time
-      Protocol</xref>.</t>
+      <t>While the detailed application described in this document is
+      inherently NTP-specific, the overall approach is not. Therefore, it
+      could be taken as guidance on how future work may apply the described
+      techniques to other time synchronization protocols (such as the <xref
+      target="IEC.61588_2009">Precision Time Protocol</xref>).</t>
     </section>
 
     <section title="Terms and Abbreviations">
@@ -148,6 +151,8 @@
 
           <t hangText="NTS  ">Network Time Security</t>
 
+          <t hangText="TLS">Transport Layer Security</t>
+
           <t hangText="DTLS">Datagram Transport Layer Security</t>
 
           <t hangText="AEAD">Authenticated Encryption with Associated Data
@@ -156,9 +161,9 @@
     </section>
 
     <section title="Objectives">
-      <t>The specific objectives for applying the NTS specification to the NTP
-      are as follows:<list style="symbols">
-          <t>Protection for time synchronization messages:<list
+      <t>The specific objectives for the measures described this document are
+      as follows:<list style="symbols">
+          <t>Protection for NTP time synchronization messages:<list
               style="symbols">
               <t>Integrity: NTS protects the integrity of NTP time
               synchronization protocol packets via a MAC.</t>
@@ -1348,6 +1353,13 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
       target="I-D.ietf-ntp-network-time-security"/> have to be taken into
       account. The application of NTS to NTP requires the following additional
       considerations.</t>
+
+      <section title="Random Number Generation">
+        <t>At various points of the protocol, the generation of random numbers
+        is required. The employed methods of generation need to be
+        cryptographically secure. See <xref target="RFC4086"/> for guidelines
+        concerning this topic.</t>
+      </section>
 
       <section title="Usage of NTP Pools">
         <t>The certification-based authentication scheme described in <xref
