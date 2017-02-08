@@ -97,7 +97,7 @@
         Security consists of not one protocol but a suite of them:
         <list>
           <t>
-            The &quot;NTS-encapsulated NTPv4&quot; protocol is little
+            The &quot;DTLS-encapsulated NTPv4&quot; protocol is little
             more than &quot;NTP over DTLS&quot;: the two endpoints
             perform a DTLS handshake and then exchange NTP packets
             encapsulated as DTLS Application Data. It is suitable for
@@ -107,8 +107,8 @@
           </t>
           <t>
             The &quot;NTS Key Establishment&quot; protocol (NTS-KE) uses
-            DTLS to establish key material and negotiate some additional
-            protocol options, but then quickly closes the DTLS channel
+            TLS to establish key material and negotiate some additional
+            protocol options, but then quickly closes the TLS channel
             and does not use it for the exchange of time packets. NTS-KE
             is designed to be extensible, and might be extended to
             support key establishment for other protocols such as PTP.
@@ -136,37 +136,44 @@
         described in <xref target="RFC2119">RFC 2119</xref>.
       </t>
     </section>
-    <section title="DTLS profile for Network Time Security" anchor="dtls-profile">
+    <section title="TLS profile for Network Time Security" anchor="tls-profile">
       <t>
-        Since securing time protocols is (as of 2016) a novel
-        application of DTLS, no backward-compatibility concerns exist
-        to justify using obsolete, insecure, or otherwise broken DTLS
+        Network Time Security makes use of both TLS (for NTS Key
+        Establishment) and DTLS (for DTLS-encapsulated NTPv4). In
+        either case, the requirements and recommendations of this
+        section are similar. The notation &quot;(D)TLS&quot; refers to
+        both TLS and DTLS.
+      </t>
+      <t>
+        Since securing time protocols is (as of 2017) a novel
+        application of (D)TLS, no backward-compatibility concerns exist
+        to justify using obsolete, insecure, or otherwise broken TLS
         features or versions. We therefore put forward the following
-        requirements and guidelines, roughly representing 2016's best
+        requirements and guidelines, roughly representing 2017's best
         practices.
       </t>
       <t>
-        Implementations MUST NOT negotiate DTLS versions earlier than
-        1.2.
+        Implementations MUST NOT negotiate (D)TLS versions
+        earlier than 1.2.
       </t>
       <t>
         Implementations willing to negotiate more than one possible
-        version of DTLS SHOULD NOT respond to handshake failures by
+        version of (D)TLS SHOULD NOT respond to handshake failures by
         retrying with a downgraded protocol version. If they do, they
         MUST implement <xref target="RFC7507"/>.
       </t>
       <t>
-        DTLS clients MUST NOT offer, and DTLS servers MUST not select,
+        (D)TLS clients MUST NOT offer, and DTLS servers MUST not select,
         RC4 cipher suites. <xref target="RFC7465"/>
       </t>
       <t>
-        DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
+        (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
         <xref target="RFC5746">TLS Renegotiation Indication
         Extension</xref>. Regardless, they MUST NOT initiate or permit
         insecure renegotiation. (*)
       </t>
       <t>
-        DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
+        (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
         <xref target="RFC7627">TLS Session Hash and Extended Master
         Secret Extension</xref>. (*)
       </t>
@@ -176,154 +183,20 @@
         it is REQUIRED for interoperability.
       </t>
       <t>
-        (*): Note that DTLS 1.3 or beyond may render the indicated
+        (*): Note that (D)TLS 1.3 or beyond may render the indicated
         recommendations inapplicable.
       </t>
     </section>
-    <section title="Transport mechanisms for DTLS records"
-             anchor="transport-mechanisms">
+    <section title="The DTLS-encapsulated NTPv4 protocol">
       <t>
-        This section specifies two mechanisms, one REQUIRED and one
-        OPTIONAL, for exchanging NTS-related DTLS records. It is
-        intended that the choice of transport mechanism be orthogonal
-        to any concerns at the application layer: DTLS records SHOULD
-        receive identical disposition regardless of which mechanism
-        they arrive by.
+        The DTLS-encapsulated NTPv4 protocol is conducted on UDP port [TBD].
       </t>
-      <section title="Transport via NTS port">
-        <t>
-          In this transport mechanism, DTLS records, formatted
-          according to <xref target="RFC6347">RFC 6347</xref> or a
-          subsequent revision thereof, are exchanged directly on UDP
-          port [[TBD]], with one DTLS record per UDP packet and no
-          additional layer of encapsulation between the UDP header
-          and the DTLS record.
-
-          Servers which implement NTS MUST support this mechanism.
-        </t>
-      </section>
-      <section title="Transport via NTP extension field">
-        <t>
-          In this transport mechanism, DTLS records are exchanged
-          within extension fields of specially-formed NTP packets,
-          which are themselves exchanged via the usual NTP service
-          port (123/udp). NTP packets conveying DTLS records SHALL be
-          formatted as in <xref target="dtls-packet-layout"/>.  They
-          MUST NOT contain any other extensions or a legacy MAC field.
-        </t>
-        <figure anchor="dtls-packet-layout"
-                title="Format of NTP packets conveying DTLS records">
-          <artwork><![CDATA[
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-.                                                               .
-.                     NTP Header (48 octets)                    .
-.                                                               .
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          Extension Type         |       Extension Length      |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-.                                                               .
-.                     DTLS Record (variable)                    .
-.                                                               .
-|                                                               |
-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|               |                                               |
-+-+-+-+-+-+-+-+-+                                               +
-|                                                               |
-.                                                               .
-.                    Padding (1-24 octets)                      .
-.                                                               .
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+]]>
-          </artwork>
-        </figure>
-        <t>
-          Within the NTP header,
-          <list>
-            <t>The Leap Indicator field SHALL be set to 3 (unsynchronized).</t>
-            <t>The Version Number field SHALL be set to 4.</t>
-            <t>
-              DTLS clients SHALL set the Mode field to 3, and DTLS
-              servers SHALL set the Mode field to 4, even if the DTLS
-              record is being used (in the full-encapsulation
-              protocol) to protect some NTP mode other than
-              client/server.
-            </t>
-            <t>The Stratum field SHALL be set to 0 (unspecified or invalid).</t>
-            <t>
-              The Reference ID field (conveying a kiss code) SHALL be
-              set to &quot;DTLS&quot;
-            </t>
-            <t>
-              DTLS servers SHALL set the origin timestamp field from
-              the transmit timestamp field of the packet most recently
-              received from the client.
-            </t>
-            <t>
-              All other header fields MUST be ignored by the receiver,
-              and MAY contain arbitrary or bogus values.
-            </t>
-          </list>
-        </t>
-        <t>
-          The Extension Type field SHALL be set to [[TBD]]. The
-          Extension Length field SHALL be computed and set as per
-          <xref target="RFC7822">RFC 7822</xref>.
-        </t>
-        <t>
-          The DTLS Record field SHALL contain a DTLS Record formatted
-          as per <xref target="RFC6347">RFC 6347</xref> or a subsequent
-          revision thereof.
-        </t>
-        <t>
-          The Padding field SHALL contain between 1 and 24 octets of
-          padding, with every octet set to the number of padding
-          octets included, e.g., &quot;01&quot;, &quot;02 02&quot;, or
-          &quot;03 03 03&quot;. The number of padding bytes should be
-          chosen in order to comply with the <xref
-          target="RFC7822">RFC 7822</xref> requirement that (in the
-          absence of a legacy MAC) extensions have a total length in
-          octets (including the four octets for the type and length
-          fields) which is at least 28 and divisible by
-          4. Furthermore, since future revisions of DTLS may employ
-          record formats that are not self-delimiting, at least one
-          octet of padding MUST be included so that receivers can
-          unambiguously determine where the DTLS record ends and the
-          padding begins. If the length of the DTLS record is already
-          at least 24 and a multiple of 4, then the correct amount of
-          padding to include is 4 octets.
-        </t>
-        <t>
-          The NTP header values specified above are selected such that
-          NTP implementations which do not understand NTS will
-          interpret the packet as an innocuous no-op and not attempt
-          to use it for time synchronization. To NTS-aware
-          implementations, however, these packets are best understood
-          as not being NTP packets at all, but simply a means of
-          &quot;smuggling&quot; arbitrary DTLS records across port
-          123/udp. Indeed, these records need not be pertinent to NTP
-          at all — for example, they could be NTS-KE messages
-          eventually intended for securing PTP traffic.
-        </t>
-        <t>
-          This transport mechanism is intended for use as a fallback
-          in situations where firewalls or other middleboxes are
-          preventing communication on the NTS port. Support for it is
-          OPTIONAL.
-        </t>
-      </section>
-    </section>
-    <section title="The NTS-encapsulated NTPv4 protocol">
       <t>
-        The NTS-encapsulated NTPv4 protocol proceeds in two parts. 
+        The DTLS-encapsulated NTPv4 protocol proceeds in two parts. 
         First, DTLS handshake records are exchanged using one of the 
         two transport mechanisms specified in <xref target="transport-mechanisms"/>.
         The two endpoints carry out a DTLS handshake in conformance with <xref
-        target="dtls-profile"/>, with the client offering (via an <xref
+        target="tls-profile"/>, with the client offering (via an <xref
         target="RFC7301">ALPN</xref> extension), and the server
         accepting, an application-layer protocol of &quot;ntp/4&quot;.
         Second, once the handshake is successfully completed, the two
@@ -332,7 +205,7 @@
       </t>
       <t>
         In addition to the requirements specified in <xref
-        target="dtls-profile"/>, implementations MUST enforce the
+        target="tls-profile"/>, implementations MUST enforce the
         anti-replay mechanism specified in <xref target="RFC6347">
         Section 4.1.2.6 of RFC 6347</xref> (or an equivalent mechanism
         specified in a subsequent revision of DTLS). Servers wishing
@@ -341,7 +214,7 @@
         the client's identity.
       </t>
       <t>
-        The NTS-encapsulated NTPv4 protocol is the RECOMMENDED
+        The DTLS-encapsulated NTPv4 protocol is the RECOMMENDED
         mechanism for cryptographically securing mode 1 (symmetric
         active), 2 (symmetric passive), and 6 (control) NTPv4 traffic.
         It is equally safe for mode 3/4 (client/server) traffic, but
@@ -352,18 +225,20 @@
     </section>
     <section title="The NTS Key Establishment protocol">
       <t>
-        The NTS Key Establishment (NTS-KE) protocol is carried out by
-        exchanging DTLS records using one of the two transport mechanisms
-        specified in <xref target="transport-mechanisms"/>. The two
-        endpoints carry out a DTLS handshake in conformance with <xref
-        target="dtls-profile"/>, with the client offering (via an
-        <xref target="RFC7301">ALPN</xref> extension), and the server
-        accepting, an application-layer protocol of
-        &quot;ntske/1&quot;.  Immediately following a successful
-        handshake, the client SHALL send a single request (as
-        Application Data encapsulated in the DTLS-protected channel),
-        then the server SHALL send a single response followed by a
-        "Close notify" alert and then discard the channel state.
+        
+      </t>
+      <t>
+        The NTS key establishment protocol is conducted via TCP port
+        [TBD].  The two endpoints carry out a TLS handshake in
+        conformance with <xref target="tls-profile"/>, with the client
+        offering (via an <xref target="RFC7301">ALPN</xref>
+        extension), and the server accepting, an application-layer
+        protocol of &quot;ntske/1&quot;.  Immediately following a
+        successful handshake, the client SHALL send a single request
+        (as Application Data encapsulated in the TLS-protected
+        channel), then the server SHALL send a single response
+        followed by a TLS "Close notify" alert and then discard the
+        channel state.
       </t>
       <t>
         The client's request and the server's response each SHALL
@@ -399,13 +274,7 @@
       </t>
       <t>
         The requirement that all NTS-KE messages be terminated by an
-        End of Message record makes them self-delimiting. One DTLS
-        record MAY, and typcially will, contain multiple NTS-KE
-        records. NTS-KE records MAY be split across DTLS record
-        boundaries. If, likely due to packet loss, an incomplete
-        NTS-KE message is received, implementations MUST treat this an
-        error, which clients SHOULD handle by restarting with a fresh
-        DTLS handshake and trying again.
+        End of Message record makes them self-delimiting.
       </t>
       <t>
         The fields of an NTS-KE record are defined as follows:
