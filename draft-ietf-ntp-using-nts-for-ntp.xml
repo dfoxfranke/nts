@@ -173,9 +173,10 @@
               does so only in the case of NTP's symmetric/peer mode.</t>
 
               <t>Privacy: NTS preserves unlinkability, i. e. it does not leak
-              data that would allow a passive attacker to track mobile NTP
-              clients when they move between networks. Note that unlinkability
-              is not guaranteed in the presence of active attackers, see <xref
+              data that would allow an attacker to track mobile NTP clients
+              when they move between networks. Note that unlinkability is not
+              guaranteed for devices that function as servers as well as
+              clients, see <xref
               target="privacy_considerations_unlinkability"/>.</t>
 
               <t>Request-Response-Consistency: NTS enables a client to match
@@ -1441,10 +1442,10 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
       </section>
 
       <section title="Unlinkability">
-        <t>The scenario that is to be prevented is one where whenever a new
-        network address is associated with a device (e.g. because said device
-        moved between different networks), a passive attacker is able to link
-        said new address with one that was formerly used by the device,
+        <t>Unlinkability shall prevent that a device can be tracked when it
+        changes networ adresses (e.g. because said device moved between
+        different networks). This is to say that an attacker shall be unable
+        to link a new address with one that was formerly used by the device,
         because of recognizable data that the device persistently sends as
         part of an NTS-secured NTP association. This is the justification for
         continually supplying the client with fresh cookies, so that a cookie
@@ -1456,18 +1457,13 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
         To minimize the risk of being tracked by a passive adversary the NTP
         client has to minimize the information it transmits within a client
         request (mode 3 packet) as described in the draft <xref
-        target="I-D.draft-dfranke-ntp-data-minimization"/>.</t>
+        target="I-D.draft-dfranke-ntp-data-minimization"/>. </t>
 
-        <t>Also note that generally, NTP clients should not unnecessarily act
-        as NTP servers. Otherwise, an active adversary may be able to abuse
-        the client's server responses for its tracking. In the case where the
-        participant in question offers services as an NTS-secured NTP server,
-        an active adversary can identify it via the received certificate from
-        a key exchange for NTS-secured NTP. But even in the case where this is
-        not possible, an active adversary can use mode 4 packets for tracking
-        the device in question, by evaluating combinations of the given fields
-        Precision, Root Delay, Root Dispersion, Reference ID, and Reference
-        Timestamp.</t>
+        <t>Also, the objective only holds for actual time synchronization
+        traffic, as opposed to key exchange traffic. This implies that it
+        cannot be guaranteed for devices that function not only as time
+        clients, but also as time servers (because the latter can be
+        externally triggered to send authentication data).</t>
       </section>
     </section>
 
@@ -1644,15 +1640,16 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
     <section title="Flow Diagrams of Client Behaviour">
       <figure anchor="fig_flow_unicast"
               title="The client's behavior in NTS unicast mode.">
-        <artwork><![CDATA[+------------------------------>o
-|                               |
-|                               v
-|                        +-------------+
-|                        |Key Exchange |
-|                        +------+------+
-|                               |
-|                               o<------------------------------+
-|                               |                               |
+        <artwork><![CDATA[                                             .------------.
++------------------------------>o<----------( No More Keys )<---+
+|                               |            '------------'     |
+|                               v                               |
+|                        +-------------+                        |
+|                        |Key Exchange |                        |
+|                        +------+------+                        |
+|                               |           .--------------.    |
+|                               o<---------( Keys Remaining )<--+
+|                               |           '--------------'    |
 |                               v                               |
 |                     +-------------------+                     |
 |                     |Time Sync. Messages|                     |
