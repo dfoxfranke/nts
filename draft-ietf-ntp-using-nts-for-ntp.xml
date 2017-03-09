@@ -125,15 +125,15 @@
 
   <middle>
     <section title="Introduction">
-      <t>This document provides detail on what measures to use specifically to
-      secure time synchronization between NTP participants. In particular, it
-      describes two main techniques. The first is a mechanism that uses TLS
-      (over a connection on TCP port 123) to exchange key data and that
-      afterwards allows to secure NTP mode 3 and 4 packets using Message
-      Authentication Codes embedded in extension fields of those packets. The
-      second is a mechanism for using <xref target="RFC6347">Datagram
-      Transport Layer Security</xref> (DTLS) to provide cryptographic security
-      for NTP mode 1, 2 and 6 packets.</t>
+      <t>This document specifies measures to protect time synchronization
+      between NTP participants. In particular, it describes two main
+      techniques. The first is a mechanism that uses TLS (over a connection on
+      TCP port 123) to exchange key data and that afterwards allows to secure
+      NTP mode 3 and 4 packets using Authenticated Encryption with Associated
+      Data objects embedded in extension fields of those packets. The second
+      is a mechanism for using <xref target="RFC6347">Datagram Transport Layer
+      Security</xref> (DTLS) to provide cryptographic security for NTP mode 1,
+      2 and 6 packets.</t>
 
       <t>While the detailed application described in this document is
       inherently NTP-specific, the overall approach is not. Therefore, it
@@ -166,18 +166,21 @@
           <t>Protection for NTP time synchronization messages:<list
               style="symbols">
               <t>Integrity: NTS protects the integrity of NTP time
-              synchronization protocol packets via a MAC.</t>
+              synchronization protocol packets.</t>
 
               <t>Confidentiality: NTS does not generally provide
               confidentiality protection of the time synchronization data. It
               does so only in the case of NTP's symmetric/peer mode.</t>
 
-              <t>Privacy: NTS preserves unlinkability, i. e. it does not leak
-              data that would allow an attacker to track mobile NTP clients
-              when they move between networks. Note that unlinkability is not
-              guaranteed for devices that function as servers as well as
-              clients, see <xref
-              target="privacy_considerations_unlinkability"/>.</t>
+              <t>Privacy: Once an NTS session has been established, NTS
+              supports unlinkability for devices that (1) use NTS as clients
+              and (2) minimize the information they expose in client query
+              (mode 3) packets per <xref
+              target="I-D-draft-dfranke-ntp-data-minimization"/>.
+              Unlinkability ensures that NTS does not leak data that allows an
+              attacker to track mobile NTP clients when they move between
+              networks. See <xref
+              target="privacy_considerations_unlinkability"/> for details.</t>
 
               <t>Request-Response-Consistency: NTS enables a client to match
               an incoming response to a request it has sent. NTS also enables
@@ -250,24 +253,19 @@
 
         <t>After the keys have been exchanged, the participants then use them
         to protect the authenticity and the integrity of subsequent
-        unicast-type time synchronization packets. In order to do this, the
-        server attaches a Message Authentication Code (MAC) to each time
-        synchronization packet. The calculation of the MAC includes the whole
-        time synchronization packet and the symmetric key which is stored on
-        the client side. Therefore, the client can perform a validity check
-        for this MAC on reception of a time synchronization packet.</t>
+        unicast-type time synchronization packets. In order to do this,
+        participants attach AEAD objects to their time synchronization
+        packets, included in NTP extension fields and calculated over the
+        whole time synchronization packet. Therefore, the client can perform a
+        validity check on reception of a time synchronization packet.</t>
       </section>
 
       <section title="Symmetric/Peer Mode and Control Modes">
-        <t>In the symmetric ("peer") mode as well as in control modes, there
-        is no requirement for statelessness on either side. Both sides
-        exchange and memorize one or more shared secrets. The shared secrets
-        exchanged are then used to secure NTP peer mode or control packets by
-        providing at least authenticity and integrity protection and possibly
-        also confidentiality. The DTLS-based key exchange procedure described
-        in <xref target="dtls-encapsulation"/> can be used for such
-        communication. An implementation MUST support the use of this
-        procedure.</t>
+        <t>The symmetric ("peer") mode as well as the control modes, are
+        secured via the DTLS-encapsulated NTPv4 protocol described in <xref
+        target="dtls-encapsulation"/>. This protocol is little more than "NTP
+        over DTLS"; the two endpoints perform a DTLS handshake and then
+        exchange NTP packets encapsulated as DTLS Application Data.</t>
       </section>
     </section>
 
@@ -1411,12 +1409,11 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
             <xref target="RFC5905"/>.</t>
 
             <t>Multiple communication paths: The client and server utilize
-            different paths for packet exchange as described in the I-D <xref
-            target="I-D.ietf-tictoc-multi-path-synchronization"/>. The client
-            can detect the attack, provided that the adversary is unable to
-            manipulate the majority of the available paths <xref
-            target="Shpiner"/>. Note that this approach is not yet available,
-            neither for NTP nor for PTP.</t>
+            different paths for packet exchange. The client can detect the
+            attack, provided that the adversary is unable to manipulate the
+            majority of the available paths <xref target="Shpiner"/>. Note
+            that this approach is not yet available, neither for NTP nor for
+            PTP.</t>
 
             <t>Usage of an encrypted connection: the client exchanges all
             packets with the time server over an encrypted connection (e.g.
@@ -1442,28 +1439,36 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
       </section>
 
       <section title="Unlinkability">
-        <t>Unlinkability shall prevent that a device can be tracked when it
-        changes networ adresses (e.g. because said device moved between
-        different networks). This is to say that an attacker shall be unable
-        to link a new address with one that was formerly used by the device,
-        because of recognizable data that the device persistently sends as
-        part of an NTS-secured NTP association. This is the justification for
-        continually supplying the client with fresh cookies, so that a cookie
-        never represents recognizable data in the sense outlined above.</t>
+        <t>Unlinkability prevents a device from being tracked when it changes
+        network addresses (e.g. because said device moved between different
+        networks). In other words, unlinkability thwarts an attacker that
+        seeks to link a new network address used by a device with a network
+        address that it was formerly using, because of recognizable data that
+        the device persistently sends as part of an NTS-secured NTP
+        association. This is the justification for continually supplying the
+        client with fresh cookies, so that a cookie never represents
+        recognizable data in the sense outlined above. </t>
 
-        <t>Note that the objective of NTS regarding unlinkability is merely to
-        not leak any additional data that would cause linkability. NTS does
+        <t>NTS's unlinkability objective is merely to not leak any additional
+        data that could be used to link a device's network address. NTS does
         not rectify legacy linkability issues that are already present in NTP.
-        To minimize the risk of being tracked by a passive adversary the NTP
-        client has to minimize the information it transmits within a client
-        request (mode 3 packet) as described in the draft <xref
-        target="I-D.draft-dfranke-ntp-data-minimization"/>. </t>
+        Thus, a client that requires unlinkability MUST also minimize
+        information transmitted in a client query (mode 3) packet as described
+        in the draft <xref target="I-D.draft-dfranke-ntp-data-minimization"/>.
+        </t>
 
-        <t>Also, the objective only holds for actual time synchronization
+        <t>The unlinkability objective only holds for time synchronization
         traffic, as opposed to key exchange traffic. This implies that it
         cannot be guaranteed for devices that function not only as time
         clients, but also as time servers (because the latter can be
-        externally triggered to send authentication data).</t>
+        externally triggered to send authentication data). </t>
+
+        <t>It should also be noted that it could be possible to link devices
+        that operate as time servers from their time synchronization traffic,
+        using information exposed in (mode 4) server response packets (e.g.
+        reference ID, reference time, stratum, poll).&nbsp; Also, devices that
+        respond to NTP control queries could be linked using the information
+        revealed by control queries. </t>
       </section>
     </section>
 
@@ -1489,13 +1494,7 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
 
       <?rfc include='reference.RFC.5652'?>
 
-      <?rfc include='reference.I-D.draft-ietf-ntp-cms-for-nts-message-06'?>
-
-      <?rfc include='reference.I-D.draft-ietf-ntp-network-time-security-13'?>
-
       <?rfc include='reference.I-D.draft-ietf-ntp-extension-field-07'?>
-
-      <?rfc include='reference.I-D.draft-ietf-tictoc-multi-path-synchronization-06'?>
 
       <?rfc include='reference.RFC.3629'?>
 
@@ -1520,6 +1519,8 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
       <?rfc include='reference.RFC.7301'?>
 
       <?rfc include='reference.RFC.7822'?>
+
+      <?rfc include='reference.I-D.draft-dfranke-ntp-data-minimization-01'?>
     </references>
 
     <references title="Informative References">
@@ -1528,6 +1529,8 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
       <?rfc include='reference.RFC.5077'?>
 
       <?rfc include='reference.RFC.7821'?>
+
+      <?rfc include='reference.I-D.draf-ietf-ntp-network-time-security-15'?>
 
       <reference anchor="IEC.61588_2009"
                  target="http://ieeexplore.ieee.org/servlet/opac?punumber=4839000">
