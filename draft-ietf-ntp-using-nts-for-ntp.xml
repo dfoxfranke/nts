@@ -107,12 +107,13 @@
     <keyword>DTLS</keyword>
 
     <abstract>
-      <t>This memo specifies Network Time Security (NTS) measures with which
-      to protect the Network Time Protocol (NTP). This includes mechanisms for
-      using TLS for key exchange, in combination with Message Authentication
-      Codes (MACs) in extension fields to protect client-server mode time
-      synchronization packets as well as mechanisms to directly apply Datagram
-      TLS to provide cryptographic security for NTP packets.</t>
+      <t>
+        This memo specifies Network Time Security (NTS), a mechanism
+        for using Transport Layer Security (TLS) to provide
+        cryptographic security for the Network Time Protocol or other
+        network time synchronization protocols.
+      </t>
+
     </abstract>
 
     <note title="Requirements Language">
@@ -295,169 +296,65 @@
           server, is protected from replay.</t>
         </list></t>
 
-      <section anchor="dtls-profile"
-               title="DTLS profile for Network Time Security">
-        <t>Since securing time protocols is (as of 2016) a novel application
-        of DTLS, no backward-compatibility concerns exist to justify using
-        obsolete, insecure, or otherwise broken DTLS features or versions. We
-        therefore put forward the following requirements and guidelines,
-        roughly representing 2016's best practices.</t>
-
-        <t>Implementations MUST NOT negotiate DTLS versions earlier than
-        1.2.</t>
-
-        <t>Implementations willing to negotiate more than one possible version
-        of DTLS SHOULD NOT respond to handshake failures by retrying with a
-        downgraded protocol version. If they do, they MUST implement <xref
-        target="RFC7507"/>.</t>
-
-        <t>DTLS clients MUST NOT offer, and DTLS servers MUST not select, RC4
-        cipher suites. <xref target="RFC7465"/></t>
-
-        <t>DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
-        <xref target="RFC5746">TLS Renegotiation Indication Extension</xref>.
-        Regardless, they MUST NOT initiate or permit insecure renegotiation.
-        (*)</t>
-
-        <t>DTLS clients SHOULD offer, and DTLS servers SHOULD accept, the
-        <xref target="RFC7627">TLS Session Hash and Extended Master Secret
-        Extension</xref>. (*)</t>
-
-        <t>Use of the <xref target="RFC7301">Application-Layer Protocol
-        Negotiation Extension</xref> is integral to NTS and support for it is
-        REQUIRED for interoperability.</t>
-
-        <t>(*): Note that DTLS 1.3 or beyond may render the indicated
-        recommendations inapplicable.</t>
-      </section>
-
-      <section anchor="transport-mechanisms"
-               title="Transport mechanisms for DTLS records">
-        <t>This section specifies two mechanisms, one REQUIRED and one
-        OPTIONAL, for exchanging NTS-related DTLS records. It is intended that
-        the choice of transport mechanism be orthogonal to any concerns at the
-        application layer: DTLS records SHOULD receive identical disposition
-        regardless of which mechanism they arrive by.</t>
-
-        <section title="Transport via NTS port">
-          <t>In this transport mechanism, DTLS records, formatted according to
-          <xref target="RFC6347">RFC 6347</xref> or a subsequent revision
-          thereof, are exchanged directly on UDP port [[TBD]], with one DTLS
-          record per UDP packet and no additional layer of encapsulation
-          between the UDP header and the DTLS record. Servers which implement
-          NTS MUST support this mechanism.</t>
+        <section title="TLS profile for Network Time Security" anchor="tls-profile">
+          <t>
+            Network Time Security makes use of both TLS (for NTS Key
+            Establishment) and DTLS (for DTLS-encapsulated NTPv4). In
+            either case, the requirements and recommendations of this
+            section are similar. The notation &quot;(D)TLS&quot; refers to
+            both TLS and DTLS.
+          </t>
+          <t>
+            Since securing time protocols is (as of 2017) a novel
+            application of (D)TLS, no backward-compatibility concerns exist
+            to justify using obsolete, insecure, or otherwise broken TLS
+            features or versions. We therefore put forward the following
+            requirements and guidelines, roughly representing 2017's best
+            practices.
+          </t>
+          <t>
+            Implementations MUST NOT negotiate (D)TLS versions
+            earlier than 1.2.
+          </t>
+          <t>
+            Implementations willing to negotiate more than one possible
+            version of (D)TLS SHOULD NOT respond to handshake failures by
+            retrying with a downgraded protocol version. If they do, they
+            MUST implement <xref target="RFC7507"/>.
+          </t>
+          <t>
+            (D)TLS clients MUST NOT offer, and DTLS servers MUST not select,
+            RC4 cipher suites. <xref target="RFC7465"/>
+          </t>
+          <t>
+            (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
+            <xref target="RFC5746">TLS Renegotiation Indication
+            Extension</xref>. Regardless, they MUST NOT initiate or permit
+            insecure renegotiation. (*)
+          </t>
+          <t>
+            (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
+            <xref target="RFC7627">TLS Session Hash and Extended Master
+            Secret Extension</xref>. (*)
+          </t>
+          <t>
+            Use of the <xref target="RFC7301">Application-Layer Protocol
+            Negotation Extension</xref> is integral to NTS and support for
+            it is REQUIRED for interoperability.
+          </t>
+          <t>
+            (*): Note that (D)TLS 1.3 or beyond may render the indicated
+            recommendations inapplicable.
+          </t>
         </section>
-
-        <section title="Transport via NTP extension field">
-          <t>In this transport mechanism, DTLS records are exchanged within
-          extension fields of specially-formed NTP packets, which are
-          themselves exchanged via the usual NTP service port (123/udp). NTP
-          packets conveying DTLS records SHALL be formatted as in <xref
-          target="dtls-packet-layout"/>. They MUST NOT contain any other
-          extensions or a legacy MAC field.</t>
-
-          <figure anchor="dtls-packet-layout"
-                  title="Format of NTP packets conveying DTLS records">
-            <artwork><![CDATA[
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-.                                                               .
-.                     NTP Header (48 octets)                    .
-.                                                               .
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          Extension Type         |       Extension Length      |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-.                                                               .
-.                     DTLS Record (variable)                    .
-.                                                               .
-|                                                               |
-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|               |                                               |
-+-+-+-+-+-+-+-+-+                                               +
-|                                                               |
-.                                                               .
-.                    Padding (1-24 octets)                      .
-.                                                               .
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-          ]]></artwork>
-          </figure>
-
-          <t>Within the NTP header, <list style="symbols">
-              <t>The Leap Indicator field SHALL be set to 3
-              (unsynchronized).</t>
-
-              <t>The Version Number field SHALL be set to 4.</t>
-
-              <t>DTLS clients SHALL set the Mode field to 3, and DTLS servers
-              SHALL set the Mode field to 4, even if the DTLS record is being
-              used (in the full-encapsulation protocol) to protect some NTP
-              mode other than client/server.</t>
-
-              <t>The Stratum field SHALL be set to 0 (unspecified or
-              invalid).</t>
-
-              <t>The Reference ID field (conveying a kiss code) SHALL be set
-              to "DTLS"</t>
-
-              <t>DTLS servers SHALL set the origin timestamp field from the
-              transmit timestamp field of the packet most recently received
-              from the client.</t>
-
-              <t>All other header fields MUST be ignored by the receiver, and
-              MAY contain arbitrary or bogus values.</t>
-            </list></t>
-
-          <t>The Extension Type field SHALL be set to [[TBD]]. The Extension
-          Length field SHALL be computed and set as per <xref
-          target="RFC7822">RFC 7822</xref>.</t>
-
-          <t>The DTLS Record field SHALL contain a DTLS Record formatted as
-          per <xref target="RFC6347">RFC 6347</xref> or a subsequent revision
-          thereof.</t>
-
-          <t>The Padding field SHALL contain between 1 and 24 octets of
-          padding, with every octet set to the number of padding octets
-          included, e.g., "01", "02 02", or "03 03 03". The number of padding
-          bytes should be chosen in order to comply with the <xref
-          target="RFC7822">RFC 7822</xref> requirement that (in the absence of
-          a legacy MAC) extensions have a total length in octets (including
-          the four octets for the type and length fields) which is at least 28
-          and divisible by 4. Furthermore, since future revisions of DTLS may
-          employ record formats that are not self-delimiting, at least one
-          octet of padding MUST be included so that receivers can
-          unambiguously determine where the DTLS record ends and the padding
-          begins. If the length of the DTLS record is already at least 24 and
-          a multiple of 4, then the correct amount of padding to include is 4
-          octets.</t>
-
-          <t>The NTP header values specified above are selected such that NTP
-          implementations which do not understand NTS will interpret the
-          packet as an innocuous no-op and not attempt to use it for time
-          synchronization. To NTS-aware implementations, however, these
-          packets are best understood as not being NTP packets at all, but
-          simply a means of "smuggling" arbitrary DTLS records across port
-          123/udp. Indeed, these records need not be pertinent to NTP at all
-          &mdash; for example, they could be NTS-KE messages eventually
-          intended for securing PTP traffic.</t>
-
-          <t>This transport mechanism is intended for use as a fallback in
-          situations where firewalls or other middleboxes are preventing
-          communication on the NTS port. Support for it is OPTIONAL.</t>
-        </section>
-      </section>
-
+        
       <section anchor="dtls-encapsulation"
                title="The NTS-encapsulated NTPv4 protocol">
         <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. First,
         DTLS handshake records are exchanged using one of the two transport
-        mechanisms specified in <xref target="transport-mechanisms"/>. The two
+        mechanisms specified in. The two
         endpoints carry out a DTLS handshake in conformance with <xref
-        target="dtls-profile"/>, with the client offering (via an <xref
+        target="tls-profile"/>, with the client offering (via an <xref
         target="RFC7301">ALPN</xref> extension), and the server accepting, an
         application-layer protocol of "ntp/4". Second, once the handshake is
         successfully completed, the two endpoints use the established channel
@@ -465,7 +362,7 @@
         Data.</t>
 
         <t>In addition to the requirements specified in <xref
-        target="dtls-profile"/>, implementations MUST enforce the anti-replay
+        target="tls-profile"/>, implementations MUST enforce the anti-replay
         mechanism specified in <xref target="RFC6347"> Section 4.1.2.6 of RFC
         6347</xref> (or an equivalent mechanism specified in a subsequent
         revision of DTLS). Servers wishing to enforce access control SHOULD
@@ -479,30 +376,31 @@
         because it scales poorly compared to using <xref
         target="nts-extensions-for-ntpv4">NTS Extensions for NTPv4</xref>.</t>
       </section>
-
-      <section anchor="dtls-key-establishment"
-               title="The NTS Key Establishment protocol">
-        <t>The NTS Key Establishment (NTS-KE) protocol is carried out by
-        exchanging DTLS records using one of the two transport mechanisms
-        specified in <xref target="transport-mechanisms"/>. The two endpoints
-        carry out a DTLS handshake in conformance with <xref
-        target="dtls-profile"/>, with the client offering (via an <xref
-        target="RFC7301">ALPN</xref> extension), and the server accepting, an
-        application-layer protocol of "ntske/1". Immediately following a
-        successful handshake, the client SHALL send a single request (as
-        Application Data encapsulated in the DTLS-protected channel), then the
-        server SHALL send a single response followed by a "Close notify" alert
-        and then discard the channel state.</t>
-
-        <t>The client's request and the server's response each SHALL consist
-        of a sequence of records formatted according to <xref
-        target="ntske-record"/>. The sequence SHALL be terminated by a "End of
-        Message" record, which has a Record Type of zero and a zero-length
-        body. Furthermore, requests and non-error responses each SHALL include
-        exactly one NTS Next Protocol Negotiation record.</t>
-
-        <figure anchor="ntske-record">
-          <artwork><![CDATA[
+    <section title="The NTS Key Establishment protocol">
+      <t>
+        The NTS key establishment protocol is conducted via TCP port
+        [TBD].  The two endpoints carry out a TLS handshake in
+        conformance with <xref target="tls-profile"/>, with the client
+        offering (via an <xref target="RFC7301">ALPN</xref>
+        extension), and the server accepting, an application-layer
+        protocol of &quot;ntske/1&quot;.  Immediately following a
+        successful handshake, the client SHALL send a single request
+        (as Application Data encapsulated in the TLS-protected
+        channel), then the server SHALL send a single response
+        followed by a TLS "Close notify" alert and then discard the
+        channel state.
+      </t>
+      <t>
+        The client's request and the server's response each SHALL
+        consist of a sequence of records formatted according to <xref
+        target="ntske-record"/>. The sequence SHALL be terminated by a
+        &quot;End of Message&quot; record, which has a Record Type of
+        zero and a zero-length body. Furthermore, requests and
+        non-error responses each SHALL include exactly one NTS Next
+        Protocol Negotiation record.
+      </t>
+      <figure anchor="ntske-record">
+        <artwork><![CDATA[
 0                   1                   2                   3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -513,840 +411,883 @@
 .                           Record Body                         .
 .                                                               .
 |                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        ]]></artwork>
-        </figure>
-
-        <t>[[Ed. Note: this ad-hoc binary format should be fine as long as we
-        continue to keep things very simple. However, if we think there's any
-        reasonable probability of wanting to include more complex data
-        structures, we should consider using some semi-structured data format
-        such as JSON, Protocol Buffers, or (ugh) ASN.1]]</t>
-
-        <t>The requirement that all NTS-KE messages be terminated by an End of
-        Message record makes them self-delimiting. One DTLS record MAY, and
-        typically will, contain multiple NTS-KE records. NTS-KE records MAY be
-        split across DTLS record boundaries. If, likely due to packet loss, an
-        incomplete NTS-KE message is received, implementations MUST treat this
-        an error, which clients SHOULD handle by restarting with a fresh DTLS
-        handshake and trying again.</t>
-
-        <t>The fields of an NTS-KE record are defined as follows: <list
-            style="symbols">
-            <t>C (Critical Bit): Determines the disposition of unrecognized
-            Record Types. Implementations which receive a record with an
-            unrecognized Record Type MUST ignore the record if the Critical
-            Bit is 0, and MUST treat it as an error if the Critical Bit is
-            1.</t>
-
-            <t>Record Type: A 15-bit integer in network byte order (from
-            most-to-least significant, its bits are record bits 7&ndash;1 and
-            then 15&ndash;8). The semantics of record types 0&ndash;5 are
-            specified in this memo; additional type numbers SHALL be tracked
-            through the IANA Network Time Security Key Establishment Record
-            Types registry.</t>
-
-            <t>Body Length: the length of the Record Body field, in octets, as
-            a 16-bit integer in network byte order. Record bodies may have any
-            representable length and need not be aligned to a word
-            boundary.</t>
-
-            <t>Record Body: the syntax and semantics of this field shall be
-            determined by the Record Type.</t>
-          </list></t>
-
-        <section title="NTS-KE record types">
-          <t>The following NTS-KE Record Types are defined.</t>
-
-          <section title="End of Message">
-            <t>The End of Message record has a Record Type number of 0 and an
-            zero-length body. It MUST occur exactly once as the final record
-            of every NTS-KE request and response. The Critical Bit MUST be
-            set.</t>
-          </section>
-
-          <section title="NTS Next Protocol Negotiation">
-            <t>The NTS Next Protocol Negotiation record has a record type of
-            1. It MUST occur exactly once in every NTS-KE request and
-            response. Its body consists of a sequence of 16-octet strings.
-            Each 16-octet string represents a Protocol Name from the IANA
-            Network Time Security Next Protocols registry. The Critical Bit
-            MUST be set.</t>
-
-            <t>The Protocol Names listed in the client's NTS Next Protocol
-            Negotiation record denote those protocols which the client wishes
-            to speak using the key material established through this NTS-KE
-            session. The Protocol Names listed in the server's response MUST
-            comprise a subset of those listed in the request, and denote those
-            protocols which the server is willing and able to speak using the
-            key material established through this NTS-KE session. The client
-            MAY proceed with one or more of them. The request MUST list at
-            least one protocol, but the response MAY be empty.</t>
-          </section>
-
-          <section title="Error">
-            <t>The Error record has a Record Type number of 2. Its body is
-            exactly two octets long, consisting of an unsigned 16-bit integer
-            in network byte order, denoting an error code. The Critical Bit
-            MUST be set.</t>
-
-            <t>Clients MUST NOT include Error records in their request. If
-            clients receive a server response which includes an Error record,
-            they MUST discard any negotiated key material and MUST NOT proceed
-            to the Next Protocol.</t>
-
-            <t>The following error code are defined. <list style="symbols">
-                <t>Error code 0 means "Unrecognized Critical Record". The
-                server MUST respond with this error code if the request
-                included a record which the server did not understand and
-                which had its Critical Bit set. The client SHOULD NOT retry
-                its request without modification.</t>
-
-                <t>Error code 1 means "Bad Request". The server MUST respond
-                with this error if, upon the expiration of an
-                implementation-defined timeout, it has not yet received a
-                complete and syntactically well-formed request from the
-                client. This error is likely to be the result of a dropped
-                packet, so the client SHOULD start over with a new DTLS
-                handshake and retry its request.</t>
-              </list></t>
-          </section>
-
-          <section title="Warning">
-            <t>The Warning record has a Record Type number of 3. Its body is
-            exactly two octets long, consisting of an unsigned 16-bit integer
-            in network byte order, denoting a warning code. The Critical Bit
-            MUST be set.</t>
-
-            <t>Clients MUST NOT include Warning records in their request. If
-            clients receive a server response which includes an Warning
-            record, they MAY discard any negotiated key material and abort
-            without proceeding to the Next Protocol. Unrecognized warning
-            codes MUST be treated as errors.</t>
-
-            <t>This memo defines no warning codes.</t>
-          </section>
-
-          <section title="AEAD Algorithm Negotiation">
-            <t>The AEAD Algorithm Negotiation record has a Record Type number
-            of 4. Its body consists of a sequence of unsigned 16-bit integers
-            in network byte order, denoting Numeric Identifiers from the IANA
-            <xref target="RFC5116">AEAD registry</xref>. The Critical Bit MAY
-            be set.</t>
-
-            <t>If the NTS Next Protocol Negotiation record offers "ntp/4",this
-            record MUST be included exactly once. Other protocols MAY require
-            it as well.</t>
-
-            <t>When included in a request, this record denotes which AEAD
-            algorithms the client is willing to use to secure the Next
-            Protocol, in decreasing preference order. When included in a
-            response, this record denotes which algorithm the server chooses
-            to use, or is empty if the server supports none of the algorithms
-            offered.. In requests, the list MUST include at least one
-            algorithm. In responses, it MUST include at most one. Honoring the
-            client's preference order is OPTIONAL: servers may select among
-            any of the client's offered choices, even if they are able to
-            support some other algorithm which the client prefers more.</t>
-
-            <t>Server implementations of <xref
-            target="nts-extensions-for-ntpv4">NTS extensions for NTPv4</xref>
-            MUST support AEAD_AES_128_GCM (Numeric Identifier 1). That is, if
-            the client includes AEAD_AES_128_GCM in its AEAD Algorithm
-            Negotiation record, and the server accepts the "ntp/4" protocol in
-            its NTS Next Protocol Negotiation record, then the server's AEAD
-            Algorithm Negotiation record MUST NOT be empty.</t>
-          </section>
-
-          <section title="New Cookie for NTPv4">
-            <t>The New Cookie for NTPv4 record has a Record Type number of 5.
-            The contents of its body SHALL be implementation-defined and
-            clients MUST NOT attempt to interpret them. See [[TODO]] for a
-            RECOMMENDED construction.</t>
-
-            <t>Clients MUST NOT send records of this type. Servers MUST send
-            at least one record of this type, and SHOULD send eight of them,
-            if they accept "ntp/4" as a Next Protocol. The Critical Bit SHOULD
-            NOT be set.</t>
-          </section>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+]]>
+        </artwork>
+      </figure>
+      <t>
+        [[Ed. Note: this ad-hoc binary format should be fine as long
+        as we continue to keep things very simple. However, if we
+        think there's any reasonable probability of wanting to include
+        more complex data structures, we should consider using some
+        semi-structured data format such as JSON, Protocol Buffers, or
+        (ugh) ASN.1]]
+      </t>
+      <t>
+        The requirement that all NTS-KE messages be terminated by an
+        End of Message record makes them self-delimiting.
+      </t>
+      <t>
+        The fields of an NTS-KE record are defined as follows:
+        <list>
+          <t>
+            C (Critical Bit): Determines the disposition of
+            unrecognized Record Types. Implementations which receive a
+            record with an unrecognized Record Type MUST ignore the
+            record if the Critical Bit is 0, and MUST treat it as an
+            error if the Critical Bit is 1.
+          </t>
+          <t>
+            Record Type: A 15-bit integer in network byte order (from
+            most-to-least significant, its bits are record bits 7&ndash;1
+            and then 15&ndash;8). The semantics of record types 0&ndash;5 are
+            specified in this memo; additional type numbers SHALL be
+            tracked through the IANA Network Time Security Key
+            Establishment Record Types registry.
+          </t>
+          <t>
+            Body Length: the length of the Record Body field, in
+            octets, as a 16-bit integer in network byte order. Record
+            bodies may have any representable length and need not be
+            aligned to a word boundary.
+          </t>
+          <t>
+            Record Body: the syntax and semantics of this field shall
+            be determined by the Record Type.
+          </t>
+        </list>
+      </t>
+      <section title="NTS-KE record types">
+        <t>The following NTS-KE Record Types are defined.</t>
+        <section title="End of Message">
+          <t>
+            The End of Message record has a Record Type number of 0
+            and an zero-length body. It MUST occur exactly once as the
+            final record of every NTS-KE request and response. The
+            Critical Bit MUST be set.
+          </t>
         </section>
-
-        <section title="Key Extraction (generally)">
-          <t>Following a successful run of the NTS-KE protocol, key material
-          SHALL be extracted according to <xref target="RFC5705">RFC
-          5705</xref>. Inputs to the exporter function are to be constructed
-          in a manner specific to the negotiated Next Protocol. However, all
-          protocols which utilize NTS-KE MUST conform to the following two
-          rules: <list style="symbols">
-              <t>The disambiguating label string MUST be
-              "EXPORTER-network-time-security/1".</t>
-
-              <t>The per-association context value MUST be provided, and MUST
-              begin with the 16-octet Protocol Name which was negotiated as a
-              Next Protocol.</t>
-            </list></t>
+        <section title="NTS Next Protocol Negotiation">
+          <t>
+            The NTS Next Protocol Negotiation record has a record
+            type of 1. It MUST occur exactly once in every NTS-KE
+            request and response. Its body consists of a sequence of
+            16-octet strings. Each 16-octet string represents a
+            Protocol Name from the IANA Network Time Security
+            Next Protocols registry. The Critical Bit MUST be
+            set.
+          </t>
+          <t>
+            The Protocol Names listed in the client's NTS Next
+            Protocol Negotiation record denote those protocols which
+            the client wishes to speak using the key material
+            established through this NTS-KE session. The Protocol
+            Names listed in the server's response MUST comprise a
+            subset of those listed in the request, and denote those
+            protocols which the server is willing and able to speak
+            using the key material established through this NTS-KE
+            session. The client MAY proceed with one or more of
+            them. The request MUST list at least one protocol, but the
+            response MAY be empty.
+          </t>
+        </section>
+        <section title="Error">
+          <t>
+            The Error record has a Record Type number of 2. Its body
+            is exactly two octets long, consisting of an unsigned
+            16-bit integer in network byte order, denoting an error
+            code. The Critical Bit MUST be set.
+          </t>
+          <t>
+            Clients MUST NOT include Error records in their request.
+            If clients receive a server response which includes an
+            Error record, they MUST discard any negotiated key
+            material and MUST NOT proceed to the Next Protocol.
+          </t>
+          <t>
+            The following error code are defined.
+            <list>
+              <t>
+                Error code 0 means &quot;Unrecognized Critical
+                Record&quot;. The server MUST respond with this error
+                code if the request included a record which the server
+                did not understand and which had its Critical Bit
+                set. The client SHOULD NOT retry its request without
+                modification.
+              </t>
+              <t>
+                Error code 1 means &quot;Bad Request&quot;. The server
+                MUST respond with this error if, upon the expiration
+                of an implementation-defined timeout, it has not yet
+                received a complete and syntactically well-formed
+                request from the client. This error is likely to be
+                the result of a dropped packet, so the client SHOULD
+                start over with a new DTLS handshake and retry its
+                request.
+              </t>
+            </list>
+          </t>
+        </section>
+        <section title="Warning">
+          <t>
+            The Warning record has a Record Type number of 3. Its body
+            is exactly two octets long, consisting of an unsigned
+            16-bit integer in network byte order, denoting a warning
+            code. The Critical Bit MUST be set.
+          </t>
+          <t>
+            Clients MUST NOT include Warning records in their request.
+            If clients receive a server response which includes an
+            Warning record, they MAY discard any negotiated key
+            material and abort without proceeding to the Next
+            Protocol. Unrecognized warning codes MUST be treated as
+            errors.
+          </t>
+          <t>
+            This memo defines no warning codes.
+          </t>
+        </section>
+        <section title="AEAD Algorithm Negotiation">
+          <t>
+            The AEAD Algorithm Negotiation record has a Record Type
+            number of 4. Its body consists of a sequence of unsigned
+            16-bit integers in network byte order, denoting Numeric
+            Identifiers from the IANA <xref target="RFC5116">AEAD
+            registry</xref>. The Critical Bit MAY be set.
+          </t>
+          <t>
+            If the NTS Next Protocol Negotiation record offers
+            &quot;ntp/4&quot;,this record MUST be included exactly
+            once. Other protocols MAY require it as well.
+          </t>
+          <t>
+            When included in a request, this record denotes which AEAD
+            algorithms the client is willing to use to secure the Next
+            Protocol, in decreasing preference order. When included in
+            a response, this record denotes which algorithm the server
+            chooses to use, or is empty if the server supports none of
+            the algorithms offered.. In requests, the list MUST
+            include at least one algorithm. In responses, it MUST
+            include at most one. Honoring the client's preference
+            order is OPTIONAL: servers may select among any of the
+            client's offered choices, even if they are able to support
+            some other algorithm which the client prefers more.
+          </t>
+          <t>
+            Server implementations of <xref
+            target="nts-extensions-for-ntpv4">NTS extensions for
+            NTPv4</xref> MUST support <xref
+            target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> (Numeric
+            Identifier 15). That is, if the client includes
+            AEAD_AES_SIV_CMAC_256 in its AEAD Algorithm Negotiation
+            record, and the server accepts the &quot;ntp/4&quot;
+            protocol in its NTS Next Protocol Negotiation record, then
+            the server's AEAD Algorithm Negotation record MUST NOT be
+            empty.
+          </t>
+        </section>
+        <section title="New Cookie for NTPv4">
+          <t>
+            The New Cookie for NTPv4 record has a Record Type number
+            of 5. The contents of its body SHALL be
+            implementation-defined and clients MUST NOT attempt to
+            interpret them. See [[TODO]] for a RECOMMENDED
+            construction.
+          </t>
+          <t>
+            Clients MUST NOT send records of this type. Servers MUST
+            send at least one record of this type, and SHOULD send
+            eight of them, if they accept &quot;ntp/4&quot; as a Next
+            Protocol. The Critical Bit SHOULD NOT be set.
+          </t>
+          <t>
+            [[Ed. Note: the purpose of sending eight cookies is to
+            allow the client to recover from dropped packets without
+            reusing cookies or starting a new handshake. Discussion of
+            cookie management should probably be broken out into its
+            own section.]]
+          </t>
         </section>
       </section>
+      <section title="Key Extraction (generally)">
+        <t>
+          Following a successful run of the NTS-KE protocol, key
+          material SHALL be extracted according to <xref
+          target="RFC5705">RFC 5705</xref>. Inputs to the exporter
+          function are to be constructed in a manner specific to the
+          negotiated Next Protocol. However, all protocols which
+          utilize NTS-KE MUST conform to the following two
+          rules:
+          <list>
+            <t>
+              The disambiguating label string MUST be
+              &quot;EXPORTER-network-time-security/1&quot;.
+            </t>
+            <t>
+              The per-association context value MUST be provided, and
+              MUST begin with the 16-octet Protocol Name which was
+              negotiated as a Next Protocol.
+            </t>
+          </list>
+        </t>
+      </section>
+    </section>
 
-      <section anchor="nts-extensions-for-ntpv4"
-               title="NTS Extensions for NTPv4">
-        <section title="Key Extraction (for NTPv4)">
-          <t>Following a successful run of the NTS-KE protocol wherein "ntp/4"
-          is selected as a Next Protocol, two AEAD keys SHALL be extracted: a
-          client-to-server (C2S) key and a server-to-client (S2C) key. These
-          keys SHALL be computed according to <xref target="RFC5705">RFC
-          5705</xref>, using the following inputs. <list>
-              <t>The disambiguating label string SHALL be
-              "EXPORTER-network-time-security/1".</t>
-
-              <t>The per-association context value SHALL consist of the
-              following 19 octets: <list>
-                  <t>The first 16 octets SHALL be (in hexadecimal):<vspace
-                  blankLines="1"/>
-                  &nbsp;&nbsp;6E&nbsp;74&nbsp;70&nbsp;2F&nbsp;34&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00</t>
-
-                  <t>The next two octets SHALL be the Numeric Identifier of
-                  the negotiated AEAD Algorithm, in network byte order.</t>
-
-                  <t>The final octet SHALL be 0x00 for the C2S key and 0x01
-                  for the S2C key.</t>
-                </list></t>
-            </list> Implementations wishing to derive additional keys for
-          private or experimental use MUST NOT do so by extending the
-          above-specified syntax for per-association context values. Instead,
-          they SHOULD use their own disambiguating label string. Note that RFC
-          5705 provides that disambiguating label strings beginning with
-          "EXPERIMENTAL" MAY be used without IANA registration.</t>
-        </section>
-
-        <section title="Packet structure overview">
-          <t>In general, an NTS-protected NTPv4 packet consists of: <list>
-              <t>The usual 48-octet NTP header, which is authenticated but not
-              encrypted.</t>
-
-              <t>Some extensions which are authenticated but not
-              encrypted.</t>
-
-              <t>An NTS extension which contains AEAD output (i.e., an
-              authentication tag and possible ciphertext). The corresponding
-              plaintext, if non-empty, consists of some extensions which
-              benefit from both encryption and authentication.</t>
-
-              <t>Possibly, some additional extensions which are neither
+    <section title="NTS Extensions for NTPv4" anchor="nts-extensions-for-ntpv4">
+      <section title="Key Extraction (for NTPv4)">
+      <t>
+        Following a successful run of the NTS-KE protocol wherein
+        &quot;ntp/4&quot; is selected as a Next Protocol, two AEAD
+        keys SHALL be extracted: a client-to-server (C2S) key and a
+        server-to-client (S2C) key. These keys SHALL be computed
+        according to <xref target="RFC5705">RFC 5705</xref>, using the
+        following inputs.
+        <list>
+          <t>
+            The disambiguating label string SHALL be
+            &quot;EXPORTER-network-time-security/1&quot;.
+          </t>
+          <t>
+            The per-association context value SHALL consist of the
+            following 19 octets:
+            <list>
+              <t>
+                The first 16 octets SHALL be (in hexadecimal):<vspace blankLines="1"/>
+                &nbsp;&nbsp;6E&nbsp;74&nbsp;70&nbsp;2F&nbsp;34&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00
+              </t>
+              <t>
+                The next two octets SHALL be the Numeric Identifier of
+                the negotiated AEAD Algorithm, in network byte order.
+              </t>
+              <t>
+                The final octet SHALL be 0x00 for the C2S key and 0x01
+                for the S2C key.
+              </t>
+            </list>
+          </t>
+        </list>
+        Implementations wishing to derive additional keys for private
+        or experimental use MUST NOT do so by extending the
+        above-specified syntax for per-association context values.
+        Instead, they SHOULD use their own disambiguating label
+        string. Note that RFC 5705 provides that disambiguating label
+        strings beginning with &quot;EXPERIMENTAL&quot; MAY be used
+        without IANA registration.
+      </t>
+      </section>
+      <section title="Packet structure overview">
+        <t>
+          In general, an NTS-protected NTPv4 packet consists of:
+          <list>
+            <t>
+              The usual 48-octet NTP header, which is authenticated
+              but not encrypted.
+            </t>
+            <t>
+              Some extensions which are authenticated but not encrypted.
+            </t>
+            <t>
+              An NTS extension which contains AEAD output (i.e., an
+              authentication tag and possible ciphertext). The
+              corresponding plaintext, if non-empty, consists of some
+              extensions which benefit from both encryption and
+              authentication.
+            </t>
+            <t>
+              Possibly, some additional extensions which are neither
               encrypted nor authenticated. These are discarded by the
-              receiver. [[Ed. Note: right now there's no good reason for the
-              sender to include anything here, but eventually there might be.
-              We've seen <xref target="RFC7821">Checksum Complement</xref> and
-              LAST-EF as two examples of semantically-void extensions that are
-              included to satsify constraints imposed lower on the protocol
-              stack, and while there's no reason to use either of these on
-              NTS-protected packets, I think we could see similar examples in
-              the future. So, rejecting packets with unauthenticated
-              extensions could cause interoperability problems, while
-              accepting and processing those extensions would of course be a
-              security risk. Thus, I think "allow and discard" is the correct
-              policy.]]</t>
-            </list></t>
-
-          <t>Always included among the authenticated or
-          authenticated-and-encrypted extensions are a cookie extension and a
-          unique-identifier extension. The purpose of the cookie extension is
-          to enable the server to offload storage of session state onto the
-          client. The purpose of the unique-identifier extension is to protect
-          the client from replay attacks.</t>
-        </section>
-
-        <section title="The Unique Identifier extension">
-          <t>The Unique Identifier extension has a Field Type of [[TBD]]. When
-          the extension is included in a client packet (mode 3), its body
-          SHALL consist of a string of octets generated uniformly at random.
-          The string SHOULD be 32 octets long. When the extension is included
-          in a server packet (mode 4), its body SHALL contain the same octet
-          string as was provided in the client packet to which the server is
+              receiver. [[Ed. Note: right now there's no good reason
+              for the sender to include anything here, but eventually
+              there might be. We've seen <xref
+              target="RFC7821">Checksum Complement</xref> and LAST-EF
+              as two examples of semantically-void extensions that are
+              included to satsify constraints imposed lower on the
+              protocol stack, and while there's no reason to use
+              either of these on NTS-protected packets, I think we
+              could see similar examples in the future. So, rejecting
+              packets with unauthenticated extensions could cause
+              interoperability problems, while accepting and
+              processing those extensions would of course be a
+              security risk. Thus, I think &quot;allow and
+              discard&quot; is the correct policy.]]
+            </t>
+          </list>
+        </t>
+        <t>
+          Always included among the authenticated or
+          authenticated-and-encrypted extensions are a cookie
+          extension and a unique-identifier extension. The purpose of
+          the cookie extension is to enable the server to offload
+          storage of session state onto the client. The purpose of the
+          unique-identifier extension is to protect the client from
+          replay attacks.
+        </t>
+      </section>
+      <section title="The Unique Identifier extension">
+        <t>
+          The Unique Identifier extension has a Field Type of
+          [[TBD]]. When the extension is included in a client packet
+          (mode 3), its body SHALL consist of a string of octets
+          generated uniformly at random. The string SHOULD be 32 octets
+          long.  When the extension is included in a server packet (mode
+          4), its body SHALL contain the same octet string as was
+          provided in the client packet to which the server is
           responding. Its use in modes other than client/server is not
-          defined.</t>
-
-          <t>The Unique Identifier extension provides the client with a
-          cryptographically strong means of detecting replayed packets. It may
-          also be used standalone, without NTS, in which case it provides the
-          client with a means of detecting spoofed packets from off-path
-          attackers. Historically, NTP's origin timestamp field has played
-          both these roles, but for cryptographic purposes this is suboptimal
-          because it is only 64 bits long and, depending on implementation
-          details, most of those bits may be predictable. In contrast, the
-          Unique Identifier extension enables a degree of unpredictability and
-          collision-resistance more consistent with cryptographic best
-          practice.</t>
-
-          <t>[[TODO: consider using separate extension types for request and
-          response, thus allowing for use in symmetric mode. But proper
-          handling in the presence of dropped packets needs to be documented
-          and involves a lot of subtlety.]]</t>
-        </section>
-
-        <section title="The NTS Cookie extension">
-          <t>The NTS Cookie extension has a Field Type of [[TBD]]. Its purpose
-          is to carry information which enables the server to recompute keys
-          and other session state without having to store any per-client
-          state. The contents of its body SHALL be implementation-defined and
-          clients MUST NOT attempt to interpret them. See [[TODO]] for a
-          RECOMMENDED construction. The NTS Cookie extension MUST NOT be
-          included in NTP packets whose mode is other than 3 (client) or 4
-          (server).</t>
-        </section>
-
-        <section title="The NTS Cookie Placeholder extension">
-          <t>The NTS Cookie Placeholder extension has a Field Type of [[TBD]].
+          defined.
+        </t>
+        <t>
+          The Unique Identifier extension provides the client with a
+          cryptographically strong means of detecting replayed
+          packets. It may also be used standalone, without NTS, in
+          which case it provides the client with a means of detecting
+          spoofed packets from off-path attackers. Historically, NTP's
+          origin timestamp field has played both these roles, but for
+          cryptographic purposes this is suboptimal because it is only
+          64 bits long and, depending on implementation details, most
+          of those bits may be predictable. In contrast, the Unique
+          Identifier extension enables a degree of unpredictability
+          and collision-resistance more consistent with cryptographic
+          best practice.
+        </t>
+        <t>
+          [[TODO: consider using separate extension types for request
+          and response, thus allowing for use in symmetric mode. But
+          proper handling in the presence of dropped packets needs to
+          be documented and involves a lot of subtlety.]]
+        </t>
+      </section>
+      <section title="The NTS Cookie extension">
+        <t>
+          The NTS Cookie extension has a Field Type of [[TBD]]. Its
+          purpose is to carry information which enables the server to
+          recompute keys and other session state without having to
+          store any per-client state. The contents of its body SHALL
+          be implementation-defined and clients MUST NOT attempt to
+          interpret them. See [[TODO]] for a RECOMMENDED construction.
+          The NTS Cookie extension MUST NOT be included in NTP packets
+          whose mode is other than 3 (client) or 4 (server).
+        </t>
+      </section>
+      <section title="The NTS Cookie Placeholder extension">
+        <t>
+          The NTS Cookie Placeholder extension has a Field Type of [[TBD]].
           When this extension is included in a client packet (mode 3), it
           communicates to the server that the client wishes it to send
-          additional cookies in its response. This extension MUST NOT be
-          included in NTP packets whose mode is other than 3.</t>
+          additional cookies in its response. This extension MUST NOT
+          be included in NTP packets whose mode is other than 3.
+        </t>
+        <t>
+          Whenever an NTS Cookie Placeholder extension is present, it
+          MUST be accompanied by an NTS Cookie extension, and the body
+          length of the NTS Cookie Placeholder extension MUST be the
+          same as the body length of the NTS Cookie Extension. (This
+          length requirement serves to ensure that the response will
+          not be larger than the request, in order to improve
+          timekeeping precision and prevent DDoS amplification). The
+          contents of the NTS Cookie Placeholder extension's body are
+          undefined and, aside from checking its length, MUST be
+          ignored by the server.
+        </t>
+      </section>
 
-          <t>Whenever an NTS Cookie Placeholder extension is present, it MUST
-          be accompanied by an NTS Cookie extension, and the body length of
-          the NTS Cookie Placeholder extension MUST be the same as the body
-          length of the NTS Cookie Extension. (This length requirement serves
-          to ensure that the response will not be larger than the request, in
-          order to improve timekeeping precision and prevent DDoS
-          amplification). The contents of the NTS Cookie Placeholder
-          extension's body are undefined and, aside from checking its length,
-          MUST be ignored by the server.</t>
-        </section>
-
-        <section title="The NTS Authenticator and Encrypted Extensions extension">
-          <t>The NTS Authenticator and Encrypted Extensions extension is the
-          central cryptographic element of an NTS-protected NTP packet. Its
-          Field Type is [[TBD]] and the format of its body SHALL be as
-          follows: <list>
-              <t>Nonce length: two octets in network byte order, giving the
-              length of the Nonce field.</t>
-
-              <t>Nonce: a nonce as required by the negotiated AEAD
-              Algorithm.</t>
-
-              <t>Ciphertext: the output of the negotiated AEAD Algorithm. The
-              structure of this field is determined by the negotiated
-              algorithm, but it typically contains an authentication tag in
-              addition to the actual ciphertext.</t>
-
-              <t>Padding: between 1 and 24 octets of padding, with every octet
-              set to the number of padding octets included, e.g., "01", "02
-              02", or "03 03 03". The number of padding bytes should be chosen
+      <section title="The NTS Authenticator and Encrypted Extensions extension">
+        <t>
+          The NTS Authenticator and Encrypted Extensions extension is
+          the central cryptographic element of an NTS-protected NTP
+          packet. Its Field Type is [[TBD]] and the format of its body
+          SHALL be as follows:
+          <list>
+            <t>
+              Nonce length: two octets in network byte order, giving
+              the length of the Nonce field.
+            </t>
+            <t>
+              Nonce: a nonce as required by the negotiated AEAD Algorithm.
+            </t>
+            <t>
+              Ciphertext: the output of the negotiated AEAD
+              Algorithm. The structure of this field is determined by
+              the negotiated algorithm, but it typically contains an
+              authentication tag in addition to the actual ciphertext.
+            </t>
+            <t>
+              Padding: between 1 and 24 octets of padding, with every
+              octet set to the number of padding octets included,
+              e.g., &quot;01&quot;, &quot;02 02&quot;, or &quot;03 03
+              03&quot;. The number of padding bytes should be chosen
               in order to comply with the <xref target="RFC7822">RFC
-              7822</xref> requirement that (in the absence of a legacy MAC)
-              extensions have a total length in octets (including the four
-              octets for the type and length fields) which is at least 28 and
-              divisible by 4. At least one octet of padding MUST be included,
-              so that implementations can unambiguously delimit the end of the
-              ciphertext from the start of the padding.</t>
-            </list></t>
-
-          <t>The Ciphertext field SHALL be formed by providing the following
-          inputs to the negotiated AEAD Algorithm: <list>
-              <t>K: For packets sent from the client to the server, the C2S
-              key SHALL be used. For packets sent from the server to the
-              client, the S2C key SHALL be used.</t>
-
-              <t>A: The associated data SHALL consist of the portion of the
-              NTP packet beginning from the start of the NTP header and ending
-              at the end of the last extension which precedes the NTS
-              Authenticator and Encrypted Extensions extension.</t>
-
-              <t>P: The plaintext SHALL consist of all (if any) extensions to
-              be encrypted.</t>
-
-              <t>N: The nonce SHALL be formed however required by the
-              negotiated AEAD Algorithm.</t>
-            </list></t>
-
-          <t>The NTS Authenticator and Encrypted Extensions extension MUST NOT
-          be included in NTP packets whose mode is other than 3 (client) or 4
-          (server).</t>
-        </section>
-
-        <section title="Protocol details">
-          <t>A client sending an NTS-protected request SHALL include the
-          following extensions: <list>
-              <t>Exactly one Unique Identifier extension, which MUST be
-              authenticated and MUST NOT be encrypted [[Ed. Note: so that if
-              the server can't decrypt the request, it can still echo back the
-              Unique Identifier in the NTS NAK it sends]]. MUST NOT duplicate
-              those of any previous request.</t>
-
-              <t>Exactly one NTS Cookie extension, which MUST be authenticated
-              and MUST NOT be encrypted. The cookie MUST be one which the
-              server previously provided the client; it may have been provided
-              during the NTS-KE handshake or in response to a previous
-              NTS-protected NTP request. To protect client's privacy, the same
-              cookie SHOULD NOT be included in multiple requests. If the
-              client does not have any cookies that it has not already sent,
-              it SHOULD re-run the NTS-KE protocol before continuing.</t>
-
-              <t>Exactly one NTS Authenticator and Encrypted Extensions
+              7822</xref> requirement that (in the absence of a legacy
+              MAC) extensions have a total length in octets (including
+              the four octets for the type and length fields) which is
+              at least 28 and divisible by 4. At least one octet of
+              padding MUST be included, so that implementations can
+              unambiguously delimit the end of the ciphertext from the
+              start of the padding.
+            </t>
+          </list>
+        </t>
+        <t>
+          The Ciphertext field SHALL be formed by providing the
+          following inputs to the negotiated AEAD Algorithm:
+          <list>
+            <t>
+              K: For packets sent from the client to the server, the
+              C2S key SHALL be used. For packets sent from the server
+              to the client, the S2C key SHALL be used.
+            </t>
+            <t>
+              A: The associated data SHALL consist of the portion of
+              the NTP packet beginning from the start of the NTP header
+              and ending at the end of the last extension which precedes
+              the NTS Authenticator and Encrypted Extensions extension.
+            </t>
+            <t>
+              P: The plaintext SHALL consist of all (if any)
+              extensions to be encrypted.
+            </t>
+            <t>
+              N: The nonce SHALL be formed however required by the
+              negotiated AEAD Algorithm.
+            </t>
+          </list>
+        </t>
+        <t>
+          The NTS Authenticator and Encrypted Extensions extension
+          MUST NOT be included in NTP packets whose mode is other than
+          3 (client) or 4 (server).
+        </t>
+      </section>
+      <section title="Protocol details">
+        <t>
+          A client sending an NTS-protected request SHALL include the
+          following extensions:
+          <list>
+            <t>
+              Exactly one Unique Identifier extension, which MUST be
+              authenticated and MUST NOT be encrypted [[Ed. Note: so
+              that if the server can't decrypt the request, it can
+              still echo back the Unique Identifier in the NTS NAK it
+              sends]].  MUST NOT duplicate those of any previous
+              request.
+            </t>
+            <t>
+              Exactly one NTS Cookie extension, which MUST be
+              authenticated and MUST NOT be encrypted. The cookie MUST
+              be one which the server previously provided the client;
+              it may have been provided during the NTS-KE handshake or
+              in response to a previous NTS-protected NTP request.  To
+              protect client's privacy, the same cookie SHOULD NOT be
+              included in multiple requests. If the client does not
+              have any cookies that it has not already sent, it SHOULD
+              re-run the NTS-KE protocol before continuing.
+            </t>
+            <t>
+              Exactly one NTS Authenticator and Encrypted Extensions
               extension, generated using an AEAD Algorithm and C2S key
-              established through NTS-KE.</t>
-            </list></t>
-
-          <t>The client MAY include one or more NTS Cookie Placeholder
-          extensions, which MUST be authenticated and MAY be encrypted. The
-          number of NTS Cookie Placeholder extensions that the client includes
-          SHOULD be such that if the client includes N placeholders and the
-          server sends back N+1 cookies, the number of unused cookies stored
-          by the client will come to eight. When both the client and server
-          adhere to all cookie-management guidance provided in this memo, the
-          number of placeholder extensions will equal the number of dropped
-          packets since the last successful volley.</t>
-
-          <t>The client MAY include additional (non-NTS-related) extensions,
-          which MAY appear prior to the NTS Authenticator and Encrypted
-          Extensions extension (therefore authenticated but not encrypted),
-          within it (therefore encrypted and authenticated), or after it
-          (therefore neither encrypted nor authenticated). In general,
-          however, the server MUST discard any unauthenticated extensions and
-          process the packet as though they were not present. Servers MAY
-          implement exceptions to this requirement for particular extensions
-          if their specification explicitly provides for such.</t>
-
-          <t>Upon receiving an NTS-protected request, the server SHALL
-          (through some implementation-defined mechanism) use the cookie to
-          recover the AEAD Algorithm, C2S key, and S2C key associated with the
-          request, and then use the C2S key to authenticate the packet and
-          decrypt the ciphertext. If the cookie is valid and authentication
-          and decryption succeed, then the server SHALL include the following
-          extensions in its response: <list>
-              <t>Exactly one Unique Identifier extension, which MUST be
-              authenticated, MUST NOT be encrypted, and whose contents SHALL
-              echo those provided by the client.</t>
-
-              <t>Exactly one NTS Authenticator and Encrypted Extensions
-              extension, generated using the AEAD algorithm and S2C key
-              recovered from the cookie provided by the client.</t>
-
-              <t>One or more NTS Cookie extensions, which MUST be
-              authenticated and encrypted. The number of NTS Cookie extensions
-              included SHOULD be equal to, and MUST NOT exceed, one plus the
-              number of valid NTS Cookie Placeholder extensions included in
-              the request.</t>
-            </list></t>
-
-          <t>The server MAY include additional (non-NTS-related) extensions,
-          which MAY appear prior to the NTS Authenticator and Encrypted
-          Extensions extension (therefore authenticated but not encrypted),
-          within it (therefore encrypted and authenticated), or after it
-          (therefore neither encrypted nor authenticated). In general,
-          however, the client MUST discard any unauthenticated extensions and
-          process the packet as though they were not present. Clients MAY
-          implement exceptions to this requirement for particular extensions
-          if their specification explicitly provides for such.</t>
-
-          <t>If the server is unable to validate the cookie or authenticate
-          the request, it SHOULD respond with a Kiss-o'-Death packet (see
-          <xref target="RFC5905">RFC 5905, Section 7.4)</xref>) with kiss code
-          "NTSN" (meaning "NTS NAK"). Such a response MUST include exactly one
-          Unique Identifier extension whose contents SHALL echo those provided
-          by the client. It MUST NOT include any NTS Cookie or NTS
-          Authenticator and Encrypted Extensions extension. [[Ed. Note: RFC
-          5905 already provides the kiss code "CRYP" meaning "Cryptographic
-          authentication or identification failed" but I think this is meant
-          to be Autokey-specific.]]</t>
-
-          <t>Upon receiving an NTS-protected response, the client MUST verify
-          that the Unique Identifier matches that of an outstanding request,
-          and that the packet is authentic under the S2C key associated with
-          that request. If either of these checks fails, the packet MUST be
-          discarded without further processing.</t>
-
-          <t>Upon receiving an NTS NAK, the client MUST verify that the Unique
-          Identifier matches that of an outstanding request. If this check
-          fails, the packet MUST be discarded without further processing. If
-          this check passes, the client SHOULD discard all cookies and AEAD
-          keys associated with the server which sent the NAK and initiate a
-          fresh NTS-KE handshake.</t>
-        </section>
-      </section>
-
-      <section anchor="recommended-format-for-nts-cookies"
-               title="Recommended format for NTS cookies">
-        <t>This section provides a RECOMMENDED way for servers to construct
-        NTS cookies. Clients MUST NOT examine the cookie under the assumption
-        that it is constructed according to this section.</t>
-
-        <t>The role of cookies in NTS is closely analagous to that of session
-        cookies in TLS. Accordingly, the thematic resemblance of this section
-        to <xref target="RFC5077">RFC 5077</xref> is deliberate, and the
-        reader should likewise take heed of its security considerations.</t>
-
-        <t>Servers should select an AEAD algorithm which they will use to
-        encrypt and authenticate cookies. The chosen algorithm should be one
-        such as <xref target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which
-        resists accidential nonce reuse, and it need not be the same as the
-        one that was negotiated with the client. Servers should randomly
-        generate and store a master AEAD key `K`. Servers should additionally
-        choose a non-secret, unique value `I` as key-identifier for `K`.</t>
-
-        <t>Servers should periodically (e.g., once daily) generate a new pair
-        (I,K) and immediately switch to using these values for all
-        newly-generated cookies. Immediately following each such key rotation,
-        servers should securely erase any keys generated two or more rotation
-        periods prior. Servers should continue to accept any cookie generated
-        using keys that they have not yet erased, even if those keys are no
-        longer current. Erasing old keys provides for forward secrecy,
-        limiting the scope of what old information can be stolen if a master
-        key is somehow compromised. Holding on to a limited number of old keys
-        allows clients to seamlessly transition from one generation to the
-        next without having to perform a new NTS-KE handshake.</t>
-
-        <t>[[TODO: discuss key management considerations for load-balanced
-        servers]]</t>
-
-        <t>To form a cookie, servers should first form a plaintext `P`
-        consisting of the following fields: <list>
-            <t>The AEAD algorithm negotiated during NTS-KE</t>
-
-            <t>The S2C key</t>
-
-            <t>The C2S key</t>
-          </list></t>
-
-        <t>Servers should the generate a nonce `N` uniformly at random, and
-        form AEAD output `C` by encrypting `P` under key `K` with nonce `N`
-        and no associated data.</t>
-
-        <t>The cookie should consist of the tuple `(I,N,C)`.</t>
-
-        <t>[[TODO: explicitly specify how to verify and decrypt a cookie, not
-        just how to form one]]</t>
+              established through NTS-KE.
+            </t>
+          </list>
+        </t>
+        <t>
+          The client MAY include one or more NTS Cookie Placeholder
+          extensions, which MUST be authenticated and MAY be
+          encrypted. The number of NTS Cookie Placeholder extensions
+          that the client includes SHOULD be such that if the client
+          includes N placeholders and the server sends back N+1
+          cookies, the number of unused cookies stored by the client
+          will come to eight. When both the client and server adhere
+          to all cookie-management guidance provided in this memo, the
+          number of placeholder extensions will equal the number of
+          dropped packets since the last successful volley.
+        </t>
+        <t>
+          The client MAY include additional (non-NTS-related)
+          extensions, which MAY appear prior to the NTS Authenticator
+          and Encrypted Extensions extension (therefore authenticated
+          but not encrypted), within it (therefore encrypted and
+          authenticated), or after it (therefore neither encrypted nor
+          authenticated). In general, however, the server MUST discard
+          any unauthenticated extensions and process the packet as
+          though they were not present. Servers MAY implement
+          exceptions to this requirement for particular extensions
+          if their specification explicitly provides for such.
+        </t>
+        <t>
+          Upon receiving an NTS-protected request, the server SHALL
+          (through some implementation-defined mechanism) use the
+          cookie to recover the AEAD Algorithm, C2S key, and S2C key
+          associated with the request, and then use the C2S key to
+          authenticate the packet and decrypt the ciphertext.  If the
+          cookie is valid and authentication and decryption succeed,
+          then the server SHALL include the following extensions in
+          its response:
+          <list>
+            <t>
+              Exactly one Unique Identifier extension, which MUST be
+              authenticated, MUST NOT be encrypted, and whose contents
+              SHALL echo those provided by the client.
+            </t>
+            <t>
+              Exactly one NTS Authenticator and Encrypted Extensions
+              extension, generated using the AEAD algorithm and S2C
+              key recovered from the cookie provided by the client.
+            </t>
+            <t>
+              One or more NTS Cookie extensions, which MUST be
+              authenticated and encrypted. The number of NTS Cookie
+              extensions included SHOULD be equal to, and MUST NOT
+              exceed, one plus the number of valid NTS Cookie
+              Placeholder extensions included in the request.
+            </t>
+          </list>
+        </t>
+        <t>
+          The server MAY include additional (non-NTS-related)
+          extensions, which MAY appear prior to the NTS Authenticator
+          and Encrypted Extensions extension (therefore authenticated
+          but not encrypted), within it (therefore encrypted and
+          authenticated), or after it (therefore neither encrypted nor
+          authenticated). In general, however, the client MUST discard
+          any unauthenticated extensions and process the packet as
+          though they were not present. Clients MAY implement
+          exceptions to this requirement for particular extensions
+          if their specification explicitly provides for such.
+        </t>
+        <t>
+          If the server is unable to validate the cookie or
+          authenticate the request, it SHOULD respond with a
+          Kiss-o'-Death packet (see <xref target="RFC5905">RFC 5905,
+          Section 7.4)</xref>) with kiss code &quot;NTSN&quot;
+          (meaning &quot;NTS NAK&quot;). Such a response MUST
+          include exactly one Unique Identifier extension whose
+          contents SHALL echo those provided by the client.  It MUST
+          NOT include any NTS Cookie or NTS Authenticator and
+          Encrypted Extensions extension. [[Ed. Note: RFC 5905 already
+          provides the kiss code &quot;CRYP&quot; meaning
+          &quot;Cryptographic authentication or identification failed&quot;
+          but I think this is meant to be Autokey-specific.]]
+        </t>
+        <t>
+          Upon receiving an NTS-protected response, the client MUST
+          verify that the Unique Identifier matches that of an
+          outstanding request, and that the packet is authentic under
+          the S2C key associated with that request. If either of these
+          checks fails, the packet MUST be discarded without further
+          processing.
+        </t>
+        <t>
+          Upon receiving an NTS NAK, the client MUST verify that the
+          Unique Identifier matches that of an outstanding request. If
+          this check fails, the packet MUST be discarded without
+          further processing. If this check passes, the client SHOULD
+          discard all cookies and AEAD keys associated with the server
+          which sent the NAK and initiate a fresh NTS-KE handshake.
+        </t>
       </section>
     </section>
-
-    <section anchor="IANA" title="IANA Considerations">
-      <section title="Field Type Registry">
-        <t>Within the "NTP Extensions Field Types" registry table, add the
-        field types:</t>
-
-        <figure>
-          <artwork><![CDATA[Field Type  Meaning                              References     
-----------  ------------------------------------ ----------
-TBD1        NTS-Related Content                  [this doc]
-TBD2        NTS-Related Content                  [this doc]
-TBD3        NTS-Related Content                  [this doc]]]></artwork>
-        </figure>
-      </section>
-
-      <section title="SMI Security for S/MIME CMS Content Type Registry">
-        <t>Within the "SMI Security for S/MIME CMS Content Type
-        (1.2.840.113549.1.9.16.1)" table, add one content type identifier:</t>
-
-        <figure>
-          <artwork><![CDATA[Decimal  Description                                   References
--------  --------------------------------------------  ----------
-TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
-        </figure>
-      </section>
-
-      <section title="DTLS-Based Key Exchange">
-        <t>IANA is requested to allocate an entry in the Service Name and
-        Transport Protocol Port Number Registry as follows: <list>
-            <t>Service Name: nts</t>
-
-            <t>Transport Protocol: udp</t>
-
-            <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
-
-            <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
-
-            <t>Description: Network Time Security</t>
-
-            <t>Reference: [[this memo]]</t>
-
-            <t>Port Number: selected by IANA from the user port range</t>
-          </list></t>
-
-        <t>IANA is requested to allocate the following two entries in the
-        Application-Layer Protocol Negotiation (ALPN) Protocol IDs registry:
+    <section title="Recommended format for NTS cookies" anchor="recommended-format-for-nts-cookies">
+      <t>
+        This section provides a RECOMMENDED way for servers to
+        construct NTS cookies. Clients MUST NOT examine the cookie
+        under the assumption that it is constructed according to this
+        section.
+      </t>
+      <t>
+        The role of cookies in NTS is closely analagous to that of
+        session cookies in TLS. Accordingly, the thematic resemblance
+        of this section to <xref target="RFC5077">RFC 5077</xref> is
+        deliberate, and the reader should likewise take heed of its
+        security considerations.
+      </t>
+      <t>
+        Servers should select an AEAD algorithm which they will use to
+        encrypt and authenticate cookies. The chosen algorithm should
+        be one such as <xref
+        target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which resists
+        accidential nonce reuse, and it need not be the same as the
+        one that was negotiated with the client. Servers should
+        randomly generate and store a master AEAD key `K`. Servers
+        should additionally choose a non-secret, unique value `I` as
+        key-identifier for `K`.
+      </t>
+      <t>
+        Servers should periodically (e.g., once daily) generate a new
+        pair (I,K) and immediately switch to using these values for
+        all newly-generated cookies. Immediately following each such
+        key rotation, servers should securely erase any keys generated
+        two or more rotation periods prior. Servers should continue to
+        accept any cookie generated using keys that they have not yet
+        erased, even if those keys are no longer current. Erasing old
+        keys provides for forward secrecy, limiting the scope of what
+        old information can be stolen if a master key is somehow
+        compromised. Holding on to a limited number of old keys allows
+        clients to seamlessly transition from one generation to the
+        next without having to perform a new NTS-KE handshake.
+      </t>
+      <t>
+        [[TODO: discuss key management considerations for load-balanced
+        servers]]
+      </t>
+      <t>
+        To form a cookie, servers should first form a plaintext `P`
+        consisting of the following fields:
         <list>
-            <t>Protocol: Network Time Security Key Establishment, version
-            1</t>
-
-            <t>Identification
-            Sequence:<vspace/>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x73&nbsp;0x6B&nbsp;0x65&nbsp;0x2F&nbsp;0x31&nbsp;("ntske/1")</t>
-
-            <t>Reference: [[this memo]]</t>
-          </list> <vspace/> <list>
-            <t>Protocol: Network Time Protocol, version 4</t>
-
-            <t>Identification
-            Sequence:<vspace/>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x34&nbsp;("ntp/4")</t>
-
-            <t>Reference: [[this memo]]</t>
-          </list></t>
-
-        <t>IANA is requested to allocate the following entry in the TLS
-        Exporter Label Registry:</t>
-
-        <texttable>
-          <ttcol>Value</ttcol>
-
-          <ttcol>DTLS-OK</ttcol>
-
-          <ttcol>Reference</ttcol>
-
-          <ttcol>Note</ttcol>
-
-          <c>EXPORTER-network-time-security/1</c>
-
-          <c>Y</c>
-
-          <c>[[this memo]]</c>
-
-          <c/>
-        </texttable>
-
-        <t>IANA is requested to allocate the following entries in the registry
-        of NTP Kiss-o'-Death codes:</t>
-
-        <texttable>
-          <ttcol>Code</ttcol>
-
-          <ttcol>Meaning</ttcol>
-
-          <c>DTLS</c>
-
-          <c>Packet conveys a DTLS record</c>
-
-          <c>NTSN</c>
-
-          <c>NTS NAK</c>
-        </texttable>
-
-        <t>IANA is requested to allocate the following entries in the NTP
-        Extensions Field Types registry:</t>
-
-        <texttable>
-          <ttcol>Field Type</ttcol>
-
-          <ttcol>Meaning</ttcol>
-
-          <ttcol>Reference</ttcol>
-
-          <c>[[TBD]]</c>
-
-          <c>DTLS Record</c>
-
-          <c>[[this memo]]</c>
-
-          <c>[[TBD]]</c>
-
-          <c>Unique Identifier</c>
-
-          <c>[[this memo]]</c>
-
-          <c>[[TBD]]</c>
-
-          <c>NTS Cookie</c>
-
-          <c>[[this memo]]</c>
-
-          <c>[[TBD]]</c>
-
-          <c>NTS Authenticator and Encrypted Extensions</c>
-
-          <c>[[this memo]]</c>
-        </texttable>
-
-        <t>IANA is requested to create a new registry entitled "Network Time
-        Security Key Establishment Record Types". Entries SHALL have the
-        following fields: <list>
-            <t>Type Number (REQUIRED): An integer in the range 0&ndash;32767
-            inclusive</t>
-
-            <t>Description (REQUIRED): short text description of the purpose
-            of the field</t>
-
-            <t>Set Critical Bit (REQUIRED): One of "MUST", "SHOULD", "MAY",
-            "SHOULD NOT", or "MUST NOT"</t>
-
-            <t>Reference (REQUIRED): A reference to a document specifying the
-            semantics of the record.</t>
-          </list></t>
-
-        <t>The policy for allocation of new entries in this registry SHALL
-        vary by the Type Number, as follows: <list>
-            <t>0&ndash;1023: Standards Action</t>
-
-            <t>1024&ndash;16383: Specification Required</t>
-
-            <t>16384&ndash;32767: Private and Experimental Use</t>
-          </list></t>
-
-        <t>Applications for new entries SHALL specify the contents of the
-        Description, Set Critical Bit and Reference fields and which of the
-        above ranges the Type Number should be allocated from. Applicants MAY
-        request a specific Type Number, and such requests MAY be granted at
-        the registrar's discretion.</t>
-
-        <t>The initial contents of this registry SHALL be as follows:</t>
-
-        <texttable>
-          <ttcol>Field Number</ttcol>
-
-          <ttcol>Description</ttcol>
-
-          <ttcol>Critical</ttcol>
-
-          <ttcol>Reference</ttcol>
-
-          <c>0</c>
-
-          <c>End of message</c>
-
-          <c>MUST</c>
-
-          <c>[[this memo]]</c>
-
-          <c>1</c>
-
-          <c>NTS next protocol negotiation</c>
-
-          <c>MUST</c>
-
-          <c>[[this memo]]</c>
-
-          <c>2</c>
-
-          <c>Error</c>
-
-          <c>MUST</c>
-
-          <c>[[this memo]]</c>
-
-          <c>3</c>
-
-          <c>Warning</c>
-
-          <c>MUST</c>
-
-          <c>[[this memo]]</c>
-
-          <c>4</c>
-
-          <c>AEAD algorithm negotation</c>
-
-          <c>MAY</c>
-
-          <c>[[this memo]]</c>
-
-          <c>5</c>
-
-          <c>New cookie for NTPv4</c>
-
-          <c>SHOULD NOT</c>
-
-          <c>[[this memo]]</c>
-
-          <c>16384&ndash;32767</c>
-
-          <c>Reserved for Private &amp; Experimental Use</c>
-
-          <c>MAY</c>
-
-          <c>[[this memo]]</c>
-        </texttable>
-
-        <t>IANA is requested to create a new registry entitled "Network Time
-        Security Next Protocols". Entries SHALL have the following fields:
+          <t>The AEAD algorithm negotiated during NTS-KE</t>
+          <t>The S2C key</t>
+          <t>The C2S key</t>
+        </list>
+      </t>
+      <t>
+        Servers should the generate a nonce `N` uniformly at random,
+        and form AEAD output `C` by encrypting `P` under key `K` with
+        nonce `N` and no associated data.
+      </t>
+      <t>
+        The cookie should consist of the tuple `(I,N,C)`.
+      </t>
+      <t>
+        [[TODO: explicitly specify how to verify and decrypt a cookie,
+        not just how to form one]]
+      </t>
+    </section>
+      
+  </section>
+
+      <section title="IANA Considerations" anchor="iana-considerations">
+      <t>
+        IANA is requested to allocate an entry in the Service Name and
+        Transport Protocol Port Number Registry as follows:
         <list>
-            <t>Protocol Name (REQUIRED): a sequence of 16 octets. Shorter
-            sequences SHALL implicitly be right-padded with null octets
-            (0x00).</t>
+          <t>Service Name: nts</t>
+          <t>Transport Protocol: udp</t>
+          <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
+          <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
+          <t>Description: Network Time Security</t>
+          <t>Reference: [[this memo]]</t>
+          <t>Port Number: selected by IANA from the user port range</t>
+        </list>
+      </t>
+      <t>
+        IANA is requested to allocate the following two entries in the
+        Application-Layer Protocol Negotation (ALPN) Protocol IDs
+        registry:
+        <list>
+          <t>Protocol: Network Time Security Key Establishment, version 1</t>
+          <t>
+            Identification
+            Sequence:<vspace/>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x73&nbsp;0x6B&nbsp;0x65&nbsp;0x2F&nbsp;0x31&nbsp;("ntske/1")
+          </t>
+          <t>Reference: [[this memo]]</t>
+        </list>
+        <vspace/>
+        <list>
+          <t>Protocol: Network Time Protocol, version 4</t>
+          <t>
+            Identification
+            Sequence:<vspace/>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x34&nbsp;("ntp/4")
+          </t>
+          <t>Reference: [[this memo]]</t>
+        </list>
+      </t>
+      <t>
+        IANA is requested to allocate the following entry in the TLS
+        Exporter Label Registry:
+      </t>
+      <texttable>
+        <ttcol>Value</ttcol>
+        <ttcol>DTLS-OK</ttcol>
+        <ttcol>Reference</ttcol>
+        <ttcol>Note</ttcol>
+        <c>EXPORTER-network-time-security/1</c>
+        <c>Y</c>
+        <c>[[this memo]]</c>
+        <c/>
+      </texttable>
+      <t>
+        IANA is requested to allocate the following entries in the registry
+        of NTP Kiss-o'-Death codes:
+      </t>
+      <texttable>
+        <ttcol>Code</ttcol><ttcol>Meaning</ttcol>
+        <c>DTLS</c><c>Packet conveys a DTLS record</c>
+        <c>NTSN</c><c>NTS NAK</c>
+      </texttable>
+      <t>
+        IANA is requested to allocate the following entries in the
+        NTP Extensions Field Types registry:
+      </t>
+      <texttable>
+        <ttcol>Field Type</ttcol>
+        <ttcol>Meaning</ttcol>
+        <ttcol>Reference</ttcol>
+        <c>[[TBD]]</c><c>DTLS Record</c><c>[[this memo]]</c>
+        <c>[[TBD]]</c><c>Unique Identifier</c><c>[[this memo]]</c>
+        <c>[[TBD]]</c><c>NTS Cookie</c><c>[[this memo]]</c>
+        <c>[[TBD]]</c><c>NTS Cookie Placeholder</c><c>[[this memo]]</c>        
+        <c>[[TBD]]</c><c>NTS Authenticator and Encrypted Extensions</c><c>[[this memo]]</c>
+      </texttable>
+      <t>
+        IANA is requested to create a new registry entitled
+        &quot;Network Time Security Key Establishment Record Types&quot;.
+        Entries SHALL have the following fields:
+        <list>
+          <t>
+            Type Number (REQUIRED): An integer in the range 0&ndash;32767
+            inclusive
+          </t>
+          <t>
+            Description (REQUIRED): short text description of the
+            purpose of the field
+          </t>
+          <t>
+            Set Critical Bit (REQUIRED): One of &quot;MUST&quot;,
+            &quot;SHOULD&quot;, &quot;MAY&quot;,  &quot;SHOULD NOT&quot;,
+            or &quot;MUST NOT&quot;
+          </t>
+          <t>
+            Reference (REQUIRED): A reference to a document specifying
+            the semantics of the record.
+          </t>
+        </list>
+      </t>
+      <t>
+        The policy for allocation of new entries in this registry SHALL vary
+        by the Type Number, as follows:
+        <list>
+          <t>0&ndash;1023: Standards Action</t>
+          <t>1024&ndash;16383: Specification Required</t>
+          <t>16384&ndash;32767: Private and Experimental Use</t>
+        </list>
+      </t>
+      <t>
+        Applications for new entries SHALL specify the contents of the
+        Description, Set Critical Bit and Reference fields and which
+        of the above ranges the Type Number should be allocated
+        from. Applicants MAY request a specific Type Number, and such
+        requests MAY be granted at the registrar's discretion.
+      </t>
+      <t>
+        The initial contents of this registry SHALL be as follows:
+      </t>
+      <texttable>
+        <ttcol>Field Number</ttcol>
+        <ttcol>Description</ttcol>
+        <ttcol>Critical</ttcol>
+        <ttcol>Reference</ttcol>
+        
+        <c>0</c>
+        <c>End of message</c>
+        <c>MUST</c>
+        <c>[[this memo]]</c>
 
-            <t>Human-Readable Name (OPTIONAL): if the sequence of octets
-            making up the protocol name intentionally represent a valid <xref
-            target="RFC3629">UTF-8</xref> string, this field SHALL consist of
-            that string.</t>
+        <c>1</c>
+        <c>NTS next protocol negotiation</c>
+        <c>MUST</c>
+        <c>[[this memo]]</c>
+        
+        <c>2</c>
+        <c>Error</c>
+        <c>MUST</c>
+        <c>[[this memo]]</c>
+        
+        <c>3</c>
+        <c>Warning</c>
+        <c>MUST</c>
+        <c>[[this memo]]</c>
+        
+        <c>4</c>
+        <c>AEAD algorithm negotation</c>
+        <c>MAY</c>
+        <c>[[this memo]]</c>
 
-            <t>Reference (RECOMMENDED): a reference to a relevant
+        <c>5</c>
+        <c>New cookie for NTPv4</c>
+        <c>SHOULD NOT</c>
+        <c>[[this memo]]</c>
+        
+        <c>16384&ndash;32767</c>
+        <c>Reserved for Private &amp; Experimental Use</c>
+        <c>MAY</c>
+        <c>[[this memo]]</c>
+      </texttable>
+      <t>
+        IANA is requested to create a new registry entitled
+        &quot;Network Time Security Next Protocols&quot;.
+        Entries SHALL have the following fields:
+        <list>
+          <t>
+            Protocol Name (REQUIRED): a sequence of 16 octets. Shorter
+            sequences SHALL implicitly be right-padded with null
+            octets (0x00).
+          </t>
+          <t>
+            Human-Readable Name (OPTIONAL): if the sequence of octets
+            making up the protocol name intentionally represent a
+            valid <xref target="RFC3629">UTF-8</xref> string, this
+            field SHALL consist of that string.
+          </t>
+          <t>
+            Reference (RECOMMENDED): a reference to a relevant
             specification document. If no relevant document exists, a
-            point-of-contact for questions regarding the entry SHOULD be
-            listed here in lieu.</t>
-          </list></t>
+            point-of-contact for questions regarding the entry SHOULD
+            be listed here in lieu.
+          </t>
+        </list>
+      </t>
+      <t>
+        Applications for new entries in this registry SHALL specify
+        all desired fields, and SHALL be granted on a First Come,
+        First Serve basis. Protocol Names beginning with 0x78 0x2D
+        (&quot;x-&quot;) SHALL be reserved for Private or Experimental
+        Use, and SHALL NOT be registered. The reserved entry
+        &quot;ptp/2&quot; may be updated or released by a future
+        Standards Action.
+      </t>
+      <t>
+        The initial contents of this registry SHALL be as follows:
+      </t>
+      <texttable>
+        <ttcol>Protocol Name</ttcol>
+        <ttcol>Human-Readable Name</ttcol>
+        <ttcol>Reference</ttcol>
+        
+        <c>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x34&nbsp;</c>
+        <c>ntp/4</c>
+        <c>[[this memo]]</c>
 
-        <t>Applications for new entries in this registry SHALL specify all
-        desired fields, and SHALL be granted on a First Come, First Serve
-        basis. Protocol Names beginning with 0x78 0x2D ("x-") SHALL be
-        reserved for Private or Experimental Use, and SHALL NOT be registered.
-        The reserved entry "ptp/2" may be updated or released by a future
-        Standards Action.</t>
-
-        <t>The initial contents of this registry SHALL be as follows:</t>
-
-        <texttable>
-          <ttcol>Protocol Name</ttcol>
-
-          <ttcol>Human-Readable Name</ttcol>
-
-          <ttcol>Reference</ttcol>
-
-          <c>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x34&nbsp;</c>
-
-          <c>ntp/4</c>
-
-          <c>[[this memo]]</c>
-
-          <c>&nbsp;&nbsp;0x70&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x32&nbsp;</c>
-
-          <c>ptp/2</c>
-
-          <c>Reserved by [[this memo]]</c>
-        </texttable>
-
-        <t>IANA is requested to create two new registries entitled "Network
-        Time Security Error Codes" and "Network Time Security Warning Codes".
-        Entries in each SHALL have the following fields: <list>
-            <t>Number (REQUIRED): a 16-bit unsigned integer</t>
-
-            <t>Description (REQUIRED): a short text description of the
-            condition.</t>
-
-            <t>Reference (REQUIRED): a reference to a relevant specification
-            document.</t>
-          </list> The policy for allocation of new entries in these registries
-        SHALL vary by their Number, as follows: <list>
-            <t>0&ndash;1023: Standards Action</t>
-
-            <t>1024&ndash;32767: Specification Required</t>
-
-            <t>32768&ndash;65535: Private and Experimental Use</t>
-          </list></t>
-
-        <t>The initial contents of the Network Time Security Error Codes
-        Registry SHALL be as follows:</t>
-
-        <texttable>
-          <ttcol>Number</ttcol>
-
-          <ttcol>Description</ttcol>
-
-          <ttcol>Reference</ttcol>
-
-          <c>0</c>
-
-          <c>Unrecognized Critical Extension</c>
-
-          <c>[[this memo]]</c>
-
-          <c>1</c>
-
-          <c>Bad Request</c>
-
-          <c>[[this memo]]</c>
-        </texttable>
-
-        <t>The Network Time Security Warning Codes Registry SHALL initially be
-        empty.</t>
-      </section>
+        <c>&nbsp;&nbsp;0x70&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x32&nbsp;</c>
+        <c>ptp/2</c>
+        <c>Reserved by [[this memo]]</c>
+      </texttable>
+      <t>
+        IANA is requested to create two new registries entitled
+        &quot;Network Time Security Error Codes&quot; and
+        &quot;Network Time Security Warning Codes&quot;. Entries in
+        each SHALL have the following fields:
+        <list>
+          <t>Number (REQUIRED): a 16-bit unsigned integer</t>
+          <t>Description (REQUIRED): a short text description of the condition.</t>
+          <t>Reference (REQUIRED): a reference to a relevant specification document.</t>
+        </list>
+        The policy for allocation of new entries in these registries
+        SHALL vary by their Number, as follows:
+        <list>
+          <t>0&ndash;1023: Standards Action</t>
+          <t>1024&ndash;32767: Specification Required</t>
+          <t>32768&ndash;65535: Private and Experimental Use</t>
+        </list>
+      </t>
+      <t>
+        The initial contents of the Network Time Security Error Codes Registry SHALL be as follows:
+      </t>
+      <texttable>
+        <ttcol>Number</ttcol><ttcol>Description</ttcol><ttcol>Reference</ttcol>
+        <c>0</c><c>Unrecognized Critical Extension</c><c>[[this memo]]</c>
+        <c>1</c><c>Bad Request</c><c>[[this memo]]</c>
+      </texttable>
+      <t>
+        The Network Time Security Warning Codes Registry SHALL initially be empty.
+      </t>
     </section>
-
     <section title="Security Considerations">
       <t>All security considerations described in <xref
       target="I-D.ietf-ntp-network-time-security"/> have to be taken into
