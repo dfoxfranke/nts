@@ -176,11 +176,11 @@
               supports unlinkability for devices that (1) use NTS as clients
               and (2) minimize the information they expose in client query
               (mode 3) packets per <xref
-              target="I-D-draft-dfranke-ntp-data-minimization"/>.
+              target="I-D.dfranke-ntp-data-minimization"/>.
               Unlinkability ensures that NTS does not leak data that allows an
               attacker to track mobile NTP clients when they move between
               networks. See <xref
-              target="privacy_considerations_unlinkability"/> for details.</t>
+              target="Unlinkability"/> for details.</t>
 
               <t>Request-Response-Consistency: NTS enables a client to match
               an incoming response to a request it has sent. NTS also enables
@@ -1438,7 +1438,7 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
         for this document.</t>
       </section>
 
-      <section title="Unlinkability">
+      <section title="Unlinkability" anchor="Unlinkability">
         <t>Unlinkability prevents a device from being tracked when it changes
         network addresses (e.g. because said device moved between different
         networks). In other words, unlinkability thwarts an attacker that
@@ -1454,7 +1454,7 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
         not rectify legacy linkability issues that are already present in NTP.
         Thus, a client that requires unlinkability MUST also minimize
         information transmitted in a client query (mode 3) packet as described
-        in the draft <xref target="I-D.draft-dfranke-ntp-data-minimization"/>.
+        in the draft <xref target="I-D.dfranke-ntp-data-minimization"/>.
         </t>
 
         <t>The unlinkability objective only holds for time synchronization
@@ -1524,13 +1524,15 @@ TBD4     id-ct-nts-ntsForNtpMessageAuthenticationCode  [this doc]]]></artwork>
     </references>
 
     <references title="Informative References">
+      <?rfc include='reference.RFC.4086'?>
+
       <?rfc include='reference.RFC.7384'?>
 
       <?rfc include='reference.RFC.5077'?>
 
       <?rfc include='reference.RFC.7821'?>
 
-      <?rfc include='reference.I-D.draf-ietf-ntp-network-time-security-15'?>
+      <?rfc include='reference.I-D.draft-ietf-ntp-network-time-security-15'?>
 
       <reference anchor="IEC.61588_2009"
                  target="http://ieeexplore.ieee.org/servlet/opac?punumber=4839000">
