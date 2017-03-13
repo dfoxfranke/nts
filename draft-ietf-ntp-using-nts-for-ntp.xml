@@ -109,9 +109,9 @@
     <abstract>
       <t>
         This memo specifies Network Time Security (NTS), a mechanism
-        for using Transport Layer Security (TLS) to provide
-        cryptographic security for the Network Time Protocol or other
-        network time synchronization protocols.
+        for using Transport Layer Security (TLS) and Authenticated
+        Encryption with Associated Data (AEAD) to provide
+        cryptographic security for the Network Time Protocol.
       </t>
 
     </abstract>
