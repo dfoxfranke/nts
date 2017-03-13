@@ -10,7 +10,7 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-07"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-08"
      ipr="trust200902" submissionType="IETF">
   <front>
     <title abbrev="NTS4NTP">Network Time Security for the Network Time
@@ -90,7 +90,7 @@
       </address>
     </author>
 
-    <date day="02" month="February" year="2017"/>
+    <date day="13" month="March" year="2017"/>
 
     <area>Internet Area</area>
 
@@ -244,13 +244,9 @@
       <section anchor="overview" title="Client-Server Mode">
         <t>The server does not keep a long-term state of the client. NTS
         initially verifies the authenticity of the time server and exchanges
-        one or more symmetric keys. The DTLS-based key exchange procedure
-        described in <xref target="key-exchange"/> can be used for this
-        exchange. An implementation MUST support the use of this procedure. It
-        MAY additionally support the use of any alternative secure
-        communication for this purpose, as long as it fulfills the
-        preconditions given in <xref
-        target="I-D.ietf-ntp-network-time-security"/>, Section 6.1.1.</t>
+        one or more symmetric keys. The TLS-based key exchange procedure
+        described in <xref target="key-exchange"/> MUST be used for this
+        exchange.</t>
 
         <t>After the keys have been exchanged, the participants then use them
         to protect the authenticity and the integrity of subsequent
@@ -270,7 +266,7 @@
       </section>
     </section>
 
-    <section anchor="key-exchange" title="Employing DTLS for NTP Security">
+    <section anchor="key-exchange" title="Employing (D)TLS for NTP Security">
       <t>Since (as discussed in <xref target="overview"/>) no single approach
       can simultaneously satisfy the needs of all modes, this specification
       consists of not one protocol but a suite of them: <list style="symbols">
@@ -280,7 +276,7 @@
           suitable for symmetric and control modes, and is also secure for
           client/server mode but relatively wasteful of server resources.</t>
 
-          <t>The "NTS Key Establishment" protocol (NTS-KE) uses DTLS to
+          <t>The "NTS Key Establishment" protocol (NTS-KE) uses TLS to
           establish key material and negotiate some additional protocol
           options, but then quickly closes the DTLS channel and does not use
           it for the exchange of time packets. NTS-KE is designed to be
@@ -350,9 +346,7 @@
         
       <section anchor="dtls-encapsulation"
                title="The NTS-encapsulated NTPv4 protocol">
-        <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. First,
-        DTLS handshake records are exchanged using one of the two transport
-        mechanisms specified in. The two
+        <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. The two
         endpoints carry out a DTLS handshake in conformance with <xref
         target="tls-profile"/>, with the client offering (via an <xref
         target="RFC7301">ALPN</xref> extension), and the server accepting, an
