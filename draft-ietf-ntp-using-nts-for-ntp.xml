@@ -278,7 +278,7 @@
 
           <t>The "NTS Key Establishment" protocol (NTS-KE) uses TLS to
           establish key material and negotiate some additional protocol
-          options, but then quickly closes the DTLS channel and does not use
+          options, but then quickly closes the TLS channel and does not use
           it for the exchange of time packets. NTS-KE is designed to be
           extensible, and might be extended to support key establishment for
           other protocols such as PTP.</t>
@@ -295,7 +295,7 @@
         <section title="TLS profile for Network Time Security" anchor="tls-profile">
           <t>
             Network Time Security makes use of both TLS (for NTS Key
-            Establishment) and DTLS (for DTLS-encapsulated NTPv4). In
+            Establishment) and DTLS (for NTS-encapsulated NTPv4). In
             either case, the requirements and recommendations of this
             section are similar. The notation &quot;(D)TLS&quot; refers to
             both TLS and DTLS.
@@ -515,7 +515,7 @@
                 received a complete and syntactically well-formed
                 request from the client. This error is likely to be
                 the result of a dropped packet, so the client SHOULD
-                start over with a new DTLS handshake and retry its
+                start over with a new TLS handshake and retry its
                 request.
               </t>
             </list>
@@ -559,7 +559,7 @@
             Protocol, in decreasing preference order. When included in
             a response, this record denotes which algorithm the server
             chooses to use, or is empty if the server supports none of
-            the algorithms offered.. In requests, the list MUST
+            the algorithms offered. In requests, the list MUST
             include at least one algorithm. In responses, it MUST
             include at most one. Honoring the client's preference
             order is OPTIONAL: servers may select among any of the
@@ -1317,10 +1317,6 @@
         clock <xref target="attacking-ntp"/> can potentially circumvent the
         employed security measures of later messages <xref
         target="delorean"/>.</t>
-      </section>
-
-      <section title="DTLS-Related Issues">
-        <t>... TBD</t>
       </section>
 
       <section anchor="DelayAttack" title="Delay Attack">
