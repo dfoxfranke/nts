@@ -462,20 +462,20 @@
         </section>
         <section title="NTS Next Protocol Negotiation">
           <t>
-            The NTS Next Protocol Negotiation record has a record
-            type of 1. It MUST occur exactly once in every NTS-KE
-            request and response. Its body consists of a sequence of
-            16-octet strings. Each 16-octet string represents a
-            Protocol Name from the IANA Network Time Security
-            Next Protocols registry. The Critical Bit MUST be
+            The NTS Next Protocol Negotiation record has a record type
+            of 1. It MUST occur exactly once in every NTS-KE request
+            and response. Its body consists of a sequence of 16-bit
+            unsigned integers in network byte order. Each integer
+            represents a Protocol ID from the IANA Network Time
+            Security Next Protocols registry. The Critical Bit MUST be
             set.
           </t>
           <t>
-            The Protocol Names listed in the client's NTS Next
+            The Protocol IDs listed in the client's NTS Next
             Protocol Negotiation record denote those protocols which
             the client wishes to speak using the key material
             established through this NTS-KE session. The Protocol
-            Names listed in the server's response MUST comprise a
+            IDs listed in the server's response MUST comprise a
             subset of those listed in the request, and denote those
             protocols which the server is willing and able to speak
             using the key material established through this NTS-KE
@@ -618,7 +618,7 @@
             </t>
             <t>
               The per-association context value MUST be provided, and
-              MUST begin with the 16-octet Protocol Name which was
+              MUST begin with the two-octet Protocol ID which was
               negotiated as a Next Protocol.
             </t>
           </list>
@@ -642,11 +642,10 @@
           </t>
           <t>
             The per-association context value SHALL consist of the
-            following 19 octets:
+            following five octets:
             <list>
               <t>
-                The first 16 octets SHALL be (in hexadecimal):<vspace blankLines="1"/>
-                &nbsp;&nbsp;6E&nbsp;74&nbsp;70&nbsp;2F&nbsp;34&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00&nbsp;00
+                The first two octets SHALL be zero.
               </t>
               <t>
                 The next two octets SHALL be the Numeric Identifier of
@@ -1102,7 +1101,6 @@
       </t>
       <texttable>
         <ttcol>Code</ttcol><ttcol>Meaning</ttcol>
-        <c>DTLS</c><c>Packet conveys a DTLS record</c>
         <c>NTSN</c><c>NTS NAK</c>
       </texttable>
       <t>
@@ -1113,7 +1111,6 @@
         <ttcol>Field Type</ttcol>
         <ttcol>Meaning</ttcol>
         <ttcol>Reference</ttcol>
-        <c>[[TBD]]</c><c>DTLS Record</c><c>[[this memo]]</c>
         <c>[[TBD]]</c><c>Unique Identifier</c><c>[[this memo]]</c>
         <c>[[TBD]]</c><c>NTS Cookie</c><c>[[this memo]]</c>
         <c>[[TBD]]</c><c>NTS Cookie Placeholder</c><c>[[this memo]]</c>        
@@ -1209,15 +1206,12 @@
         Entries SHALL have the following fields:
         <list>
           <t>
-            Protocol Name (REQUIRED): a sequence of 16 octets. Shorter
-            sequences SHALL implicitly be right-padded with null
-            octets (0x00).
+            Protocol ID (REQUIRED): a 16-bit unsigned integer functioning
+            as an identifier.
           </t>
           <t>
-            Human-Readable Name (OPTIONAL): if the sequence of octets
-            making up the protocol name intentionally represent a
-            valid <xref target="RFC3629">UTF-8</xref> string, this
-            field SHALL consist of that string.
+            Protocol Name (REQUIRED): a short text string naming the
+            protocol being identified.
           </t>
           <t>
             Reference (RECOMMENDED): a reference to a relevant
@@ -1229,12 +1223,11 @@
       </t>
       <t>
         Applications for new entries in this registry SHALL specify
-        all desired fields, and SHALL be granted on a First Come,
-        First Serve basis. Protocol Names beginning with 0x78 0x2D
-        (&quot;x-&quot;) SHALL be reserved for Private or Experimental
-        Use, and SHALL NOT be registered. The reserved entry
-        &quot;ptp/2&quot; may be updated or released by a future
-        Standards Action.
+        all desired fields, and SHALL be granted upon approval by a
+        Designated Expert. Protocol IDs 32768-65535 SHALL be reserved
+        for Private or Experimental Use, and SHALL NOT be
+        registered. The reserved entry &quot;ptp/2&quot; may be
+        updated or released by a future Standards Action.
       </t>
       <t>
         The initial contents of this registry SHALL be as follows:
@@ -1244,12 +1237,16 @@
         <ttcol>Human-Readable Name</ttcol>
         <ttcol>Reference</ttcol>
         
-        <c>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x34&nbsp;</c>
-        <c>ntp/4</c>
+        <c>0</c>
+        <c>Network Time Protocol version 4</c>
         <c>[[this memo]]</c>
 
-        <c>&nbsp;&nbsp;0x70&nbsp;0x74&nbsp;0x70&nbsp;0x2F&nbsp;0x32&nbsp;</c>
-        <c>ptp/2</c>
+        <c>1</c>
+        <c>Precision Time Protocol version 2</c>
+        <c>Reserved by [[this memo]]</c>
+
+        <c>32768-65535</c>
+        <c>Reserved for Private or Experimental Use</c>
         <c>Reserved by [[this memo]]</c>
       </texttable>
       <t>
