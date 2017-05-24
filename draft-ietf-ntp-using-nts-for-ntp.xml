@@ -409,14 +409,6 @@
         </artwork>
       </figure>
       <t>
-        [[Ed. Note: this ad-hoc binary format should be fine as long
-        as we continue to keep things very simple. However, if we
-        think there's any reasonable probability of wanting to include
-        more complex data structures, we should consider using some
-        semi-structured data format such as JSON, Protocol Buffers, or
-        (ugh) ASN.1]]
-      </t>
-      <t>
         The requirement that all NTS-KE messages be terminated by an
         End of Message record makes them self-delimiting.
       </t>
@@ -593,13 +585,6 @@
             eight of them, if they accept &quot;ntp/4&quot; as a Next
             Protocol. The Critical Bit SHOULD NOT be set.
           </t>
-          <t>
-            [[Ed. Note: the purpose of sending eight cookies is to
-            allow the client to recover from dropped packets without
-            reusing cookies or starting a new handshake. Discussion of
-            cookie management should probably be broken out into its
-            own section.]]
-          </t>
         </section>
       </section>
       <section title="Key Extraction (generally)">
@@ -688,20 +673,7 @@
             <t>
               Possibly, some additional extensions which are neither
               encrypted nor authenticated. These are discarded by the
-              receiver. [[Ed. Note: right now there's no good reason
-              for the sender to include anything here, but eventually
-              there might be. We've seen <xref
-              target="RFC7821">Checksum Complement</xref> and LAST-EF
-              as two examples of semantically-void extensions that are
-              included to satsify constraints imposed lower on the
-              protocol stack, and while there's no reason to use
-              either of these on NTS-protected packets, I think we
-              could see similar examples in the future. So, rejecting
-              packets with unauthenticated extensions could cause
-              interoperability problems, while accepting and
-              processing those extensions would of course be a
-              security risk. Thus, I think &quot;allow and
-              discard&quot; is the correct policy.]]
+              receiver.
             </t>
           </list>
         </t>
@@ -954,10 +926,7 @@
           include exactly one Unique Identifier extension whose
           contents SHALL echo those provided by the client.  It MUST
           NOT include any NTS Cookie or NTS Authenticator and
-          Encrypted Extensions extension. [[Ed. Note: RFC 5905 already
-          provides the kiss code &quot;CRYP&quot; meaning
-          &quot;Cryptographic authentication or identification failed&quot;
-          but I think this is meant to be Autokey-specific.]]
+          Encrypted Extensions extension.
         </t>
         <t>
           Upon receiving an NTS-protected response, the client MUST
@@ -1144,7 +1113,7 @@
         The policy for allocation of new entries in this registry SHALL vary
         by the Type Number, as follows:
         <list>
-          <t>0&ndash;1023: Standards Action</t>
+          <t>0&ndash;1023: IETF Review</t>
           <t>1024&ndash;16383: Specification Required</t>
           <t>16384&ndash;32767: Private and Experimental Use</t>
         </list>
@@ -1226,8 +1195,7 @@
         all desired fields, and SHALL be granted upon approval by a
         Designated Expert. Protocol IDs 32768-65535 SHALL be reserved
         for Private or Experimental Use, and SHALL NOT be
-        registered. The reserved entry &quot;ptp/2&quot; may be
-        updated or released by a future Standards Action.
+        registered.
       </t>
       <t>
         The initial contents of this registry SHALL be as follows:
@@ -1262,7 +1230,7 @@
         The policy for allocation of new entries in these registries
         SHALL vary by their Number, as follows:
         <list>
-          <t>0&ndash;1023: Standards Action</t>
+          <t>0&ndash;1023: IETF Review</t>
           <t>1024&ndash;32767: Specification Required</t>
           <t>32768&ndash;65535: Private and Experimental Use</t>
         </list>
