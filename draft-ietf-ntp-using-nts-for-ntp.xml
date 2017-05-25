@@ -576,8 +576,9 @@
             The New Cookie for NTPv4 record has a Record Type number
             of 5. The contents of its body SHALL be
             implementation-defined and clients MUST NOT attempt to
-            interpret them. See [[TODO]] for a RECOMMENDED
-            construction.
+            interpret them. See <iref
+            target="recommended-format-for-nts-cookie"/> for a
+            RECOMMENDED construction.
           </t>
           <t>
             Clients MUST NOT send records of this type. Servers MUST
@@ -713,12 +714,6 @@
           and collision-resistance more consistent with cryptographic
           best practice.
         </t>
-        <t>
-          [[TODO: consider using separate extension types for request
-          and response, thus allowing for use in symmetric mode. But
-          proper handling in the presence of dropped packets needs to
-          be documented and involves a lot of subtlety.]]
-        </t>
       </section>
       <section title="The NTS Cookie extension">
         <t>
@@ -727,9 +722,11 @@
           recompute keys and other session state without having to
           store any per-client state. The contents of its body SHALL
           be implementation-defined and clients MUST NOT attempt to
-          interpret them. See [[TODO]] for a RECOMMENDED construction.
-          The NTS Cookie extension MUST NOT be included in NTP packets
-          whose mode is other than 3 (client) or 4 (server).
+          interpret them. See <iref
+          target="recommended-format-for-nts-cookie"/> for a
+          RECOMMENDED construction.  The NTS Cookie extension MUST NOT
+          be included in NTP packets whose mode is other than 3
+          (client) or 4 (server).
         </t>
       </section>
       <section title="The NTS Cookie Placeholder extension">
@@ -828,11 +825,8 @@
           <list>
             <t>
               Exactly one Unique Identifier extension, which MUST be
-              authenticated and MUST NOT be encrypted [[Ed. Note: so
-              that if the server can't decrypt the request, it can
-              still echo back the Unique Identifier in the NTS NAK it
-              sends]].  MUST NOT duplicate those of any previous
-              request.
+              authenticated, MUST NOT be encrypted, and whose contents
+              MUST NOT duplicate those of any previous request.
             </t>
             <t>
               Exactly one NTS Cookie extension, which MUST be
@@ -986,8 +980,16 @@
         next without having to perform a new NTS-KE handshake.
       </t>
       <t>
-        [[TODO: discuss key management considerations for load-balanced
-        servers]]
+        The need to keep keys synchronized across load-balanced
+        clusters can make automatic key rotation challenging. However,
+        the task can be accomplished without the need for central
+        key-management infrastructure by using a ratchet, i.e., making
+        each new key a deterministic, cryptographically pseudo-random
+        function of its predecessor. A recommended concrete
+        implementation of this approach is to use <xref
+        target="RFC5869">HKDF</xref> to derive new keys, using the
+        key's predecessor as Input Keying Material and its key identifier
+        as a salt.
       </t>
       <t>
         To form a cookie, servers should first form a plaintext `P`
@@ -1007,8 +1009,16 @@
         The cookie should consist of the tuple `(I,N,C)`.
       </t>
       <t>
-        [[TODO: explicitly specify how to verify and decrypt a cookie,
-        not just how to form one]]
+        To verify and decrypt a cookie provided by the client, first
+        parse it into its components `I`, `N`, and `C`. Use `I` to
+        look up its decryption key `K`. If the key whose identifier is
+        `I` has been erased or never existed, decryption fails; reply
+        with an NTS NAK. Otherwise, attempt to decrypt and verify
+        ciphertext `C` using key `K` and nonce `N` with no associated
+        data. If decryption or verification fails, reply with an NTS
+        NAK. Otherwise, parse out the contents of the resulting
+        plaintext `P` to obtain the negotiated AEAD algorithm, S2C key,
+        and C2S key.
       </t>
     </section>
       
@@ -1425,6 +1435,8 @@
       <?rfc include='reference.RFC.7384'?>
 
       <?rfc include='reference.RFC.5077'?>
+
+      <?rfc include='reference.RFC.5859'?>
 
       <?rfc include='reference.RFC.7821'?>
 
