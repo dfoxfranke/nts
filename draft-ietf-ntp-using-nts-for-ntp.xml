@@ -1258,11 +1258,6 @@
       </t>
     </section>
     <section title="Security Considerations">
-      <t>All security considerations described in <xref
-      target="I-D.ietf-ntp-network-time-security"/> have to be taken into
-      account. The application of NTS to NTP requires the following additional
-      considerations.</t>
-
       <section title="Random Number Generation">
         <t>At various points of the protocol, the generation of random numbers
         is required. The employed methods of generation need to be
@@ -1271,10 +1266,7 @@
       </section>
 
       <section title="Usage of NTP Pools">
-        <t>The certification-based authentication scheme described in <xref
-        target="I-D.ietf-ntp-network-time-security"/> is not applicable to the
-        concept of NTP pools. Therefore, NTS is unable to provide secure usage
-        of NTP pools.</t>
+        <t>[[TODO]]</t>
       </section>
 
       <section title="Initial Verification of the Server Certificates">
@@ -1392,18 +1384,6 @@
     <references title="Normative References">
       <?rfc include='reference.RFC.2119'?>
 
-      <?rfc include='reference.RFC.3394'?>
-
-      <?rfc include='reference.RFC.4082'?>
-
-      <?rfc include='reference.RFC.4634'?>
-
-      <?rfc include='reference.RFC.5652'?>
-
-      <?rfc include='reference.I-D.draft-ietf-ntp-extension-field-07'?>
-
-      <?rfc include='reference.RFC.3629'?>
-
       <?rfc include='reference.RFC.5116'?>
 
       <?rfc include='reference.RFC.5297'?>
@@ -1437,10 +1417,6 @@
       <?rfc include='reference.RFC.5077'?>
 
       <?rfc include='reference.RFC.5869'?>
-
-      <?rfc include='reference.RFC.7821'?>
-
-      <?rfc include='reference.I-D.draft-ietf-ntp-network-time-security-15'?>
 
       <reference anchor="IEC.61588_2009"
                  target="http://ieeexplore.ieee.org/servlet/opac?punumber=4839000">
