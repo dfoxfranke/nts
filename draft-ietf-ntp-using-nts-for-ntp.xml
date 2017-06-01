@@ -373,7 +373,7 @@
     <section title="The NTS Key Establishment protocol">
       <t>
         The NTS key establishment protocol is conducted via TCP port
-        [TBD].  The two endpoints carry out a TLS handshake in
+        [[TBD1]].  The two endpoints carry out a TLS handshake in
         conformance with <xref target="tls-profile"/>, with the client
         offering (via an <xref target="RFC7301">ALPN</xref>
         extension), and the server accepting, an application-layer
@@ -691,7 +691,7 @@
       <section title="The Unique Identifier extension">
         <t>
           The Unique Identifier extension has a Field Type of
-          [[TBD]]. When the extension is included in a client packet
+          [[TBD2]]. When the extension is included in a client packet
           (mode 3), its body SHALL consist of a string of octets
           generated uniformly at random. The string SHOULD be 32 octets
           long.  When the extension is included in a server packet (mode
@@ -717,7 +717,7 @@
       </section>
       <section title="The NTS Cookie extension">
         <t>
-          The NTS Cookie extension has a Field Type of [[TBD]]. Its
+          The NTS Cookie extension has a Field Type of [[TBD3]]. Its
           purpose is to carry information which enables the server to
           recompute keys and other session state without having to
           store any per-client state. The contents of its body SHALL
@@ -731,7 +731,7 @@
       </section>
       <section title="The NTS Cookie Placeholder extension">
         <t>
-          The NTS Cookie Placeholder extension has a Field Type of [[TBD]].
+          The NTS Cookie Placeholder extension has a Field Type of [[TBD4]].
           When this extension is included in a client packet (mode 3), it
           communicates to the server that the client wishes it to send
           additional cookies in its response. This extension MUST NOT
@@ -755,7 +755,7 @@
         <t>
           The NTS Authenticator and Encrypted Extensions extension is
           the central cryptographic element of an NTS-protected NTP
-          packet. Its Field Type is [[TBD]] and the format of its body
+          packet. Its Field Type is [[TBD5]] and the format of its body
           SHALL be as follows:
           <list>
             <t>
@@ -1035,7 +1035,7 @@
           <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
           <t>Description: Network Time Security</t>
           <t>Reference: [[this memo]]</t>
-          <t>Port Number: selected by IANA from the user port range</t>
+          <t>Port Number: [[TBD1]], selected by IANA from the user port range</t>
         </list>
       </t>
       <t>
@@ -1090,10 +1090,10 @@
         <ttcol>Field Type</ttcol>
         <ttcol>Meaning</ttcol>
         <ttcol>Reference</ttcol>
-        <c>[[TBD]]</c><c>Unique Identifier</c><c>[[this memo]]</c>
-        <c>[[TBD]]</c><c>NTS Cookie</c><c>[[this memo]]</c>
-        <c>[[TBD]]</c><c>NTS Cookie Placeholder</c><c>[[this memo]]</c>        
-        <c>[[TBD]]</c><c>NTS Authenticator and Encrypted Extensions</c><c>[[this memo]]</c>
+        <c>[[TBD2]]</c><c>Unique Identifier</c><c>[[this memo]]</c>
+        <c>[[TBD3]]</c><c>NTS Cookie</c><c>[[this memo]]</c>
+        <c>[[TBD4]]</c><c>NTS Cookie Placeholder</c><c>[[this memo]]</c>        
+        <c>[[TBD5]]</c><c>NTS Authenticator and Encrypted Extensions</c><c>[[this memo]]</c>
       </texttable>
       <t>
         IANA is requested to create a new registry entitled
