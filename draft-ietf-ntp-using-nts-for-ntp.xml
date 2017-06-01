@@ -115,261 +115,271 @@
       </t>
 
     </abstract>
-
-    <note title="Requirements Language">
-      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-      document are to be interpreted as described in <xref
-      target="RFC2119">RFC 2119</xref>.</t>
-    </note>
   </front>
 
   <middle>
     <section title="Introduction">
-      <t>This document specifies measures to protect time synchronization
-      between NTP participants. In particular, it describes two main
-      techniques. The first is a mechanism that uses TLS (over a connection on
-      TCP port 123) to exchange key data and that afterwards allows to secure
-      NTP mode 3 and 4 packets using Authenticated Encryption with Associated
-      Data objects embedded in extension fields of those packets. The second
-      is a mechanism for using <xref target="RFC6347">Datagram Transport Layer
-      Security</xref> (DTLS) to provide cryptographic security for NTP mode 1,
-      2 and 6 packets.</t>
+      <t>
+	This memo specifies Network Time Security (NTS), a
+	cryptographic security mechanism for network time
+	synchronization. A complete specification is provided for
+	application of NTS to the <xref target="RFC5905">Network Time
+	Protocol (NTP)</xref>. However, certain sections of this memo
+	are not inherently NTP-specific, and enable future work to
+	apply them to other time synchronization protocols such as the
+	<xref target="IEC.61588_2009">Precision Time Protocol (PTP)</xref>.
+      </t>
 
-      <t>While the detailed application described in this document is
-      inherently NTP-specific, the overall approach is not. Therefore, it
-      could be taken as guidance on how future work may apply the described
-      techniques to other time synchronization protocols (such as the <xref
-      target="IEC.61588_2009">Precision Time Protocol</xref>).</t>
-    </section>
-
-    <section title="Terms and Abbreviations">
-      <t><list style="hanging">
-          <t hangText="MAC">Message Authentication Code</t>
-
-          <t hangText="NTP  ">Network Time Protocol (<xref
-          target="RFC5905">RFC 5905</xref>)</t>
-
-          <t hangText="NTS  ">Network Time Security</t>
-
-          <t hangText="TLS">Transport Layer Security</t>
-
-          <t hangText="DTLS">Datagram Transport Layer Security</t>
-
-          <t hangText="AEAD">Authenticated Encryption with Associated Data
-          (<xref target="RFC5116">RFC 5116</xref>)</t>
-        </list></t>
-    </section>
-
-    <section title="Objectives">
-      <t>The specific objectives for the measures described this document are
-      as follows:<list style="symbols">
-          <t>Protection for NTP time synchronization messages:<list
-              style="symbols">
-              <t>Integrity: NTS protects the integrity of NTP time
-              synchronization protocol packets.</t>
-
-              <t>Confidentiality: NTS does not generally provide
-              confidentiality protection of the time synchronization data. It
-              does so only in the case of NTP's symmetric/peer mode.</t>
-
-              <t>Privacy: Once an NTS session has been established, NTS
-              supports unlinkability for devices that (1) use NTS as clients
-              and (2) minimize the information they expose in client query
-              (mode 3) packets per <xref
-              target="I-D.ietf-ntp-data-minimization"/>.
-              Unlinkability ensures that NTS does not leak data that allows an
-              attacker to track mobile NTP clients when they move between
-              networks. See <xref
-              target="Unlinkability"/> for details.</t>
-
-              <t>Request-Response-Consistency: NTS enables a client to match
-              an incoming response to a request it has sent. NTS also enables
-              the client to deduce from the response whether its request to
-              the server has arrived without alteration. This is to prevent
-              attacks employing replays of valid server responses.</t>
-            </list></t>
-
-          <t>Additional protection for key exchange messages:<list
-              style="symbols">
-              <t>Authenticity: NTS enables an NTP client to authenticate its
-              time server(s) during key exchange procedures.</t>
-
-              <t>Authorization: NTS optionally enables the server to verify
-              the client's authorization.</t>
-            </list></t>
-
-          <t>Modes of operation: Both the client-server mode and the symmetric
-          peer mode of NTP are supported. The broadcast mode of NTP can NOT be
-          secured with measures within this document.</t>
-
-          <t>Hybrid mode: For all supported modes, both secure and insecure
-          communication modes can be used at the same time, for both NTP
-          servers and clients.</t>
-
-          <t>Compatibility:<list style="symbols">
-              <t>NTS-secured communication does not affect NTP associations
-              which are not secured by NTS.</t>
-
-              <t>NTS-secured authentication requests do not affect any NTP
-              servers that do not support NTS.</t>
-            </list></t>
-        </list></t>
-    </section>
-
-    <section title="Overview of NTS-Secured NTP">
-      <t>The Network Time Protocol includes many different operating modes to
-      support various network topologies. In addition to its best-known and
-      most-widely-used client-server mode, it also includes modes for
-      synchronization between symmetric peers, a control mode for server
-      monitoring and administration and a broadcast mode. These various modes
-      have differing and contradictory requirements for security and
-      performance. Symmetric and control modes demand mutual authentication
-      and mutual replay protection, and for certain message types control mode
-      may require confidentiality as well as authentication. Client-server
-      mode places more stringent requirements on resource utilization than
-      other modes, because servers may have vast number of clients and be
-      unable to afford to maintain per-client state. However, client-server
-      mode also has more relaxed security needs, because only the client
-      requires replay protection: it is harmless for servers to process
-      replayed packets. The security demands of symmetric and control modes,
-      on the other hand, are in conflict with the resource-utilization demands
-      of client-server mode: any scheme which provides replay protection
-      inherently involves maintaining some state to keep track of what
-      messages have already been seen.</t>
-
-      <t>This document does not discuss how to add security to NTP's broadcast
-      mode.</t>
-
-      <section anchor="overview" title="Client-Server Mode">
-        <t>The server does not keep a long-term state of the client. NTS
-        initially verifies the authenticity of the time server and exchanges
-        one or more symmetric keys. The TLS-based key exchange procedure
-        described in <xref target="key-exchange"/> MUST be used for this
-        exchange.</t>
-
-        <t>After the keys have been exchanged, the participants then use them
-        to protect the authenticity and the integrity of subsequent
-        unicast-type time synchronization packets. In order to do this,
-        participants attach AEAD objects to their time synchronization
-        packets, included in NTP extension fields and calculated over the
-        whole time synchronization packet. Therefore, the client can perform a
-        validity check on reception of a time synchronization packet.</t>
+      <section title="Objectives">
+	<t>
+	  The objectives of NTS are as follows:
+	  
+	  <list style="symbols">
+	    <t>
+	      Identity: Through the use of the X.509 PKI,
+	      implementations may cryptographically establish the
+	      identity of the parties they are communicating with
+	    </t>
+	    <t>
+	      Authentication: Implementations may cryptographically
+	      verify that any time synchronization packets are
+	      authentic, i.e., that they were produced by an
+	      identified party and have not been modified in transit.
+	    </t>
+	    <t>
+	      Confidentiality: Although basic time synchronization
+	      data is considered non-confidential and sent in the
+	      clear, NTS includes support for encrypting NTP extension
+	      fields.
+	    </t>
+	    <t>
+	      Replay prevention: Implementations may detect when
+	      a received time synchronization packet is a replay of
+	      a previous packet.
+	    </t>
+	    <t>
+	      Request-response consistency: Client implementations may
+	      verify that a time synchronization packet received from
+	      a server was sent in response to a particular request from
+	      the client.
+	    </t>
+	    <t>
+	      Unlinkability: For mobile clients, NTS will not leak any
+	      information which would permit a passive adversary to
+	      determine that two packets sent over different networks
+	      came from the same client.
+	    </t>
+	    <t>
+	      Non-amplification: implementations may avoid acting as
+	      DDoS amplifiers by never responding to a request with a
+	      packet larger than the request packet.
+	    </t>
+	    <t>
+	      Scalability: Servers implementations may serve large
+	      numbers of clients without having to retain any
+	      client-specific state.
+	    </t>
+	  </list>
+	</t>
       </section>
 
-      <section title="Symmetric/Peer Mode and Control Modes">
-        <t>The symmetric ("peer") mode as well as the control modes, are
-        secured via the DTLS-encapsulated NTPv4 protocol described in <xref
-        target="dtls-encapsulation"/>. This protocol is little more than "NTP
-        over DTLS"; the two endpoints perform a DTLS handshake and then
-        exchange NTP packets encapsulated as DTLS Application Data.</t>
-      </section>
+      <section title="Protocol overview">
+	<t>
+	  The Network Time Protocol includes many different operating
+	  modes to support various network topologies. In addition to
+	  its best-known and most-widely-used client-server mode, it
+	  also includes modes for synchronization between symmetric
+	  peers, a control mode for server monitoring and administration
+	  and a broadcast mode. These various modes have differing and
+	  contradictory requirements for security and
+	  performance. Symmetric and control modes demand mutual
+	  authentication and mutual replay protection, and for certain
+	  message types control mode may require confidentiality as well
+	  as authentication. Client-server mode places more stringent
+	  requirements on resource utilization than other modes, because
+	  servers may have vast number of clients and be unable to
+	  afford to maintain per-client state. However, client-server
+	  mode also has more relaxed security needs, because only the
+	  client requires replay protection: it is harmless for servers
+	  to process replayed packets. The security demands of symmetric
+	  and control modes, on the other hand, are in conflict with the
+	  resource-utilization demands of client-server mode: any scheme
+	  which provides replay protection inherently involves
+	  maintaining some state to keep track of what messages have
+	  already been seen.
+	</t>
+	
+	<t>
+	  In order to simulatenously serve these conflicting requirements,
+	  NTS is structured as a suite of three protocols:
+	  
+	  <list>
+	    <t>
+	      The &quot;DTLS-encapsulated NTPv4&quot; protocol is little
+	      more than &quot;NTP over DTLS&quot;: the two endpoints
+	    perform a DTLS handshake and then exchange NTP packets
+	    encapsulated as DTLS Application Data. It provides mutual
+	    replay protection and is suitable for symmetric and
+	    control modes, and is also secure for client/server mode
+	    but relatively wasteful of server resources.
+	    </t>
+	    
+	    <t>
+	      The "NTS Extensions for NTPv4" are a collection of NTP
+	      extension fields for cryptographically securing NTPv4
+	      using prevoiously-established key material. They are
+	      suitable for securing client/server mode because the
+	      server can implement them without retaining per-client
+	      state, but on the other hand are suitable *only* for
+	      client/server mode because only the client, and not the
+	      server, is protected from replay.
+	    </t>
+	    
+	    <t>
+              The &quot;NTS Key Establishment&quot; protocol (NTS-KE) is
+              mechanism for establishing key material for use with the
+              NTS extensions for NTPv4. It uses TLS to exchange keys and
+              negotiate some additional protocol options, but then
+              quickly closes the TLS channel and permits the server to
+              discard all associated state.  NTS-KE is not NTP-specific;
+              it is designed to be extensible, and might be extended to
+              support key establishment for other protocols such as PTP.
+            </t>
+	  </list>
+	</t>
+	
+	<t>
+	  It is intended that NTP implementations will use
+	  DTLS-encapsulated NTPv4 to secure symmetric mode and control
+	  mode, and use NTS-KE followed by NTS Extensions for NTPv4 to
+	  secure client/server mode. NTS does not support NTP's
+	  broadcast mode.
+	</t>
+	
+	<t>
+	  As previously stated, DTLS-encapsulated NTPv4 is trivial. The
+	  communicating parties establish a DTLS session and then exchange
+	  arbitrary NTP packets as DTLS Application Data.
+	</t>
+	
+	<t>
+	  The typical protocol flow for client/server mode is as
+	  follows.  The client connects to the server on the NTS TCP
+	  port and the two parties perform a TLS handshake. Via the TLS
+	  channel, the parties negotiate some additional protocol
+	  parameters and the server sends the client a supply of
+	  cookies.  The parties use <xref target="RFC5705">TLS key
+	  export</xref> to extract key material which will be used in
+	  the next phase of the protocol.  This negotiation takes only a
+	  single round trip, after which the server closes the
+	  connection and discards all associated state. At this point
+	  the NTS-KE phase of the protocol is complete.
+	</t>
+	<t>
+	  Time synchronization proceeds over the NTP UDP port. The
+	  client sends the server an NTP client packet which includes
+	  several extension fields. Included among these fields are a
+	  cookie (previously provided by the server), and an
+	  authentication tag, computed using key material extracted from
+	  the NTS-KE handshake. The server uses the cookie to recover
+	  this key material (previously discarded to avoid maintaining
+	  state) and send back an authenticated response. The response
+	  includes a fresh, encrypted cookie which the client then sends
+	  back in the clear with its next request. (This constant
+	  refreshing of cookies is necessary in order to achieve NTS's
+	  unlinkability goal.)
+	</t>
+      </section>      
     </section>
 
-    <section anchor="key-exchange" title="Employing (D)TLS for NTP Security">
-      <t>Since (as discussed in <xref target="overview"/>) no single approach
-      can simultaneously satisfy the needs of all modes, this specification
-      consists of not one protocol but a suite of them: <list style="symbols">
-          <t>The "NTS-encapsulated NTPv4" protocol is little more than "NTP
-          over DTLS": the two endpoints perform a DTLS handshake and then
-          exchange NTP packets encapsulated as DTLS Application Data. It is
-          suitable for symmetric and control modes, and is also secure for
-          client/server mode but relatively wasteful of server resources.</t>
-
-          <t>The "NTS Key Establishment" protocol (NTS-KE) uses TLS to
-          establish key material and negotiate some additional protocol
-          options, but then quickly closes the TLS channel and does not use
-          it for the exchange of time packets. NTS-KE is designed to be
-          extensible, and might be extended to support key establishment for
-          other protocols such as PTP.</t>
-
-          <t>The "NTS extensions for NTPv4" are a collection of NTP extension
-          fields for cryptographically securing NTPv4 using key material
-          previously negotiated using NTS-KE. They are suitable for securing
-          client/server mode because the server can implement them without
-          retaining per-client state, but on the other hand are suitable
-          *only* for client/server mode because only the client, and not the
-          server, is protected from replay.</t>
-        </list></t>
-
-        <section title="TLS profile for Network Time Security" anchor="tls-profile">
-          <t>
-            Network Time Security makes use of both TLS (for NTS Key
-            Establishment) and DTLS (for NTS-encapsulated NTPv4). In
-            either case, the requirements and recommendations of this
-            section are similar. The notation &quot;(D)TLS&quot; refers to
-            both TLS and DTLS.
-          </t>
-          <t>
-            Since securing time protocols is (as of 2017) a novel
-            application of (D)TLS, no backward-compatibility concerns exist
-            to justify using obsolete, insecure, or otherwise broken TLS
-            features or versions. We therefore put forward the following
-            requirements and guidelines, roughly representing 2017's best
-            practices.
-          </t>
-          <t>
-            Implementations MUST NOT negotiate (D)TLS versions
-            earlier than 1.2.
-          </t>
-          <t>
-            Implementations willing to negotiate more than one possible
-            version of (D)TLS SHOULD NOT respond to handshake failures by
-            retrying with a downgraded protocol version. If they do, they
-            MUST implement <xref target="RFC7507"/>.
-          </t>
-          <t>
-            (D)TLS clients MUST NOT offer, and DTLS servers MUST not select,
-            RC4 cipher suites. <xref target="RFC7465"/>
-          </t>
-          <t>
-            (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
-            <xref target="RFC5746">TLS Renegotiation Indication
-            Extension</xref>. Regardless, they MUST NOT initiate or permit
-            insecure renegotiation. (*)
-          </t>
-          <t>
-            (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
-            <xref target="RFC7627">TLS Session Hash and Extended Master
-            Secret Extension</xref>. (*)
-          </t>
-          <t>
-            Use of the <xref target="RFC7301">Application-Layer Protocol
-            Negotation Extension</xref> is integral to NTS and support for
-            it is REQUIRED for interoperability.
-          </t>
-          <t>
-            (*): Note that (D)TLS 1.3 or beyond may render the indicated
-            recommendations inapplicable.
-          </t>
-        </section>
+    <section title="Requirements Language">
+      <t>
+	The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+	NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+	"OPTIONAL" in this document are to be interpreted as described
+	in <xref target="RFC2119">RFC 2119</xref>.
+      </t>
+    </section>
+    
+    <section title="TLS profile for Network Time Security" anchor="tls-profile">
+      <t>
+        Network Time Security makes use of both TLS (for NTS Key
+        Establishment) and DTLS (for NTS-encapsulated NTPv4). In
+        either case, the requirements and recommendations of this
+        section are similar. The notation &quot;(D)TLS&quot; refers to
+        both TLS and DTLS.
+      </t>
+      <t>
+        Since securing time protocols is (as of 2017) a novel
+        application of (D)TLS, no backward-compatibility concerns exist
+        to justify using obsolete, insecure, or otherwise broken TLS
+        features or versions. We therefore put forward the following
+        requirements and guidelines, roughly representing 2017's best
+        practices.
+      </t>
+      <t>
+        Implementations MUST NOT negotiate (D)TLS versions
+        earlier than 1.2.
+      </t>
+      <t>
+        Implementations willing to negotiate more than one possible
+        version of (D)TLS SHOULD NOT respond to handshake failures by
+        retrying with a downgraded protocol version. If they do, they
+        MUST implement <xref target="RFC7507"/>.
+      </t>
+      <t>
+        (D)TLS clients MUST NOT offer, and (D)TLS servers MUST not select,
+        RC4 cipher suites. <xref target="RFC7465"/>
+      </t>
+      <t>
+        (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
+        <xref target="RFC5746">TLS Renegotiation Indication
+        Extension</xref>. Regardless, they MUST NOT initiate or permit
+        insecure renegotiation. (*)
+      </t>
+      <t>
+        (D)TLS clients SHOULD offer, and (D)TLS servers SHOULD accept, the
+        <xref target="RFC7627">TLS Session Hash and Extended Master
+        Secret Extension</xref>. (*)
+      </t>
+      <t>
+        Use of the <xref target="RFC7301">Application-Layer Protocol
+        Negotation Extension</xref> is integral to NTS and support for
+        it is REQUIRED for interoperability.
+      </t>
+      <t>
+        (*): Note that (D)TLS 1.3 or beyond may render the indicated
+        recommendations inapplicable.
+      </t>
+    </section>
         
-      <section anchor="dtls-encapsulation"
-               title="The NTS-encapsulated NTPv4 protocol">
-        <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. The two
-        endpoints carry out a DTLS handshake in conformance with <xref
-        target="tls-profile"/>, with the client offering (via an <xref
-        target="RFC7301">ALPN</xref> extension), and the server accepting, an
-        application-layer protocol of "ntp/4". Second, once the handshake is
-        successfully completed, the two endpoints use the established channel
-        to exchange arbitrary NTPv4 packets as DTLS-protected Application
-        Data.</t>
+    <section anchor="dtls-encapsulation"
+             title="The NTS-encapsulated NTPv4 protocol">
+      <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. The two
+      endpoints carry out a DTLS handshake in conformance with <xref
+      target="tls-profile"/>, with the client offering (via an <xref
+      target="RFC7301">ALPN</xref> extension), and the server accepting, an
+      application-layer protocol of "ntp/4". Second, once the handshake is
+      successfully completed, the two endpoints use the established channel
+      to exchange arbitrary NTPv4 packets as DTLS-protected Application
+      Data.</t>
+      
+      <t>In addition to the requirements specified in <xref
+      target="tls-profile"/>, implementations MUST enforce the anti-replay
+      mechanism specified in <xref target="RFC6347"> Section 4.1.2.6 of RFC
+      6347</xref> (or an equivalent mechanism specified in a subsequent
+      revision of DTLS). Servers wishing to enforce access control SHOULD
+      either demand a client certificate or use a PSK-based handshake in
+      order to establish the client's identity.</t>
+      
+      <t>The NTS-encapsulated NTPv4 protocol is the RECOMMENDED mechanism
+      for cryptographically securing mode 1 (symmetric active), 2 (symmetric
+      passive), and 6 (control) NTPv4 traffic. It is equally safe for mode
+      3/4 (client/server) traffic, but is NOT RECOMMENDED for this purpose
+      because it scales poorly compared to using <xref
+      target="nts-extensions-for-ntpv4">NTS Extensions for NTPv4</xref>.</t>
+    </section>
 
-        <t>In addition to the requirements specified in <xref
-        target="tls-profile"/>, implementations MUST enforce the anti-replay
-        mechanism specified in <xref target="RFC6347"> Section 4.1.2.6 of RFC
-        6347</xref> (or an equivalent mechanism specified in a subsequent
-        revision of DTLS). Servers wishing to enforce access control SHOULD
-        either demand a client certificate or use a PSK-based handshake in
-        order to establish the client's identity.</t>
-
-        <t>The NTS-encapsulated NTPv4 protocol is the RECOMMENDED mechanism
-        for cryptographically securing mode 1 (symmetric active), 2 (symmetric
-        passive), and 6 (control) NTPv4 traffic. It is equally safe for mode
-        3/4 (client/server) traffic, but is NOT RECOMMENDED for this purpose
-        because it scales poorly compared to using <xref
-        target="nts-extensions-for-ntpv4">NTS Extensions for NTPv4</xref>.</t>
-      </section>
     <section title="The NTS Key Establishment protocol">
       <t>
         The NTS key establishment protocol is conducted via TCP port
@@ -1022,15 +1032,14 @@
       </t>
     </section>
       
-  </section>
-
       <section title="IANA Considerations" anchor="iana-considerations">
       <t>
-        IANA is requested to allocate an entry in the Service Name and
-        Transport Protocol Port Number Registry as follows:
+        IANA is requested to allocate two entries, identical except
+        for the Transport Protocol, in the Service Name and Transport
+        Protocol Port Number Registry as follows:
         <list>
           <t>Service Name: nts</t>
-          <t>Transport Protocol: udp</t>
+          <t>Transport Protocol: tcp, udp</t>
           <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
           <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
           <t>Description: Network Time Security</t>
@@ -1075,7 +1084,7 @@
         <c/>
       </texttable>
       <t>
-        IANA is requested to allocate the following entries in the registry
+        IANA is requested to allocate the following entry in the registry
         of NTP Kiss-o'-Death codes:
       </t>
       <texttable>
@@ -1165,7 +1174,7 @@
         <c>[[this memo]]</c>
         
         <c>4</c>
-        <c>AEAD algorithm negotation</c>
+        <c>AEAD algorithm negotiation</c>
         <c>MAY</c>
         <c>[[this memo]]</c>
 
@@ -1408,14 +1417,6 @@
     </section>
 
     <section title="Privacy Considerations">
-      <section title="Confidentiality">
-        <t>The actual time synchronization data in NTP packets does not
-        involve any information that needs to be kept secret. There also does
-        not seem to be any necessity to disguise the nature of an NTP
-        association. This is why content confidentiality is a non-objective
-        for this document.</t>
-      </section>
-
       <section title="Unlinkability" anchor="Unlinkability">
         <t>Unlinkability prevents a device from being tracked when it changes
         network addresses (e.g. because said device moved between different
@@ -1448,6 +1449,27 @@
         respond to NTP control queries could be linked using the information
         revealed by control queries. </t>
       </section>
+      <section title="Confidentiality">
+	<t>
+	  NTS does not protect the confidentiality of information in
+	  NTP's header fields. When clients implement <xref
+	  target="I-D.ietf-ntp-data-minimization"/>, client packet
+	  headers do not contain any information which the client
+	  could conceivably wish to keep secret: one field is random,
+	  and all others are fixed. Information in server packet
+	  headers is likewise public: the origin timestamp is copied
+	  from the client's (random) transmit timestamp, and all other
+	  fields are set the same regardless of the identity of the
+	  client making the request.
+	</t>
+	<t>
+	  Future extension fields could hypothetically contain
+	  sensitive information, in which case NTS provides a
+	  mechanism for encrypting them.
+	</t>
+      </section>
+
+
     </section>
 
     <section anchor="Acknowledgements" title="Acknowledgements">
@@ -1551,43 +1573,32 @@
       </reference>
     </references>
 
-    <section title="Flow Diagrams of Client Behaviour">
-      <figure anchor="fig_flow_unicast"
-              title="The client's behavior in NTS unicast mode.">
-        <artwork><![CDATA[                                             .------------.
-+------------------------------>o<----------( No More Keys )<---+
-|                               |            '------------'     |
-|                               v                               |
-|                        +-------------+                        |
-|                        |Key Exchange |                        |
-|                        +------+------+                        |
-|                               |           .--------------.    |
-|                               o<---------( Keys Remaining )<--+
-|                               |           '--------------'    |
-|                               v                               |
-|                     +-------------------+                     |
-|                     |Time Sync. Messages|                     |
-|                     +---------+---------+                     |
-|                               |                               |
-|                               v                               |
-|                            +-----+                            |
-|                            |Check|                            |
-|                            +--+--+                            |
-|                               |                               |
-|            /------------------+------------------\            |
-|           v                   v                   v           |
-|     .-----------.      .-------------.        .-------.       |
-|    ( MAC Failure )    ( Nonce Failure )      ( Success )      |
-|     '-----+-----'      '------+------'        '---+---'       |
-|           |                   |                   |           |
-|           v                   v                   v           |
-|    +-------------+     +-------------+     +--------------+   |
-|    |Discard Data |     |Discard Data |     |Sync. Process |   |
-|    +-------------+     +------+------+     +------+-------+   |
-|           |                   |                   |           |
-|           |                   |                   v           |
-+-----------+                   +------------------>o-----------+]]></artwork>
-      </figure>
+    <section title="Terms and Abbreviations">
+      <t>
+	<list style="hanging">
+	  <t hangText="AEAD">
+	    Authenticated Encryption with Associated Data <xref target="RFC5116"/>
+	  </t>
+	  <t hangText="DDoS">
+	    Distributed Denial of Service
+	  </t>
+	  <t hangText="DTLS">
+	    Datagram Transport Layer Security
+	  </t>
+          <t hangText="NTP  ">
+	    Network Time Protocol <xref target="RFC5905"/>
+	  </t>
+          <t hangText="NTS  ">
+	    Network Time Security
+	  </t>
+	  <t hangText="PTP  ">
+	    Precision Time Protocol
+	  </t>
+          <t hangText="TLS">
+	    Transport Layer Security
+	  </t>
+	</list>
+      </t>
     </section>
   </back>
 </rfc>
