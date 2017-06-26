@@ -355,29 +355,94 @@
         
     <section anchor="dtls-encapsulation"
              title="The NTS-encapsulated NTPv4 protocol">
-      <t>The NTS-encapsulated NTPv4 protocol proceeds in two parts. The two
-      endpoints carry out a DTLS handshake in conformance with <xref
-      target="tls-profile"/>, with the client offering (via an <xref
-      target="RFC7301">ALPN</xref> extension), and the server accepting, an
-      application-layer protocol of "ntp/4". Second, once the handshake is
-      successfully completed, the two endpoints use the established channel
-      to exchange arbitrary NTPv4 packets as DTLS-protected Application
-      Data.</t>
+      <t>
+	The NTS-encapsulated NTPv4 protocol proceeds in two parts. The
+	two endpoints carry out a DTLS handshake in conformance with
+	<xref target="tls-profile"/>, with the client offering (via an
+	<xref target="RFC7301">ALPN</xref> extension), and the server
+	accepting, an application-layer protocol of "ntp/4". Second,
+	once the handshake is successfully completed, the two
+	endpoints use the established channel to exchange arbitrary
+	NTPv4 packets as DTLS-protected Application Data.
+      </t>
       
-      <t>In addition to the requirements specified in <xref
-      target="tls-profile"/>, implementations MUST enforce the anti-replay
-      mechanism specified in <xref target="RFC6347"> Section 4.1.2.6 of RFC
-      6347</xref> (or an equivalent mechanism specified in a subsequent
-      revision of DTLS). Servers wishing to enforce access control SHOULD
-      either demand a client certificate or use a PSK-based handshake in
-      order to establish the client's identity.</t>
+      <t>
+	In addition to the requirements specified in <xref
+	target="tls-profile"/>, implementations MUST enforce the
+	anti-replay mechanism specified in <xref target="RFC6347">
+	Section 4.1.2.6 of RFC 6347</xref> (or an equivalent mechanism
+	specified in a subsequent revision of DTLS). Servers wishing
+	to enforce access control SHOULD either demand a client
+	certificate or use a PSK-based handshake in order to establish
+	the client's identity.
+      </t>
       
-      <t>The NTS-encapsulated NTPv4 protocol is the RECOMMENDED mechanism
-      for cryptographically securing mode 1 (symmetric active), 2 (symmetric
-      passive), and 6 (control) NTPv4 traffic. It is equally safe for mode
-      3/4 (client/server) traffic, but is NOT RECOMMENDED for this purpose
-      because it scales poorly compared to using <xref
-      target="nts-extensions-for-ntpv4">NTS Extensions for NTPv4</xref>.</t>
+      <t>
+	The NTS-encapsulated NTPv4 protocol is the RECOMMENDED
+	mechanism for cryptographically securing mode 1 (symmetric
+	active), 2 (symmetric passive), and 6 (control) NTPv4
+	traffic. It is equally safe for mode 3/4 (client/server)
+	traffic, but is NOT RECOMMENDED for this purpose because it
+	scales poorly compared to using <xref
+	target="nts-extensions-for-ntpv4">NTS Extensions for
+	NTPv4</xref>.
+      </t>
+
+      <t>
+	Since DTLS-encapsulated NTPv4 sessions may carry arbitrary NTP
+	packets, there is no prescribed implication from an
+	implementation's role as a DTLS client vs. DTLS server, to its
+	role in the application-level Network Time Protocol. For
+	example, it is entirely permissible for an implementation to
+	initiate a DTLS handshake (thus acting in the role of DTLS
+	client), and then once the handshake is completed, act as an
+	NTP server with the DTLS server acting as an NTP client. The
+	following guidelines are offered as sensible default behavior.
+	Implementations may depart from this guidance if the user
+	configures them to do so.
+      </t>
+	
+      <t>
+	Implementations typically should not use DTLS-encapsulated
+	NTPv4 for client/server mode, instead preferring to use NTS-KE
+	and NTS Extensions for NTPv4. If DTLS-encapsulated NTPv4 is
+	used for client/server mode, then the NTP client (mode 3)
+	should be the DTLS client and the NTP server (mode 4) should
+	be the DTLS server.
+      </t>
+
+      <t>
+	For control mode (6), the party sending queries should be the
+	DTLS client and the party responding to the queries should be
+	the DTLS server.
+      </t>
+
+      <t>
+	For symmetric operation between an active (mode 1) and passive
+	(mode 2) peer, the active peer should be the DTLS client and the
+	passive peer should be the DTLS server.
+      </t>
+
+      <t>
+	For symmetric operation between two active (mode 1) peers, both
+	parties should attempt to initiate a DTLS session with their
+	peer. If one handshake fails and the other succeeds, the
+	successfully-established session should be used for traffic in
+	both directions. If both handshakes succeed, either session may
+	be used and packets should receive identical dispositon
+	regardless of which of the two sessions they arrived
+	over. Inactive sessions may be timed out but the redundant
+	session should not be proactively closed.
+      </t>
+
+      <t>
+	If, likely as a result of user error, party A is configured as a
+	symmetry active peer of party B, but party B is neither accepting DTLS
+	handshakes from party A nor initiating one with it, then after a
+	suitable number of failed attempts, party A may fall back to acting as
+	an NTP client (mode 3) of party B using NTS-KE and NTS Extensions for
+	NTPv4.
+      </t>
     </section>
 
     <section title="The NTS Key Establishment protocol">
