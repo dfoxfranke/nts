@@ -835,7 +835,8 @@
           <list>
             <t>
               Nonce length: two octets in network byte order, giving
-              the length of the Nonce field.
+              the length of the Nonce field and interpreted as an
+              unsigned integer.
             </t>
             <t>
               Nonce: a nonce as required by the negotiated AEAD Algorithm.
