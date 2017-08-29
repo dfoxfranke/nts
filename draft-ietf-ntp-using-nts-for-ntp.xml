@@ -304,7 +304,7 @@
     <section title="TLS profile for Network Time Security" anchor="tls-profile">
       <t>
         Network Time Security makes use of both TLS (for NTS Key
-        Establishment) and DTLS (for NTS-encapsulated NTPv4). In
+        Establishment) and DTLS (for DTLS-encapsulated NTPv4). In
         either case, the requirements and recommendations of this
         section are similar. The notation &quot;(D)TLS&quot; refers to
         both TLS and DTLS.
@@ -354,9 +354,9 @@
     </section>
         
     <section anchor="dtls-encapsulation"
-             title="The NTS-encapsulated NTPv4 protocol">
+             title="The DTLS-encapsulated NTPv4 protocol">
       <t>
-	The NTS-encapsulated NTPv4 protocol proceeds in two parts. The
+	The DTLS-encapsulated NTPv4 protocol proceeds in two parts. The
 	two endpoints carry out a DTLS handshake in conformance with
 	<xref target="tls-profile"/>, with the client offering (via an
 	<xref target="RFC7301">ALPN</xref> extension), and the server
@@ -378,7 +378,7 @@
       </t>
       
       <t>
-	The NTS-encapsulated NTPv4 protocol is the RECOMMENDED
+	The DTLS-encapsulated NTPv4 protocol is the RECOMMENDED
 	mechanism for cryptographically securing mode 1 (symmetric
 	active), 2 (symmetric passive), and 6 (control) NTPv4
 	traffic. It is equally safe for mode 3/4 (client/server)
