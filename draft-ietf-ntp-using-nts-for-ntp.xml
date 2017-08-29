@@ -1549,12 +1549,14 @@
     </section>
 
     <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>The authors would like to thank Richard Barnes, Steven Bellovin,
-      Sharon Goldberg, Russ Housley, Martin Langer, Miroslav Lichvar, Aanchal
-      Malhotra, Dave Mills, Danny Mayer, Karen O'Donoghue, Eric K. Rescorla,
-      Stephen Roettger, Kurt Roeckx, Kyle Rose, Rich Salz, Brian Sniffen,
-      Susan Sons, Douglas Stebila, Harlan Stenn, Martin Thomson, and Richard
-      Welty for contributions to this document. on the design of NTS.</t>
+      <t>The authors would like to thank Richard Barnes, Steven
+      Bellovin, Scott Fluhrer, Sharon Goldberg, Russ Housley, Martin
+      Langer, Miroslav Lichvar, Aanchal Malhotra, Dave Mills, Danny
+      Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen Roettger,
+      Kurt Roeckx, Kyle Rose, Rich Salz, Brian Sniffen, Susan Sons,
+      Douglas Stebila, Harlan Stenn, Martin Thomson, and Richard Welty
+      for contributions to this document and comments on the design of
+      NTS.</t>
     </section>
   </middle>
 
