@@ -225,10 +225,10 @@
 	    </t>
 	    
 	    <t>
-	      The "NTS Extensions for NTPv4" are a collection of NTP
-	      extension fields for cryptographically securing NTPv4
-	      using previously-established key material. They are
-	      suitable for securing client/server mode because the
+	      The "NTS Extension Fields for NTPv4" are a collection of
+	      NTP extension fields for cryptographically securing
+	      NTPv4 using previously-established key material. They
+	      are suitable for securing client/server mode because the
 	      server can implement them without retaining per-client
 	      state, but on the other hand are suitable *only* for
 	      client/server mode because only the client, and not the
@@ -236,14 +236,15 @@
 	    </t>
 	    
 	    <t>
-              The &quot;NTS Key Establishment&quot; protocol (NTS-KE) is
-              mechanism for establishing key material for use with the
-              NTS extensions for NTPv4. It uses TLS to exchange keys and
-              negotiate some additional protocol options, but then
-              quickly closes the TLS channel and permits the server to
-              discard all associated state.  NTS-KE is not NTP-specific;
-              it is designed to be extensible, and might be extended to
-              support key establishment for other protocols such as PTP.
+              The &quot;NTS Key Establishment&quot; protocol (NTS-KE)
+              is mechanism for establishing key material for use with
+              the NTS Extension Fields for NTPv4. It uses TLS to
+              exchange keys and negotiate some additional protocol
+              options, but then quickly closes the TLS channel and
+              permits the server to discard all associated state.
+              NTS-KE is not NTP-specific; it is designed to be
+              extensible, and might be extended to support key
+              establishment for other protocols such as PTP.
             </t>
 	  </list>
 	</t>
@@ -251,9 +252,9 @@
 	<t>
 	  It is intended that NTP implementations will use
 	  DTLS-encapsulated NTPv4 to secure symmetric mode and control
-	  mode, and use NTS-KE followed by NTS Extensions for NTPv4 to
-	  secure client/server mode. NTS does not support NTP's
-	  broadcast mode.
+	  mode, and use NTS-KE followed by NTS Extension Fields for
+	  NTPv4 to secure client/server mode. NTS does not support
+	  NTP's broadcast mode.
 	</t>
 	
 	<t>
@@ -384,8 +385,8 @@
 	traffic. It is equally safe for mode 3/4 (client/server)
 	traffic, but is NOT RECOMMENDED for this purpose because it
 	scales poorly compared to using <xref
-	target="nts-extensions-for-ntpv4">NTS Extensions for
-	NTPv4</xref>.
+	target="nts-extension-fields-for-ntpv4">NTS Extension Fields
+	for NTPv4</xref>.
       </t>
 
       <t>
@@ -405,8 +406,8 @@
       <t>
 	Implementations typically should not use DTLS-encapsulated
 	NTPv4 for client/server mode, instead preferring to use NTS-KE
-	and NTS Extensions for NTPv4. If DTLS-encapsulated NTPv4 is
-	used for client/server mode, then the NTP client (mode 3)
+	and NTS Extension Fields for NTPv4. If DTLS-encapsulated NTPv4
+	is used for client/server mode, then the NTP client (mode 3)
 	should be the DTLS client and the NTP server (mode 4) should
 	be the DTLS server.
       </t>
@@ -441,7 +442,8 @@
 	is neither accepting DTLS handshakes from party A nor
 	initiating one with it, then after a suitable number of failed
 	attempts, party A may fall back to acting as an NTP client
-	(mode 3) of party B using NTS-KE and NTS Extensions for NTPv4.
+	(mode 3) of party B using NTS-KE and NTS Extension Fields for
+	NTPv4.
       </t>
     </section>
 
@@ -635,8 +637,8 @@
           </t>
           <t>
             Server implementations of <xref
-            target="nts-extensions-for-ntpv4">NTS extensions for
-            NTPv4</xref> MUST support <xref
+            target="nts-extension-fields-for-ntpv4">NTS extension
+            fields for NTPv4</xref> MUST support <xref
             target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> (Numeric
             Identifier 15). That is, if the client includes
             AEAD_AES_SIV_CMAC_256 in its AEAD Algorithm Negotiation
@@ -687,7 +689,7 @@
       </section>
     </section>
 
-    <section title="NTS Extensions for NTPv4" anchor="nts-extensions-for-ntpv4">
+    <section title="NTS Extension Fields for NTPv4" anchor="nts-extension-fields-for-ntpv4">
       <section title="Key Extraction (for NTPv4)">
       <t>
         Following a successful run of the NTS-KE protocol wherein
@@ -737,47 +739,47 @@
               but not encrypted.
             </t>
             <t>
-              Some extensions which are authenticated but not encrypted.
+              Some extension fields which are authenticated but not encrypted.
             </t>
             <t>
-              An NTS extension which contains AEAD output (i.e., an
+              An extension field which contains AEAD output (i.e., an
               authentication tag and possible ciphertext). The
               corresponding plaintext, if non-empty, consists of some
-              extensions which benefit from both encryption and
+              extension fields which benefit from both encryption and
               authentication.
             </t>
             <t>
-              Possibly, some additional extensions which are neither
-              encrypted nor authenticated. These are discarded by the
-              receiver.
+              Possibly, some additional extension fields which are
+              neither encrypted nor authenticated. These are discarded
+              by the receiver.
             </t>
           </list>
         </t>
         <t>
           Always included among the authenticated or
-          authenticated-and-encrypted extensions are a cookie
-          extension and a unique-identifier extension. The purpose of
-          the cookie extension is to enable the server to offload
-          storage of session state onto the client. The purpose of the
-          unique-identifier extension is to protect the client from
-          replay attacks.
+          authenticated-and-encrypted extension fields are a cookie
+          extension field and a unique-identifier extension field. The
+          purpose of the cookie extension field is to enable the
+          server to offload storage of session state onto the
+          client. The purpose of the unique-identifier extension field
+          is to protect the client from replay attacks.
         </t>
       </section>
-      <section title="The Unique Identifier extension">
+      <section title="The Unique Identifier extension field">
         <t>
-          The Unique Identifier extension has a Field Type of
-          [[TBD2]]. When the extension is included in a client packet
-          (mode 3), its body SHALL consist of a string of octets
-          generated uniformly at random. The string SHOULD be 32 octets
-          long.  When the extension is included in a server packet (mode
-          4), its body SHALL contain the same octet string as was
-          provided in the client packet to which the server is
-          responding. Its use in modes other than client/server is not
-          defined.
+          The Unique Identifier extension field has a Field Type of
+          [[TBD2]]. When the extension field is included in a client
+          packet (mode 3), its body SHALL consist of a string of
+          octets generated uniformly at random. The string SHOULD be
+          32 octets long.  When the extension field is included in a
+          server packet (mode 4), its body SHALL contain the same
+          octet string as was provided in the client packet to which
+          the server is responding. Its use in modes other than
+          client/server is not defined.
         </t>
         <t>
-          The Unique Identifier extension provides the client with a
-          cryptographically strong means of detecting replayed
+          The Unique Identifier extension field provides the client
+          with a cryptographically strong means of detecting replayed
           packets. It may also be used standalone, without NTS, in
           which case it provides the client with a means of detecting
           spoofed packets from off-path attackers. Historically, NTP's
@@ -785,50 +787,51 @@
           cryptographic purposes this is suboptimal because it is only
           64 bits long and, depending on implementation details, most
           of those bits may be predictable. In contrast, the Unique
-          Identifier extension enables a degree of unpredictability
-          and collision-resistance more consistent with cryptographic
-          best practice.
+          Identifier extension field enables a degree of
+          unpredictability and collision-resistance more consistent
+          with cryptographic best practice.
         </t>
       </section>
-      <section title="The NTS Cookie extension">
+      <section title="The NTS Cookie extension field">
         <t>
-          The NTS Cookie extension has a Field Type of [[TBD3]]. Its
-          purpose is to carry information which enables the server to
-          recompute keys and other session state without having to
-          store any per-client state. The contents of its body SHALL
-          be implementation-defined and clients MUST NOT attempt to
-          interpret them. See <xref
+          The NTS Cookie extension field has a Field Type of
+          [[TBD3]]. Its purpose is to carry information which enables
+          the server to recompute keys and other session state without
+          having to store any per-client state. The contents of its
+          body SHALL be implementation-defined and clients MUST NOT
+          attempt to interpret them. See <xref
           target="recommended-format-for-nts-cookies"/> for a
-          RECOMMENDED construction.  The NTS Cookie extension MUST NOT
-          be included in NTP packets whose mode is other than 3
-          (client) or 4 (server).
+          RECOMMENDED construction.  The NTS Cookie extension field
+          MUST NOT be included in NTP packets whose mode is other than
+          3 (client) or 4 (server).
         </t>
       </section>
-      <section title="The NTS Cookie Placeholder extension">
+      <section title="The NTS Cookie Placeholder extension field">
         <t>
-          The NTS Cookie Placeholder extension has a Field Type of [[TBD4]].
-          When this extension is included in a client packet (mode 3), it
-          communicates to the server that the client wishes it to send
-          additional cookies in its response. This extension MUST NOT
-          be included in NTP packets whose mode is other than 3.
+          The NTS Cookie Placeholder extension field has a Field Type
+          of [[TBD4]].  When this extension field is included in a
+          client packet (mode 3), it communicates to the server that
+          the client wishes it to send additional cookies in its
+          response. This extension field MUST NOT be included in NTP
+          packets whose mode is other than 3.
         </t>
         <t>
-          Whenever an NTS Cookie Placeholder extension is present, it
-          MUST be accompanied by an NTS Cookie extension, and the body
-          length of the NTS Cookie Placeholder extension MUST be the
-          same as the body length of the NTS Cookie Extension. (This
-          length requirement serves to ensure that the response will
-          not be larger than the request, in order to improve
-          timekeeping precision and prevent DDoS amplification). The
-          contents of the NTS Cookie Placeholder extension's body are
-          undefined and, aside from checking its length, MUST be
-          ignored by the server.
+          Whenever an NTS Cookie Placeholder extension field is
+          present, it MUST be accompanied by an NTS Cookie extension
+          field, and the body length of the NTS Cookie Placeholder
+          extension field MUST be the same as the body length of the
+          NTS Cookie extension field. (This length requirement serves
+          to ensure that the response will not be larger than the
+          request, in order to improve timekeeping precision and
+          prevent DDoS amplification). The contents of the NTS Cookie
+          Placeholder extension field's body are undefined and, aside
+          from checking its length, MUST be ignored by the server.
         </t>
       </section>
 
-      <section title="The NTS Authenticator and Encrypted Extensions extension">
+      <section title="The NTS Authenticator and Encrypted Extension Fields extension field">
         <t>
-          The NTS Authenticator and Encrypted Extensions extension is
+          The NTS Authenticator and Encrypted Extension Fields extension field is
           the central cryptographic element of an NTS-protected NTP
           packet. Its Field Type is [[TBD5]] and the format of its body
           SHALL be as follows:
@@ -854,12 +857,12 @@
               03&quot;. The number of padding bytes should be chosen
               in order to comply with the <xref target="RFC7822">RFC
               7822</xref> requirement that (in the absence of a legacy
-              MAC) extensions have a total length in octets (including
-              the four octets for the type and length fields) which is
-              at least 28 and divisible by 4. At least one octet of
-              padding MUST be included, so that implementations can
-              unambiguously delimit the end of the ciphertext from the
-              start of the padding.
+              MAC) extension fields have a total length in octets
+              (including the four octets for the type and length
+              fields) which is at least 28 and divisible by 4. At
+              least one octet of padding MUST be included, so that
+              implementations can unambiguously delimit the end of the
+              ciphertext from the start of the padding.
             </t>
           </list>
         </t>
@@ -874,13 +877,14 @@
             </t>
             <t>
               A: The associated data SHALL consist of the portion of
-              the NTP packet beginning from the start of the NTP header
-              and ending at the end of the last extension which precedes
-              the NTS Authenticator and Encrypted Extensions extension.
+              the NTP packet beginning from the start of the NTP
+              header and ending at the end of the last extension field
+              which precedes the NTS Authenticator and Encrypted
+              Extension Fields extension field.
             </t>
             <t>
               P: The plaintext SHALL consist of all (if any)
-              extensions to be encrypted.
+              extension fields to be encrypted.
             </t>
             <t>
               N: The nonce SHALL be formed however required by the
@@ -889,23 +893,24 @@
           </list>
         </t>
         <t>
-          The NTS Authenticator and Encrypted Extensions extension
-          MUST NOT be included in NTP packets whose mode is other than
-          3 (client) or 4 (server).
+          The NTS Authenticator and Encrypted Extension Fields
+          extension field MUST NOT be included in NTP packets whose
+          mode is other than 3 (client) or 4 (server).
         </t>
       </section>
       <section title="Protocol details">
         <t>
           A client sending an NTS-protected request SHALL include the
-          following extensions:
+          following extension fields:
           <list>
             <t>
-              Exactly one Unique Identifier extension, which MUST be
-              authenticated, MUST NOT be encrypted, and whose contents
-              MUST NOT duplicate those of any previous request.
+              Exactly one Unique Identifier extension field, which
+              MUST be authenticated, MUST NOT be encrypted, and whose
+              contents MUST NOT duplicate those of any previous
+              request.
             </t>
             <t>
-              Exactly one NTS Cookie extension, which MUST be
+              Exactly one NTS Cookie extension field, which MUST be
               authenticated and MUST NOT be encrypted. The cookie MUST
               be one which the server previously provided the client;
               it may have been provided during the NTS-KE handshake or
@@ -916,35 +921,36 @@
               re-run the NTS-KE protocol before continuing.
             </t>
             <t>
-              Exactly one NTS Authenticator and Encrypted Extensions
-              extension, generated using an AEAD Algorithm and C2S key
-              established through NTS-KE.
+              Exactly one NTS Authenticator and Encrypted Extension
+              Fields extension field, generated using an AEAD
+              Algorithm and C2S key established through NTS-KE.
             </t>
           </list>
         </t>
         <t>
           The client MAY include one or more NTS Cookie Placeholder
-          extensions, which MUST be authenticated and MAY be
-          encrypted. The number of NTS Cookie Placeholder extensions
-          that the client includes SHOULD be such that if the client
-          includes N placeholders and the server sends back N+1
+          extension field, which MUST be authenticated and MAY be
+          encrypted. The number of NTS Cookie Placeholder extension
+          fields that the client includes SHOULD be such that if the
+          client includes N placeholders and the server sends back N+1
           cookies, the number of unused cookies stored by the client
           will come to eight. When both the client and server adhere
           to all cookie-management guidance provided in this memo, the
-          number of placeholder extensions will equal the number of
-          dropped packets since the last successful volley.
+          number of placeholder extension fields will equal the number
+          of dropped packets since the last successful volley.
         </t>
         <t>
           The client MAY include additional (non-NTS-related)
-          extensions, which MAY appear prior to the NTS Authenticator
-          and Encrypted Extensions extension (therefore authenticated
-          but not encrypted), within it (therefore encrypted and
-          authenticated), or after it (therefore neither encrypted nor
-          authenticated). In general, however, the server MUST discard
-          any unauthenticated extensions and process the packet as
-          though they were not present. Servers MAY implement
-          exceptions to this requirement for particular extensions
-          if their specification explicitly provides for such.
+          extension fields, which MAY appear prior to the NTS
+          Authenticator and Encrypted Extension Fields extension
+          fields (therefore authenticated but not encrypted), within
+          it (therefore encrypted and authenticated), or after it
+          (therefore neither encrypted nor authenticated). In general,
+          however, the server MUST discard any unauthenticated
+          extension fields and process the packet as though they were
+          not present. Servers MAY implement exceptions to this
+          requirement for particular extension fields if their
+          specification explicitly provides for such.
         </t>
         <t>
           Upon receiving an NTS-protected request, the server SHALL
@@ -953,50 +959,52 @@
           associated with the request, and then use the C2S key to
           authenticate the packet and decrypt the ciphertext.  If the
           cookie is valid and authentication and decryption succeed,
-          then the server SHALL include the following extensions in
-          its response:
+          then the server SHALL include the following extension fields
+          in its response:
           <list>
             <t>
-              Exactly one Unique Identifier extension, which MUST be
-              authenticated, MUST NOT be encrypted, and whose contents
-              SHALL echo those provided by the client.
+              Exactly one Unique Identifier extension field, which
+              MUST be authenticated, MUST NOT be encrypted, and whose
+              contents SHALL echo those provided by the client.
             </t>
             <t>
-              Exactly one NTS Authenticator and Encrypted Extensions
-              extension, generated using the AEAD algorithm and S2C
-              key recovered from the cookie provided by the client.
+              Exactly one NTS Authenticator and Encrypted Extension
+              Fields extension field, generated using the AEAD
+              algorithm and S2C key recovered from the cookie provided
+              by the client.
             </t>
             <t>
-              One or more NTS Cookie extensions, which MUST be
+              One or more NTS Cookie extension fields, which MUST be
               authenticated and encrypted. The number of NTS Cookie
-              extensions included SHOULD be equal to, and MUST NOT
-              exceed, one plus the number of valid NTS Cookie
-              Placeholder extensions included in the request.
+              extension fields included SHOULD be equal to, and MUST
+              NOT exceed, one plus the number of valid NTS Cookie
+              Placeholder extension fields included in the request.
             </t>
           </list>
         </t>
         <t>
           The server MAY include additional (non-NTS-related)
-          extensions, which MAY appear prior to the NTS Authenticator
-          and Encrypted Extensions extension (therefore authenticated
-          but not encrypted), within it (therefore encrypted and
-          authenticated), or after it (therefore neither encrypted nor
-          authenticated). In general, however, the client MUST discard
-          any unauthenticated extensions and process the packet as
-          though they were not present. Clients MAY implement
-          exceptions to this requirement for particular extensions
-          if their specification explicitly provides for such.
+          extension fields, which MAY appear prior to the NTS
+          Authenticator and Encrypted Extension Fields extension field
+          (therefore authenticated but not encrypted), within it
+          (therefore encrypted and authenticated), or after it
+          (therefore neither encrypted nor authenticated). In general,
+          however, the client MUST discard any unauthenticated
+          extension fields and process the packet as though they were
+          not present. Clients MAY implement exceptions to this
+          requirement for particular extension fields if their
+          specification explicitly provides for such.
         </t>
         <t>
           If the server is unable to validate the cookie or
           authenticate the request, it SHOULD respond with a
           Kiss-o'-Death packet (see <xref target="RFC5905">RFC 5905,
           Section 7.4)</xref>) with kiss code &quot;NTSN&quot;
-          (meaning &quot;NTS NAK&quot;). Such a response MUST
-          include exactly one Unique Identifier extension whose
-          contents SHALL echo those provided by the client.  It MUST
-          NOT include any NTS Cookie or NTS Authenticator and
-          Encrypted Extensions extension.
+          (meaning &quot;NTS NAK&quot;). Such a response MUST include
+          exactly one Unique Identifier extension field whose contents
+          SHALL echo those provided by the client.  It MUST NOT
+          include any NTS Cookie or NTS Authenticator and Encrypted
+          Extension Fields extension fields.
         </t>
         <t>
           Upon receiving an NTS-protected response, the client MUST
@@ -1170,7 +1178,7 @@
         <c>[[TBD2]]</c><c>Unique Identifier</c><c>[[this memo]]</c>
         <c>[[TBD3]]</c><c>NTS Cookie</c><c>[[this memo]]</c>
         <c>[[TBD4]]</c><c>NTS Cookie Placeholder</c><c>[[this memo]]</c>        
-        <c>[[TBD5]]</c><c>NTS Authenticator and Encrypted Extensions</c><c>[[this memo]]</c>
+        <c>[[TBD5]]</c><c>NTS Authenticator and Encrypted Extension Fields</c><c>[[this memo]]</c>
       </texttable>
       <t>
         IANA is requested to create a new registry entitled
@@ -1348,11 +1356,11 @@
         </t>
         <t>
           NTS is designed to avoid contributing any further to this
-          problem by ensuring that NTS-related extensions included in
+          problem by ensuring that NTS-related extension fields included in
           server responses will be the same size as the NTS-related
-          extensions sent by the client. In particular, this is why
+          extension fields sent by the client. In particular, this is why
           the client is required to send a separate and appropriately
-          padded-out NTS Cookie Placeholder extension for every cookie
+          padded-out NTS Cookie Placeholder extension field for every cookie
           it wants to get back, rather than being permitted simply to
           specify a desired quantity.
         </t>
