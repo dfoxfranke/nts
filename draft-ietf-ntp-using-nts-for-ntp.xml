@@ -126,8 +126,7 @@
 	application of NTS to the <xref target="RFC5905">Network Time
 	Protocol (NTP)</xref>. However, certain sections of this memo
 	are not inherently NTP-specific, and enable future work to
-	apply them to other time synchronization protocols such as the
-	<xref target="IEC.61588_2009">Precision Time Protocol (PTP)</xref>.
+	apply them to protocols other than NTP.
       </t>
 
       <section title="Objectives">
@@ -1296,17 +1295,13 @@
         The initial contents of this registry SHALL be as follows:
       </t>
       <texttable>
-        <ttcol>Protocol Name</ttcol>
+        <ttcol>Protocol ID</ttcol>
         <ttcol>Human-Readable Name</ttcol>
         <ttcol>Reference</ttcol>
         
         <c>0</c>
         <c>Network Time Protocol version 4</c>
         <c>[[this memo]]</c>
-
-        <c>1</c>
-        <c>Precision Time Protocol version 2</c>
-        <c>Reserved by [[this memo]]</c>
 
         <c>32768-65535</c>
         <c>Reserved for Private or Experimental Use</c>
@@ -1584,41 +1579,6 @@
       <?rfc include="reference.RFC.5280'?>
       <?rfc include='reference.RFC.7384'?>
       <?rfc include='reference.RFC.5869'?>
-      <reference anchor="IEC.61588_2009"
-                 target="http://ieeexplore.ieee.org/servlet/opac?punumber=4839000">
-        <front>
-          <title>Precision clock synchronization protocol for networked
-          measurement and control systems</title>
-
-          <author>
-            <organization>IEEE/IEC</organization>
-          </author>
-
-          <date day="2" month="February" year="2009"/>
-
-          <abstract>
-            <t>A protocol is provided in this standard that enables precise
-            synchronization of clocks in measurement and control systems
-            implemented with technologies such as network communication, local
-            computing, and distributed objects. The protocol is applicable to
-            systems communicating via packet networks. Heterogeneous systems
-            are enabled that include clocks of various inherent precision,
-            resolution, and stability to synchronize. System-wide
-            synchronization accuracy and precision in the sub-microsecond
-            range are supported with minimal network and local clock computing
-            resources. Simple systems are installed and operated without
-            requiring the management attention of users because the default
-            behavior of the protocol allows for it.</t>
-          </abstract>
-        </front>
-
-        <seriesInfo name="IEEE" value="1588-2008(E)"/>
-
-        <seriesInfo name="IEC" value="61588:2009(E)"/>
-
-        <seriesInfo name="DOI" value="10.1109/IEEESTD.2009.4839002"/>
-      </reference>
-
       <reference anchor="Mizrahi" target="">
         <front>
           <title>A game theoretic analysis of delay attacks against time
@@ -1668,9 +1628,6 @@
 	  </t>
           <t hangText="NTS  ">
 	    Network Time Security
-	  </t>
-	  <t hangText="PTP  ">
-	    Precision Time Protocol
 	  </t>
           <t hangText="TLS">
 	    Transport Layer Security
