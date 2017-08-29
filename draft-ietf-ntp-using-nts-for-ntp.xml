@@ -437,7 +437,7 @@
 
       <t>
 	If, likely as a result of user error, party A is configured as a
-	symmetry active peer of party B, but party B is neither accepting DTLS
+	symmetric active peer of party B, but party B is neither accepting DTLS
 	handshakes from party A nor initiating one with it, then after a
 	suitable number of failed attempts, party A may fall back to acting as
 	an NTP client (mode 3) of party B using NTS-KE and NTS Extensions for
