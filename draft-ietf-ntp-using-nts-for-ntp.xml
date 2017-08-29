@@ -861,7 +861,8 @@
               fields) which is at least 28 and divisible by 4. At
               least one octet of padding MUST be included, so that
               implementations can unambiguously delimit the end of the
-              ciphertext from the start of the padding.
+              ciphertext from the start of the padding by examining
+	      the last octet to determine the padding length.
             </t>
           </list>
         </t>
