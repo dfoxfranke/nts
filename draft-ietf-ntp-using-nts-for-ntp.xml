@@ -654,14 +654,14 @@
             empty.
           </t>
         </section>
-        <section title="New Cookie for NTPv4">
+        <section title="New Cookie for NTPv4" anchor="new-cookie-for-ntpv4">
           <t>
             The New Cookie for NTPv4 record has a Record Type number
             of 5. The contents of its body SHALL be
             implementation-defined and clients MUST NOT attempt to
             interpret them. See <xref
-            target="recommended-format-for-nts-cookies"/> for a
-            RECOMMENDED construction.
+            target="suggested-format-for-nts-cookies"/> for a
+            suggested construction.
           </t>
           <t>
             Clients MUST NOT send records of this type. Servers MUST
@@ -799,7 +799,7 @@
           with cryptographic best practice.
         </t>
       </section>
-      <section title="The NTS Cookie extension field">
+      <section title="The NTS Cookie extension field" anchor="nts-cookie-extension-field">
         <t>
           The NTS Cookie extension field has a Field Type of
           [[TBD3]]. Its purpose is to carry information which enables
@@ -807,8 +807,8 @@
           having to store any per-client state. The contents of its
           body SHALL be implementation-defined and clients MUST NOT
           attempt to interpret them. See <xref
-          target="recommended-format-for-nts-cookies"/> for a
-          RECOMMENDED construction.  The NTS Cookie extension field
+          target="suggested-format-for-nts-cookies"/> for a
+          suggested construction.  The NTS Cookie extension field
           MUST NOT be included in NTP packets whose mode is other than
           3 (client) or 4 (server).
         </t>
@@ -1038,12 +1038,12 @@
         </t>
       </section>
     </section>
-    <section title="Recommended format for NTS cookies" anchor="recommended-format-for-nts-cookies">
+    <section title="Suggested format for NTS cookies" anchor="suggested-format-for-nts-cookies">
       <t>
-        This section provides a RECOMMENDED way for servers to
-        construct NTS cookies. Clients MUST NOT examine the cookie
-        under the assumption that it is constructed according to this
-        section.
+	This section is non-normative. It gives a suggested way for
+	servers to construct NTS cookies. All normative requirements
+	are stated in <xref target="new-cookie-for-ntpv4"/> and <xref
+	target="nts-cookie-extension-field"/>.
       </t>
       <t>
         The role of cookies in NTS is closely analogous to that of
