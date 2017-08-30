@@ -714,7 +714,8 @@
             following five octets:
             <list>
               <t>
-                The first two octets SHALL be zero.
+                The first two octets SHALL be zero (the Protocol ID
+                for NTPv4).
               </t>
               <t>
                 The next two octets SHALL be the Numeric Identifier of
