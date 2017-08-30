@@ -628,14 +628,19 @@
           Whenever an NTS Cookie Placeholder extension is present, it
           MUST be accompanied by an NTS Cookie extension, and the body
           length of the NTS Cookie Placeholder extension MUST be the
-          same as the body length of the NTS Cookie Extension. (This
+	  same as the body length of an NTS Cookie Extension previously
+	  received from the server. (This
           length requirement serves to ensure that the response will
           not be larger than the request, in order to improve
           timekeeping precision and prevent DDoS amplification). The
-          contents of the NTS Cookie Placeholder extension's body are
-          undefined and, aside from checking its length, MUST be
+          contents of the NTS Cookie Placeholder extension's MUST be
+          all zero bytes and, aside from checking its length, MUST be
           ignored by the server.
         </t>
+	<t>
+	  If a client wants multiple cookies, it should repeat this
+	  extension for each cookie it wants.
+	</t>
       </section>
 
       <section title="The NTS Authenticator and Encrypted Extensions extension">
@@ -715,7 +720,7 @@
               authenticated and MUST NOT be encrypted [[Ed. Note: so
               that if the server can't decrypt the request, it can
               still echo back the Unique Identifier in the NTS NAK it
-              sends]].  MUST NOT duplicate those of any previous
+              sends]].  The client MUST NOT duplicate those of any previous
               request.
             </t>
             <t>
