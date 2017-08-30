@@ -1282,8 +1282,8 @@
         Entries SHALL have the following fields:
         <list>
           <t>
-            Protocol ID (REQUIRED): a 16-bit unsigned integer functioning
-            as an identifier.
+            Protocol ID (REQUIRED): a integer in the range 0-65535
+            inclusive, functioning as an identifier.
           </t>
           <t>
             Protocol Name (REQUIRED): a short text string naming the
@@ -1326,7 +1326,7 @@
         &quot;Network Time Security Warning Codes&quot;. Entries in
         each SHALL have the following fields:
         <list>
-          <t>Number (REQUIRED): a 16-bit unsigned integer</t>
+          <t>Number (REQUIRED): a integer in the range 0-65535 inclusive</t>
           <t>Description (REQUIRED): a short text description of the condition.</t>
           <t>Reference (REQUIRED): a reference to a relevant specification document.</t>
         </list>
