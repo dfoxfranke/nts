@@ -499,12 +499,11 @@
             error if the Critical Bit is 1.
           </t>
           <t>
-            Record Type: A 15-bit integer in network byte order (from
-            most-to-least significant, its bits are record bits 7&ndash;1
-            and then 15&ndash;8). The semantics of record types 0&ndash;5 are
-            specified in this memo; additional type numbers SHALL be
-            tracked through the IANA Network Time Security Key
-            Establishment Record Types registry.
+            Record Type: A 15-bit integer in network byte order. The
+            semantics of record types 0&ndash;5 are specified in this
+            memo; additional type numbers SHALL be tracked through the
+            IANA Network Time Security Key Establishment Record Types
+            registry.
           </t>
           <t>
             Body Length: the length of the Record Body field, in
@@ -517,6 +516,13 @@
             be determined by the Record Type.
           </t>
         </list>
+      </t>
+      <t>
+	For clarity regarding bit-endianness: the Critical Bit is the
+	most-significant bit of the first octet. In C, given a network
+	buffer `unsigned char b[]` containing an NTS-KE record, the
+	critical bit is `b[0] &gt;&gt; 7` while the record type is
+	`((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
       </t>
       <section title="NTS-KE record types">
         <t>The following NTS-KE Record Types are defined.</t>
