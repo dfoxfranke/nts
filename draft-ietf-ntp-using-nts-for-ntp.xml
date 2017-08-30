@@ -624,8 +624,9 @@
           </t>
           <t>
             If the NTS Next Protocol Negotiation record offers
-            &quot;ntp/4&quot;,this record MUST be included exactly
-            once. Other protocols MAY require it as well.
+            Protocol ID 0 (for NTPv4), then this record MUST be
+            included exactly once. Other protocols MAY require it as
+            well.
           </t>
           <t>
             When included in a request, this record denotes which AEAD
@@ -647,9 +648,9 @@
             target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> (Numeric
             Identifier 15). That is, if the client includes
             AEAD_AES_SIV_CMAC_256 in its AEAD Algorithm Negotiation
-            record, and the server accepts the &quot;ntp/4&quot;
-            protocol in its NTS Next Protocol Negotiation record, then
-            the server's AEAD Algorithm Negotiation record MUST NOT be
+            record, and the server accepts Protocol ID 0 (NTPv4); in
+            its NTS Next Protocol Negotiation record, then the
+            server's AEAD Algorithm Negotiation record MUST NOT be
             empty.
           </t>
         </section>
@@ -665,8 +666,8 @@
           <t>
             Clients MUST NOT send records of this type. Servers MUST
             send at least one record of this type, and SHOULD send
-            eight of them, if they accept &quot;ntp/4&quot; as a Next
-            Protocol. The Critical Bit SHOULD NOT be set.
+            eight of them, if they accept Protocol ID 0 (NTPv4) as a
+            Next Protocol. The Critical Bit SHOULD NOT be set.
           </t>
         </section>
       </section>
@@ -698,7 +699,7 @@
       <section title="Key Extraction (for NTPv4)">
       <t>
         Following a successful run of the NTS-KE protocol wherein
-        &quot;ntp/4&quot; is selected as a Next Protocol, two AEAD
+        Protocol ID 0 (NTPv4) is selected as a Next Protocol, two AEAD
         keys SHALL be extracted: a client-to-server (C2S) key and a
         server-to-client (S2C) key. These keys SHALL be computed
         according to <xref target="RFC5705">RFC 5705</xref>, using the
@@ -1311,7 +1312,7 @@
         <ttcol>Reference</ttcol>
         
         <c>0</c>
-        <c>Network Time Protocol version 4</c>
+        <c>Network Time Protocol version 4 (NTPv4)</c>
         <c>[[this memo]]</c>
 
         <c>32768-65535</c>
