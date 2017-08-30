@@ -883,8 +883,12 @@
               Extension Fields extension field.
             </t>
             <t>
-              P: The plaintext SHALL consist of all (if any)
-              extension fields to be encrypted.
+              P: The plaintext SHALL consist of all (if any) NTP
+              extension fields to be encrypted. The format of any such
+              fields SHALL be in accordance with <xref
+              target="RFC7822">RFC 7822</xref>, and if multiple
+              extension fields are present they SHALL be joined by
+              concatenation.
             </t>
             <t>
               N: The nonce SHALL be formed however required by the
@@ -1426,21 +1430,18 @@
         <t>
 	  Additional standardization work and infrastructure
 	  development is necessary before NTS can be used with public
-	  NTP server pools. First, a scheme needs to be specified for
-	  determining what constitutes an acceptable certificate for a
-	  pool server, such as establishing a value required to be
-	  contained in its Extended Key Usage attribute, and how to
+	  NTP server pools. First, a scheme will need to be specified
+	  for determining what constitutes an acceptable certificate
+	  for a pool server, such as establishing a value required to
+	  be contained in its Extended Key Usage attribute, and how to
 	  determine, given the DNS name of a pool, what Subject
 	  Alternative Name to expect in the certificates of its
-	  members. A more important matter, however, is that pool
-	  operators need procedures for establishing and maintaining
-	  trust in their members. Pools in existence as of 2017 are
-	  volunteer-run, with minimal requirements for admission and
-	  no organized effort to monitor pool servers for misbehavior.
-	  Without any sort of policing in place, there is nothing to
-	  prevent an adversary from going through normal channels to
-	  obtain a valid certificate for participation in a pool and
-	  then proceeding to serve maliciously inaccurate time.
+	  members. Implementing any such specification will
+	  necessitate infrastructure work: pool organizers will need
+	  to act as certificate authorities, regularly monitor the
+	  behavior of servers to which certificates have been issued,
+	  and promptly revoke the certificate of any server found to
+	  be serving incorrect time.
 	</t>
       </section>
       <section anchor="DelayAttack" title="Delay attacks">
