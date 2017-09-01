@@ -388,62 +388,164 @@
 	for NTPv4</xref>.
       </t>
 
-      <t>
-	Since DTLS-encapsulated NTPv4 sessions may carry arbitrary NTP
-	packets, there is no prescribed implication from an
-	implementation's role as a DTLS client vs. DTLS server, to its
-	role in the application-level Network Time Protocol. For
-	example, it is entirely permissible for an implementation to
-	initiate a DTLS handshake (thus acting in the role of DTLS
-	client), and then once the handshake is completed, act as an
-	NTP server with the DTLS server acting as an NTP client. The
-	following guidelines are offered as sensible default behavior.
-	Implementations may depart from this guidance if the user
-	configures them to do so.
-      </t>
-	
-      <t>
-	Implementations typically should not use DTLS-encapsulated
-	NTPv4 for client/server mode, instead preferring to use NTS-KE
-	and NTS Extension Fields for NTPv4. If DTLS-encapsulated NTPv4
-	is used for client/server mode, then the NTP client (mode 3)
-	should be the DTLS client and the NTP server (mode 4) should
-	be the DTLS server.
-      </t>
+      <section title="Who initiates the DTLS session?">
+	<t>
+	  RFC 2119 requirements language in this subsection shall be
+	  understood as pertaining only to implementations of
+	  DTLS-encapsulated NTPv4. In particular, statements concerning
+	  mode 3 (client) and mode 4 (server) traffic are not intended
+	  to apply to implementations which only ever use NTS Extension
+	  Fields for NTPv4 to secure such traffic.
+	</t>
+	<t>
+	  Implementations may initiate DTLS handshakes (i.e, act as DTLS
+	  clients), listen for them (i.e., act as DTLS servers), or
+	  both.
+	</t>
+	<t>
+	  Implementations intending to operate in symmetric active mode
+	  (mode 1) SHOULD both listen for incoming DTLS handshakes as well
+	  as initiate them with any host they intend to communicate with.
+	</t>
+	<t>
+	  Implementations intending to operate in client mode (mode 3) or
+	  to send control queries (mode 6) SHOULD initiate DTLS handshakes
+	  with any host they intend to communicate with.
+	</t>
+	<t>
+	  Implementations intending to operate in symmetric passive mode
+	  (mode 2), server mode (mode 4), or to respond to control queries
+	  (mode 6) SHOULD listen for incoming DTLS handshakes.
+	</t>
+	<t>
+	  Once a DTLS session has been established, it ceases to be
+	  significant (for application-level purposes) which party
+	  initiated it. Established sessions may carry traffic of any
+	  mode, in either direction.
+	</t>
+	<t>
+	  Implementations may find that they have multiple, redundant
+	  DTLS sessions open with the same peer. This is especially
+	  likely in the case that both peers are operating in
+	  symmetric active mode (mode 1). Any session that has not
+	  been used to exchange any traffic in either direction for a
+	  sufficient period MAY be timed out and closed. However, due
+	  to the potential for race conditions, implementations SHOULD
+	  NOT attempt to identify redundant sessions and close them in
+	  advance of a normal timeout.
+	</t>
+	<t>
+	  If, likely as a result of a configuration error, party A is
+	  configured as a symmetric active peer of party B, but party B
+	  is neither accepting DTLS handshakes from party A nor
+	  initiating one with it, then after a suitable number of failed
+	  attempts, party A MAY fall back to acting as an NTP client
+	  (mode 3) of party B using NTS-KE and NTS Extension Fields for
+	  NTPv4.
+	</t>
+      </section>
 
-      <t>
-	For control mode (6), the party sending queries should be the
-	DTLS client and the party responding to the queries should be
-	the DTLS server.
-      </t>
+      <section title="Mapping DTLS packets to peer associations">
+	<t>
+	  In the normal operation of NTP, each time an NTP packet is
+	  received the receiver uses the packet's source IP, source
+	  port, and mode to determine what, if any, peer association
+	  the packet belongs to, and whether a new association should
+	  be mobilized. This process is specified in Section 9.2 of
+	  <xref target="RFC5905">RFC 5905</xref>.  In relevant part,
+	  it entails three successive table lookups:
 
-      <t>
-	For symmetric operation between an active (mode 1) and passive
-	(mode 2) peer, the active peer should be the DTLS client and the
-	passive peer should be the DTLS server.
-      </t>
+	  <list style="numbers">
+	    <t>(source IP, source port) -> association ID</t>
+	    <t>association ID -> association mode</t>
+	    <t>(association mode, packet mode) -> disposition</t>
+	  </list>
 
-      <t>
-	For symmetric operation between two active (mode 1) peers, both
-	parties should attempt to initiate a DTLS session with their
-	peer. If one handshake fails and the other succeeds, the
-	successfully-established session should be used for traffic in
-	both directions. If both handshakes succeed, either session may
-	be used and packets should receive identical disposition
-	regardless of which of the two sessions they arrived
-	over. Inactive sessions may be timed out but the redundant
-	session should not be proactively closed.
-      </t>
+	  The first two tables are dynamically maintained by the implementation.
+	  The third table is is given by Figure 20 in RFC 5905.
+	</t>
+	<t>
+	  Cryptographic security necessitates that this procedure be
+	  altered, because source IP and port are spoofable and
+	  therefore cannot be used directly to identify an
+	  association. The modified procedure entails the following
+	  lookups:
 
-      <t>
-	If, likely as a result of a configuration error, party A is
-	configured as a symmetric active peer of party B, but party B
-	is neither accepting DTLS handshakes from party A nor
-	initiating one with it, then after a suitable number of failed
-	attempts, party A may fall back to acting as an NTP client
-	(mode 3) of party B using NTS-KE and NTS Extension Fields for
-	NTPv4.
-      </t>
+	  <list style="numbers">
+	    <t>(source IP, source port) -> DTLS session</t>
+	    <t>DTLS session -> peer identity</t>
+	    <t>peer identity -> association ID</t>
+	    <t>association ID -> association mode</t>
+	    <t>(association mode, packet mode) -> disposition</t>
+	  </list>
+	</t>
+	<t>
+	  Step 1: Mapping a source IP and port to a DTLS session and
+	  then using the keys associated with that session to
+	  authenticate and decrypt the packet is a part of the normal
+	  operation of DTLS; use in the context of NTP introduces no
+	  special considerations. Naturally, if any part of this step
+	  fails then the packet MUST be discarded and the procedure is
+	  over.
+	</t>
+	<t>
+	  Step 2: The mapping of a DTLS session to a peer identity is
+	  determined by the certificate (or pre-shared key) which the
+	  peer supplied during the handshake. The question of whether
+	  two distinct certificates correspond to the same identity is
+	  left to the implementation. Environments with a full CA
+	  infrastructure might treat any two valid and trusted
+	  certificates with the same Subject Name as belonging to the
+	  same identity, while simpler environments which pin
+	  self-signed certificates might treat only byte-for-byte
+	  identical certificates as the same.
+	</t>
+	<t>
+	  Peers which present no identity during the handshake (as
+	  when a DTLS client does not supply a client certificate) are
+	  anonymous peers. The identity of the anonymous peer
+	  associated with each DTLS session MUST be assumed to be
+	  distinct from the identity of the peer associated with any
+	  other DTLS session, even if their IP addresses are the
+	  same. Anonymous peers ought to be assigned internal
+	  pseudonyms for tracking purposes. A simple counter suffices
+	  for pseudonym assignment.
+	</t>
+	<t>
+	  The remaining steps 3-5 are essentially identical with the
+	  original procedure given in RFC 5905 Section 9.2, except
+	  that association IDs are indexed by peer identity rather
+	  than by IP and port. By dynamic table lookup, determine if
+	  an association exists for the peer identity determined in
+	  step 2, and if so, the mode of the association. Then use the
+	  static dispatch table to determine packet disposition.
+	  Since DTLS-encapsulated NTPv4 cannot support broadcast mode,
+	  the dispatch table can be simplified somewhat, as shown
+	  below.
+	</t>
+		
+	<figure anchor="dispatch-table">
+	  <artwork><![CDATA[
++------------------+---------------------------------------+
+|                  |              Packet Mode              |
++------------------+-------+-------+-------+-------+-------+
+| Association Mode |   1   |   2   |   3   |   4   |   5   |
++------------------+-------+-------+-------+-------+-------+
+| No Association 0 | NEWPS | DSCRD | FXMIT | DSCRD | DSCRD |
+| Symm. Active   1 | PROC  | PROC  | DSCRD | DSCRD | DSCRD |
+| Symm. Passive  2 | PROC  | ERR   | DSCRD | DSCRD | DSCRD |
+| Client         3 | DSCRD | DSCRD | DSCRD | PROC  | DSCRD |
++------------------+-------+-------+-------+-------+-------+]]>
+          </artwork>
+	</figure>
+
+	<t>
+	  Implementations SHOULD NOT mobilize association with
+	  anonymous peers. Time data received from anonymous peers is
+	  not any more trustworthy than time data received via plain,
+	  unauthenticated NTP.
+	</t>
+      </section>
     </section>
 
     <section title="The NTS Key Establishment protocol">
