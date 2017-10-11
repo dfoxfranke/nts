@@ -123,10 +123,8 @@
 	This memo specifies Network Time Security (NTS), a
 	cryptographic security mechanism for network time
 	synchronization. A complete specification is provided for
-	application of NTS to the <xref target="RFC5905">Network Time
-	Protocol (NTP)</xref>. However, certain sections of this memo
-	are not inherently NTP-specific, and enable future work to
-	apply them to protocols other than NTP.
+	application of NTS to the client-server mode of the 
+  <xref target="RFC5905">Network Time Protocol (NTP)</xref>. 
       </t>
 
       <section title="Objectives">
@@ -190,7 +188,7 @@
 	  also includes modes for synchronization between symmetric
 	  peers, a control mode for server monitoring and administration
 	  and a broadcast mode. These various modes have differing and
-	  contradictory requirements for security and
+	  partly contradictory requirements for security and
 	  performance. Symmetric and control modes demand mutual
 	  authentication and mutual replay protection, and for certain
 	  message types control mode may require confidentiality as well
@@ -209,20 +207,10 @@
 	</t>
 	
 	<t>
-	  In order to simultaneously serve these conflicting requirements,
-	  NTS is structured as a suite of three protocols:
+	  This memo specifies NTS exclusively for the client-server mode
+    of NTP. To this end  NTS is structured as a suite of three protocols:
 	  
-	  <list>
-	    <t>
-	      The &quot;DTLS-encapsulated NTPv4&quot; protocol is little
-	      more than &quot;NTP over DTLS&quot;: the two endpoints
-	    perform a DTLS handshake and then exchange NTP packets
-	    encapsulated as DTLS Application Data. It provides mutual
-	    replay protection and is suitable for symmetric and
-	    control modes, and is also secure for client/server mode
-	    but relatively wasteful of server resources.
-	    </t>
-	    
+	  <list>    
 	    <t>
 	      The "NTS Extension Fields for NTPv4" are a collection of
 	      NTP extension fields for cryptographically securing
@@ -235,36 +223,19 @@
 	    </t>
 	    
 	    <t>
-              The &quot;NTS Key Establishment&quot; protocol (NTS-KE)
-              is mechanism for establishing key material for use with
-              the NTS Extension Fields for NTPv4. It uses TLS to
-              exchange keys and negotiate some additional protocol
-              options, but then quickly closes the TLS channel and
-              permits the server to discard all associated state.
-              NTS-KE is not NTP-specific; it is designed to be
-              extensible, and might be extended to support key
-              establishment for other protocols such as PTP.
-            </t>
+        The &quot;NTS Key Establishment&quot; protocol (NTS-KE)
+        is mechanism for establishing key material for use with
+        the NTS Extension Fields for NTPv4. It uses TLS to
+        exchange keys and negotiate some additional protocol
+        options, but then quickly closes the TLS channel and
+        permits the server to discard all associated state.
+      </t>
 	  </list>
 	</t>
 	
 	<t>
-	  It is intended that NTP implementations will use
-	  DTLS-encapsulated NTPv4 to secure symmetric mode and control
-	  mode, and use NTS-KE followed by NTS Extension Fields for
-	  NTPv4 to secure client/server mode. NTS does not support
-	  NTP's broadcast mode.
-	</t>
-	
-	<t>
-	  As previously stated, DTLS-encapsulated NTPv4 is trivial. The
-	  communicating parties establish a DTLS session and then exchange
-	  arbitrary NTP packets as DTLS Application Data.
-	</t>
-	
-	<t>
-	  The typical protocol flow for client/server mode is as
-	  follows.  The client connects to the server on the NTS TCP
+	  The typical protocol flow is as follows.  
+    The client connects to the server on the NTS TCP
 	  port and the two parties perform a TLS handshake. Via the TLS
 	  channel, the parties negotiate some additional protocol
 	  parameters and the server sends the client a supply of
