@@ -104,8 +104,6 @@
 
     <keyword>Security</keyword>
 
-    <keyword>DTLS</keyword>
-
     <abstract>
       <t>
         This memo specifies Network Time Security (NTS), a mechanism
