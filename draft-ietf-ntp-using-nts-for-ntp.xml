@@ -1496,9 +1496,6 @@
 	  <t hangText="DDoS">
 	    Distributed Denial of Service
 	  </t>
-	  <t hangText="DTLS">
-	    Datagram Transport Layer Security
-	  </t>
           <t hangText="NTP  ">
 	    Network Time Protocol <xref target="RFC5905"/>
 	  </t>
