@@ -293,7 +293,7 @@
         MUST implement <xref target="RFC7507"/>.
       </t>
       <t>
-        TLS clients MUST NOT offer, and TLS servers MUST not select,
+        TLS clients MUST NOT offer, and TLS servers MUST NOT select,
         RC4 cipher suites. <xref target="RFC7465"/>
       </t>
       <t>
@@ -380,11 +380,11 @@
           <t>
             Body Length: the length of the Record Body field, in
             octets, as a 16-bit integer in network byte order. Record
-            bodies may have any representable length and need not be
+            bodies MAY have any representable length and need not be
             aligned to a word boundary.
           </t>
           <t>
-            Record Body: the syntax and semantics of this field shall
+            Record Body: the syntax and semantics of this field SHALL
             be determined by the Record Type.
           </t>
         </list>
@@ -659,7 +659,7 @@
         <t>
           The Unique Identifier extension field provides the client
           with a cryptographically strong means of detecting replayed
-          packets. It may also be used standalone, without NTS, in
+          packets. It MAY also be used standalone, without NTS, in
           which case it provides the client with a means of detecting
           spoofed packets from off-path attackers. Historically, NTP's
           origin timestamp field has played both these roles, but for
@@ -733,7 +733,7 @@
               Padding: between 1 and 24 octets of padding, with every
               octet set to the number of padding octets included,
               e.g., &quot;01&quot;, &quot;02 02&quot;, or &quot;03 03
-              03&quot;. The number of padding bytes should be chosen
+              03&quot;. The number of padding bytes SHOULD be chosen
               in order to comply with the <xref target="RFC7822">RFC
               7822</xref> requirement that (in the absence of a legacy
               MAC) extension fields have a total length in octets
@@ -925,22 +925,22 @@
         security considerations.
       </t>
       <t>
-        Servers should select an AEAD algorithm which they will use to
-        encrypt and authenticate cookies. The chosen algorithm should
+        Servers SHOULD select an AEAD algorithm which they will use to
+        encrypt and authenticate cookies. The chosen algorithm SHOULD
         be one such as <xref
         target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which resists
         accidental nonce reuse, and it need not be the same as the
-        one that was negotiated with the client. Servers should
+        one that was negotiated with the client. Servers SHOULD
         randomly generate and store a master AEAD key `K`. Servers
-        should additionally choose a non-secret, unique value `I` as
+        SHOULD additionally choose a non-secret, unique value `I` as
         key-identifier for `K`.
       </t>
       <t>
-        Servers should periodically (e.g., once daily) generate a new
+        Servers SHOULD periodically (e.g., once daily) generate a new
         pair (I,K) and immediately switch to using these values for
         all newly-generated cookies. Immediately following each such
-        key rotation, servers should securely erase any keys generated
-        two or more rotation periods prior. Servers should continue to
+        key rotation, servers SHOULD securely erase any keys generated
+        two or more rotation periods prior. Servers SHOULD continue to
         accept any cookie generated using keys that they have not yet
         erased, even if those keys are no longer current. Erasing old
         keys provides for forward secrecy, limiting the scope of what
@@ -962,7 +962,7 @@
         as a salt.
       </t>
       <t>
-        To form a cookie, servers should first form a plaintext `P`
+        To form a cookie, servers SHOULD first form a plaintext `P`
         consisting of the following fields:
         <list>
           <t>The AEAD algorithm negotiated during NTS-KE</t>
@@ -971,12 +971,12 @@
         </list>
       </t>
       <t>
-        Servers should the generate a nonce `N` uniformly at random,
+        Servers SHOULD then generate a nonce `N` uniformly at random,
         and form AEAD output `C` by encrypting `P` under key `K` with
         nonce `N` and no associated data.
       </t>
       <t>
-        The cookie should consist of the tuple `(I,N,C)`.
+        The cookie SHOULD consist of the tuple `(I,N,C)`.
       </t>
       <t>
         To verify and decrypt a cookie provided by the client, first
@@ -1263,7 +1263,7 @@
 	      last boot, then on operating systems which implement a
 	      kernel-based phase-locked-loop API, a call to
 	      ntp_gettime() should show a maximum error less than
-	      NTP_PHASE_MAX. In this case, the clock should be
+	      NTP_PHASE_MAX. In this case, the clock SHOULD be        
 	      considered reliable and certificates can be strictly
 	      validated.
 	    </t>
