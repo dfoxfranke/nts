@@ -80,7 +80,7 @@
           <country>Germany</country>
         </postal>
 
-        <phone>+49-(0)531-592-8421</phone>
+        <phone>+49-(0)531-592-4471</phone>
 
         <facsimile/>
 
@@ -90,7 +90,7 @@
       </address>
     </author>
 
-    <date day="26" month="June" year="2017"/>
+    <date day="18" month="October" year="2017"/>
 
     <area>Internet Area</area>
 
@@ -148,7 +148,7 @@
 	      fields.
 	    </t>
 	    <t>
-	      Replay prevention: Implementations may detect when
+	      Replay prevention: Client implementations may detect when
 	      a received time synchronization packet is a replay of
 	      a previous packet.
 	    </t>
@@ -165,12 +165,12 @@
 	      came from the same client.
 	    </t>
 	    <t>
-	      Non-amplification: implementations may avoid acting as
+	      Non-amplification: implementations (especially server implementations) may avoid acting as
 	      DDoS amplifiers by never responding to a request with a
 	      packet larger than the request packet.
 	    </t>
 	    <t>
-	      Scalability: Servers implementations may serve large
+	      Scalability: Server implementations may serve large
 	      numbers of clients without having to retain any
 	      client-specific state.
 	    </t>
@@ -201,12 +201,12 @@
 	  resource-utilization demands of client-server mode: any scheme
 	  which provides replay protection inherently involves
 	  maintaining some state to keep track of what messages have
-	  already been seen.
+	  already been seen. 
 	</t>
 	
 	<t>
 	  This memo specifies NTS exclusively for the client-server mode
-    of NTP. To this end  NTS is structured as a suite of three protocols:
+    of NTP. To this end, NTS is structured as a suite of two protocols:
 	  
 	  <list>    
 	    <t>
