@@ -1027,7 +1027,7 @@
       </t>
       <texttable>
         <ttcol>Value</ttcol>
-        <ttcol>TLS-OK</ttcol>
+        <ttcol>DTLS-OK</ttcol>
         <ttcol>Reference</ttcol>
         <ttcol>Note</ttcol>
         <c>EXPORTER-network-time-security/1</c>
