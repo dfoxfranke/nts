@@ -195,7 +195,7 @@
 	  servers may have vast number of clients and be unable to
 	  afford to maintain per-client state. However, client-server
 	  mode also has more relaxed security needs, because only the
-	  client requires replay protection: it is harmless for servers
+	  client requires replay protection: it is harmless for stateless servers
 	  to process replayed packets. The security demands of symmetric
 	  and control modes, on the other hand, are in conflict with the
 	  resource-utilization demands of client-server mode: any scheme
