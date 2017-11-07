@@ -476,7 +476,7 @@
           </t>
           <t>
             Clients MUST NOT include Warning records in their request.
-            If clients receive a server response which includes an
+            If clients receive a server response which includes a
             Warning record, they MAY discard any negotiated key
             material and abort without proceeding to the Next
             Protocol. Unrecognized warning codes MUST be treated as
