@@ -160,7 +160,7 @@
 	    </t>
 	    <t>
 	      Unlinkability: For mobile clients, NTS will not leak any
-	      information which would permit a passive adversary to
+	      information additional to NTP which would permit a passive adversary to
 	      determine that two packets sent over different networks
 	      came from the same client.
 	    </t>
