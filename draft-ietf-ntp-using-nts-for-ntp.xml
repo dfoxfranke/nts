@@ -1354,9 +1354,11 @@
       <section title="Random number generation">
         <t>
 	  At various points in NTS, the generation of
-	  cryptographically secure random numbers is required. See
-	  <xref target="RFC4086"/> for guidelines concerning this
-	  topic.
+	  cryptographically secure random numbers is required. 
+    Whenever this draft specifies the use of random numbers, 
+    then cryptographically secure random number generation MUST 
+    be used. See <xref target="RFC4086"/> for guidelines concerning 
+    this topic.
 	</t>
       </section>
     </section>
