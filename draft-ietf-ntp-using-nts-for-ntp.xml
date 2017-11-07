@@ -1378,7 +1378,7 @@
         <t>NTS's unlinkability objective is merely to not leak any additional
         data that could be used to link a device's network address. NTS does
         not rectify legacy linkability issues that are already present in NTP.
-        Thus, a client that requires unlinkability MUST also minimize
+        Thus, a client that requires unlinkability must also minimize
         information transmitted in a client query (mode 3) packet as described
         in the draft <xref target="I-D.ietf-ntp-data-minimization"/>.
         </t>
