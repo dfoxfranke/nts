@@ -649,8 +649,8 @@
           The Unique Identifier extension field has a Field Type of
           [[TBD2]]. When the extension field is included in a client
           packet (mode 3), its body SHALL consist of a string of
-          octets generated uniformly at random. The string SHOULD be
-          32 octets long.  When the extension field is included in a
+          octets generated uniformly at random. The string MUST be at
+          least 32 octets long.  When the extension field is included in a
           server packet (mode 4), its body SHALL contain the same
           octet string as was provided in the client packet to which
           the server is responding. Its use in modes other than
