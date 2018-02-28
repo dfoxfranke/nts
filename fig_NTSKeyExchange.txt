@@ -1,0 +1,31 @@
+                +---------------------------------------+
+                | - verify client request message       |
+                | - extract TLS key material            |
+                | - generate KE response message        |
+                |   - included Record Types:            |
+                |       - NTS Next Protocol Negotiation |
+                |       - AEAD Alg. Negotiation         |
+                |       - New Cookie for NTPv4          |
+                |       - <New Cookie for NTPv4>        |
+                |       - End of Message                |
+                +-----------------+---------------------+
+                                  |
+                                  |
+Server -------- --+---------------+-----+----------------------->
+                  ^                      \          
+                 /                        \      
+                /    TLS application       \     
+               /     data                   \    
+              /                              \   
+             /                                V 
+Client -----+---------------------------------+---------------->
+            |                                 |
+            |                                 |
+            |                                 |
++-----------+----------------------+   +------+-----------------+
+|- generate KE request message     |   |- verify server response|
+| - include Record Types:          |   |  message               |
+|  o NTS Next Protocol Negotiation |   |- extract cookie(s)     |
+|  o AEAD Alg. Negotiation         |   |                        |
+|  o End of Message                |   |                        |
++----------------------------------+   +------------------------+
