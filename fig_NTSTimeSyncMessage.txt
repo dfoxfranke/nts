@@ -1,0 +1,38 @@
+                +---------------------------------------+
+                | - verify time request message         |
+                | - generate time response message      |
+                |   - included NTPv4 extension fields   |
+                |      o Unique Identifier EF           |
+                |      o NTS Cookie EF                  |
+                |      o <NTS Cookie EF>                |
+                |                                       |
+                | - generate AEAD tag of NTP message    |
+                | - add NTS Authentication and          |
+                |   Encrypted Extension Fields EF       |
+                | - transmit time request packet        |
+                +-----------------+---------------------+
+                                  |
+                                  |
+Server -------- --+---------------+-----+----------------------->
+                  ^                      \          
+                 /                        \      
+  time request  /                          \   time response
+  (mode 3)     /                            \  (mode 4)  
+              /                              \   
+             /                                V 
+Client -----+---------------------------------+---------------->
+            |                                 |
+            |                                 |
+            |                                 |
++-----------+----------------------+   +------+-----------------+
+|- generate time request message   |   |- verify time response  |
+| - include NTPv4 Extension fields |   |  message               |
+|    o Unique Identifier EF        |   |- extract cookie(s)     |
+|    o NTS Cookie EF               |   |- time synchronization  |
+|    o <NTS Cookie Placeholder EF> |   |  processing            |
+|                                  |   +------------------------+
+|- generate AEAD tag of NTP message|
+|- add NTS Authentication and      |
+|  Encrypted Extension Fields EF   |
+|- transmit time request packet    | 
++----------------------------------+   
