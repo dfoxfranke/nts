@@ -396,6 +396,46 @@
 	critical bit is `b[0] &gt;&gt; 7` while the record type is
 	`((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
       </t>
+      <t>
+       <xref target="fig_NTSKeyExchange"/> provides a schematic
+       overview of the key exchange. It displays the protocol
+       steps to be performed by the NTS client and server and
+       record types to be exchanged.
+      <figure anchor="fig_NTSKeyExchange" title="NTS Key Exchange messages">
+          <artwork><![CDATA[                +---------------------------------------+
+                | - verify client request message       |
+                | - extract TLS key material            |
+                | - generate KE response message        |
+                |   - included Record Types:            |
+                |       - NTS Next Protocol Negotiation |
+                |       - AEAD Alg. Negotiation         |
+                |       - New Cookie for NTPv4          |
+                |       - <New Cookie for NTPv4>        |
+                |       - End of Message                |
+                +-----------------+---------------------+
+                                  |
+                                  |
+Server -------- --+---------------+-----+----------------------->
+                  ^                      \          
+                 /                        \      
+                /    TLS application       \     
+               /     data                   \    
+              /                              \   
+             /                                V 
+Client -----+---------------------------------+---------------->
+            |                                 |
+            |                                 |
+            |                                 |
++-----------+----------------------+   +------+-----------------+
+|- generate KE request message     |   |- verify server response|
+| - include Record Types:          |   |  message               |
+|  o NTS Next Protocol Negotiation |   |- extract cookie(s)     |
+|  o AEAD Alg. Negotiation         |   |                        |
+|  o End of Message                |   |                        |
++----------------------------------+   +------------------------+
+]]></artwork>
+      </figure>
+      </t> 
       <section title="NTS-KE record types">
         <t>The following NTS-KE Record Types are defined.</t>
         <section title="End of Message">
@@ -786,7 +826,8 @@
     <section title="Protocol details">
         <t>
           A client sending an NTS-protected request SHALL include the
-          following extension fields:
+          following extension fields as displayed in  <xref 
+          target="fig_NTSTimeSyncMessage"/>:
           <list>
             <t>
               Exactly one Unique Identifier extension field, which
@@ -909,6 +950,46 @@
           associated with the server which sent the NAK and initiate a
           fresh NTS-KE handshake.
         </t>
+        <figure anchor="fig_NTSTimeSyncMessage" title="NTS Time Synchronization Message">
+          <artwork><![CDATA[                +---------------------------------------+
+                | - verify time request message         |
+                | - generate time response message      |
+                |   - included NTPv4 extension fields   |
+                |      o Unique Identifier EF           |
+                |      o NTS Cookie EF                  |
+                |      o <NTS Cookie EF>                |
+                |                                       |
+                | - generate AEAD tag of NTP message    |
+                | - add NTS Authentication and          |
+                |   Encrypted Extension Fields EF       |
+                | - transmit time request packet        |
+                +-----------------+---------------------+
+                                  |
+                                  |
+Server -------- --+---------------+-----+----------------------->
+                  ^                      \          
+                 /                        \      
+  time request  /                          \   time response
+  (mode 3)     /                            \  (mode 4)  
+              /                              \   
+             /                                V 
+Client -----+---------------------------------+---------------->
+            |                                 |
+            |                                 |
+            |                                 |
++-----------+----------------------+   +------+-----------------+
+|- generate time request message   |   |- verify time response  |
+| - include NTPv4 Extension fields |   |  message               |
+|    o Unique Identifier EF        |   |- extract cookie(s)     |
+|    o NTS Cookie EF               |   |- time synchronization  |
+|    o <NTS Cookie Placeholder EF> |   |  processing            |
+|                                  |   +------------------------+
+|- generate AEAD tag of NTP message|
+|- add NTS Authentication and      |
+|  Encrypted Extension Fields EF   |
+|- transmit time request packet    | 
++----------------------------------+   ]]></artwork>
+      </figure>
       </section>
     <section title="Suggested format for NTS cookies" anchor="suggested-format-for-nts-cookies">
       <t>
