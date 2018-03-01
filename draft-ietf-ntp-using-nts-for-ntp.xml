@@ -782,7 +782,8 @@
           mode is other than 3 (client) or 4 (server).
         </t>
       </section>
-      <section title="Protocol details">
+    </section>
+    <section title="Protocol details">
         <t>
           A client sending an NTS-protected request SHALL include the
           following extension fields:
@@ -909,7 +910,6 @@
           fresh NTS-KE handshake.
         </t>
       </section>
-    </section>
     <section title="Suggested format for NTS cookies" anchor="suggested-format-for-nts-cookies">
       <t>
 	This section is non-normative. It gives a suggested way for
