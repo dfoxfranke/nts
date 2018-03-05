@@ -1506,7 +1506,6 @@ Client -----+---------------------------------+---------------->
       <?rfc include='reference.RFC.5746'?>
       <?rfc include='reference.RFC.5905'?>
       <?rfc include='reference.RFC.6125'?>
-      <?rfc include='reference.RFC.6347'?>
       <?rfc include='reference.RFC.7465'?>
       <?rfc include='reference.RFC.7507'?>
       <?rfc include='reference.RFC.7627'?>
