@@ -899,7 +899,7 @@ Client -----+---------------------------------+---------------->
 	  MUST be encrypted from sent from server to client. The
 	  former is necessary in order for the server to be able to
 	  recover the C2S and S2C keys, while the latter is
-	  unnecessary to satisfy the unlinkability goals discussed in
+	  necessary to satisfy the unlinkability goals discussed in
 	  <xref target="Unlinkability"/>. We emphasize also that
 	  &quot; encrypted&quot; means encapsulated within the the NTS
 	  Authenticator and Encrypted Extensions extension
