@@ -885,17 +885,31 @@ Client -----+---------------------------------+---------------->
               by the client.
             </t>
             <t>
-              One or more NTS Cookie extension fields. The server MUST
-              include these extension fields into the NTS Authenticator 
-              and Encrypted Extension Fields extension field, in order
-              to ensure that they are authenticated and encrypted. 
-              The number of NTS Cookie
+              One or more NTS Cookie extension fields, which MUST be
+              encrypted and authenticated. The number of NTS Cookie
               extension fields included SHOULD be equal to, and MUST
               NOT exceed, one plus the number of valid NTS Cookie
               Placeholder extension fields included in the request.
             </t>
           </list>
         </t>
+	<t>
+	  We emphasize the contrast that NTS Cookie extension fields
+	  MUST NOT be encrypted when sent from client to server, but
+	  MUST be encrypted from sent from server to client. The
+	  former is necessary in order for the server to be able to
+	  recover the C2S and S2C keys, while the latter is
+	  unnecessary to satisfy the unlinkability goals discussed in
+	  <xref target="Unlinkability"/>. We emphasize also that
+	  &quot; encrypted&quot; means encapsulated within the the NTS
+	  Authenticator and Encrypted Extensions extension
+	  field. While the body of a NTS Cookie extension field will
+	  generally consist of some sort of AEAD output (regardless of
+	  whether the recommendations of <xref
+	  target="suggested-format-for-nts-cookies"/> are precisely
+	  followed), this is not sufficient to make the extension
+	  field &quot;encrypted&quot;.
+	</t>
         <t>
           The server MAY include additional (non-NTS-related)
           extension fields, which MAY appear prior to the NTS
