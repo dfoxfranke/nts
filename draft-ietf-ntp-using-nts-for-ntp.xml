@@ -880,8 +880,11 @@ Client -----+---------------------------------+---------------->
               by the client.
             </t>
             <t>
-              One or more NTS Cookie extension fields, which MUST be
-              authenticated and encrypted. The number of NTS Cookie
+              One or more NTS Cookie extension fields. The server MUST
+              include these extension fields into the NTS Authenticator 
+              and Encrypted Extension Fields extension field, in order
+              to ensure that they are authenticated and encrypted. 
+              The number of NTS Cookie
               extension fields included SHOULD be equal to, and MUST
               NOT exceed, one plus the number of valid NTS Cookie
               Placeholder extension fields included in the request.
