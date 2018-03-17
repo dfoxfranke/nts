@@ -801,6 +801,11 @@ Client -----+---------------------------------+---------------->
             </t>
           </list>
         </t>
+        <t>
+          The NTS Authenticator and Encrypted Extension Fields
+          extension field MUST NOT be included in NTP packets whose
+          mode is other than 3 (client) or 4 (server).
+        </t>
       </section>
     </section>
     <section title="Protocol details">
