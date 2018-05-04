@@ -1297,6 +1297,94 @@ Client -----+---------------------------------+---------------->
         The Network Time Security Warning Codes Registry SHALL initially be empty.
       </t>
     </section>
+    <section title="Implementation Status">
+      <t>This section records the status of known implementations of the
+      protocol defined by this specification at the time of posting of this
+      Internet-Draft, and is based on a proposal described in RFC 7942. The
+      description of implementations in this section is intended to assist the
+      IETF in its decision processes in progressing drafts to RFCs. Please
+      note that the listing of any individual implementation here does not
+      imply endorsement by the IETF. Furthermore, no effort has been spent to
+      verify the information presented here that was supplied by IETF
+      contributors. This is not intended as, and must not be construed to be,
+      a catalog of available implementations or their features. Readers are
+      advised to note that other implementations may exist.</t>
+
+      <t>According to RFC 7942, "this will allow reviewers and working groups
+      to assign due consideration to documents that have the benefit of
+      running code, which may serve as evidence of valuable experimentation
+      and feedback that have made the implemented protocols more mature. It is
+      up to the individual working groups to use this information as they see
+      fit".</t>
+
+      <section title="Implementation #1">
+        <t>Organization: Ostfalia University of Applied Science</t>
+
+        <t>Implementor: Martin Langer</t>
+
+        <t>Maturity: Proof-of-Concept Prototype</t>
+
+        <t>This implementation was used to verify consistency and to ensure
+        completeness of this specification. It also demonstrate
+        interoperability with NTP's client-server mode messages.</t>
+
+        <section title="Coverage">
+          <t>This implementation covers the complete specification.</t>
+        </section>
+
+        <section title="Licensing">
+          <t>The code is released under a Apache License 2.0 license. </t>
+
+          <t>The source code is available at:
+          https://www.ostfalia.de/cms/en/</t>
+        </section>
+
+        <section title="Contact Information">
+          <t>Contact Martin Langer: mart.langer@ostfalia.de</t>
+        </section>
+
+        <section title="Last Update">
+          <t>The implementation was updated 3rd May 2018.</t>
+        </section>
+      </section>
+
+      <section title="Implementation #2">
+        <t>Organization: tbd</t>
+
+        <t>Implementor: Daniel Fox Franke </t>
+
+        <t>Maturity: Proof-of-Concept Prototype</t>
+
+        <t>This implementation was used to verify consistency and to ensure
+        completeness of this specification. </t>
+
+        <section title="Coverage">
+          <t>This implementation provides the client and the server for the
+          initial TLS handshake and NTS key exchange. It provides the the
+          client part of the NTS protected NTP messages. </t>
+        </section>
+
+        <section title="Licensing">
+          <t>Public domain.</t>
+
+          <t>The source code is available at:
+          https://github.com/dfoxfranke/nts-hackathon</t>
+        </section>
+
+        <section title="Contact Information">
+          <t>Contact Daniel Fox Franke: dfoxfranke@gmail.com</t>
+        </section>
+
+        <section title="Last Update">
+          <t>The implementation was updated 16th March 2018.</t>
+        </section>
+      </section>
+
+      <section title="Interoperability ">
+        <t>Interoperability of these two implementations have been tested at
+        the 101 IETF's Hackathon event. tbd</t>
+      </section>
+    </section>
     <section title="Security considerations">
       <section title="Avoiding DDoS amplification">
         <t>
