@@ -1317,7 +1317,7 @@ Client -----+---------------------------------+---------------->
       up to the individual working groups to use this information as they see
       fit".</t>
 
-      <section title="Implementation #1">
+      <section title="Implementation PoC 1">
         <t>Organization: Ostfalia University of Applied Science</t>
 
         <t>Implementor: Martin Langer</t>
@@ -1348,7 +1348,7 @@ Client -----+---------------------------------+---------------->
         </section>
       </section>
 
-      <section title="Implementation #2">
+      <section title="Implementation PoC 2">
         <t>Organization: tbd</t>
 
         <t>Implementor: Daniel Fox Franke </t>
@@ -1381,8 +1381,18 @@ Client -----+---------------------------------+---------------->
       </section>
 
       <section title="Interoperability ">
-        <t>Interoperability of these two implementations have been tested at
-        the 101 IETF's Hackathon event. tbd</t>
+        <t>The Interoperability tests distinguished between NTS key
+        exchange and time exchange message. For the 
+        NTS key exchange, interoperability  between
+        the two implementations  have been verified successfully for the 
+        case that PoC 1 represents the server and PoC 2 the client and 
+        vice versa. The Interoperability tests for the NTS time exchange
+        revealed a misunderstanding of this draft by the 
+        PoC 1 implementation. After appropriate correction, 
+        interoperability of NTS time exchange messages have been verified
+        successfully for the case that PoC 1 represents the server and 
+        PoC 2 the client. 
+        </t>
       </section>
     </section>
     <section title="Security considerations">
