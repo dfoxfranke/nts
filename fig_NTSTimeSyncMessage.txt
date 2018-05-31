@@ -3,12 +3,10 @@
                 | - generate time response message      |
                 |   - included NTPv4 extension fields   |
                 |      o Unique Identifier EF           |
-                |      o NTS Cookie EF                  |
-                |      o <NTS Cookie EF>                |
-                |                                       |
-                | - generate AEAD tag of NTP message    |
-                | - add NTS Authentication and          |
-                |   Encrypted Extension Fields EF       |
+                |      o NTS Authentication and         |
+                |        Encrypted Extension Fields EF  |
+                |        - NTS Cookie EF                |
+                |        - <NTS Cookie EF>              |
                 | - transmit time request packet        |
                 +-----------------+---------------------+
                                   |
