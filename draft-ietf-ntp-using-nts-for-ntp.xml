@@ -388,23 +388,23 @@
        record types to be exchanged.
       <figure anchor="fig_NTSKeyExchange" title="NTS Key Exchange messages">
           <artwork><![CDATA[                +---------------------------------------+
-                | - verify client request message       |
-                | - extract TLS key material            |
-                | - generate KE response message        |
-                |   - included Record Types:            |
-                |       - NTS Next Protocol Negotiation |
-                |       - AEAD Alg. Negotiation         |
-                |       - New Cookie for NTPv4          |
-                |       - <New Cookie for NTPv4>        |
-                |       - End of Message                |
+                | - verify time request message         |
+                | - generate time response message      |
+                |   - included NTPv4 extension fields   |
+                |      o Unique Identifier EF           |
+                |      o NTS Authentication and         |
+                |        Encrypted Extension Fields EF  |
+                |        - NTS Cookie EF                |
+                |        - <NTS Cookie EF>              |
+                | - transmit time request packet        |
                 +-----------------+---------------------+
                                   |
                                   |
 Server -------- --+---------------+-----+----------------------->
                   ^                      \          
                  /                        \      
-                /    TLS application       \     
-               /     data                   \    
+  time request  /                          \   time response
+  (mode 3)     /                            \  (mode 4)  
               /                              \   
              /                                V 
 Client -----+---------------------------------+---------------->
@@ -412,12 +412,17 @@ Client -----+---------------------------------+---------------->
             |                                 |
             |                                 |
 +-----------+----------------------+   +------+-----------------+
-|- generate KE request message     |   |- verify server response|
-| - include Record Types:          |   |  message               |
-|  o NTS Next Protocol Negotiation |   |- extract cookie(s)     |
-|  o AEAD Alg. Negotiation         |   |                        |
-|  o End of Message                |   |                        |
-+----------------------------------+   +------------------------+
+|- generate time request message   |   |- verify time response  |
+| - include NTPv4 Extension fields |   |  message               |
+|    o Unique Identifier EF        |   |- extract cookie(s)     |
+|    o NTS Cookie EF               |   |- time synchronization  |
+|    o <NTS Cookie Placeholder EF> |   |  processing            |
+|                                  |   +------------------------+
+|- generate AEAD tag of NTP message|
+|- add NTS Authentication and      |
+|  Encrypted Extension Fields EF   |
+|- transmit time request packet    | 
++----------------------------------+   
 ]]></artwork>
       </figure>
       </t> 
