@@ -1396,7 +1396,9 @@ Client -----+---------------------------------+---------------->
         PoC 1 implementation. After appropriate correction, 
         interoperability of NTS time exchange messages have been verified
         successfully for the case that PoC 1 represents the server and 
-        PoC 2 the client. 
+        PoC 2 the client. These tests successfully 
+        demonstrate that implementations that comply to this draft 
+        are able to interoperate.
         </t>
       </section>
     </section>
