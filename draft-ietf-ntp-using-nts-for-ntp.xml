@@ -118,7 +118,7 @@
 	    <t>
 	      Identity: Through the use of the X.509 PKI,
 	      implementations may cryptographically establish the
-	      identity of the parties they are communicating with
+	      identity of the parties they are communicating with.
 	    </t>
 	    <t>
 	      Authentication: Implementations may cryptographically
@@ -150,7 +150,7 @@
 	      came from the same client.
 	    </t>
 	    <t>
-	      Non-amplification: implementations (especially server implementations) may avoid acting as
+	      Non-amplification: Implementations (especially server implementations) may avoid acting as
 	      DDoS amplifiers by never responding to a request with a
 	      packet larger than the request packet.
 	    </t>
@@ -198,16 +198,16 @@
 	      The "NTS Extension Fields for NTPv4" are a collection of
 	      NTP extension fields for cryptographically securing
 	      NTPv4 using previously-established key material. They
-	      are suitable for securing client/server mode because the
+	      are suitable for securing client-server mode because the
 	      server can implement them without retaining per-client
 	      state, but on the other hand are suitable *only* for
-	      client/server mode because only the client, and not the
+	      client-server mode because only the client, and not the
 	      server, is protected from replay.
 	    </t>
 	    
 	    <t>
         The &quot;NTS Key Establishment&quot; protocol (NTS-KE)
-        is mechanism for establishing key material for use with
+        is a mechanism for establishing key material for use with
         the NTS Extension Fields for NTPv4. It uses TLS to
         exchange keys and negotiate some additional protocol
         options, but then quickly closes the TLS channel and
@@ -237,7 +237,7 @@
 	  authentication tag, computed using key material extracted from
 	  the NTS-KE handshake. The server uses the cookie to recover
 	  this key material (previously discarded to avoid maintaining
-	  state) and send back an authenticated response. The response
+	  state) and sends back an authenticated response. The response
 	  includes a fresh, encrypted cookie which the client then sends
 	  back in the clear with its next request. (This constant
 	  refreshing of cookies is necessary in order to achieve NTS's
@@ -363,13 +363,13 @@
             registry.
           </t>
           <t>
-            Body Length: the length of the Record Body field, in
+            Body Length: The length of the Record Body field, in
             octets, as a 16-bit integer in network byte order. Record
             bodies MAY have any representable length and need not be
             aligned to a word boundary.
           </t>
           <t>
-            Record Body: the syntax and semantics of this field SHALL
+            Record Body: The syntax and semantics of this field SHALL
             be determined by the Record Type.
           </t>
         </list>
@@ -426,7 +426,7 @@ Client -----+---------------------------------+---------------->
 ]]></artwork>
       </figure>
       </t> 
-      <section title="NTS-KE record types">
+      <section title="NTS-KE Record Types">
         <t>The following NTS-KE Record Types are defined.</t>
         <section title="End of Message">
           <t>
@@ -438,7 +438,7 @@ Client -----+---------------------------------+---------------->
         </section>
         <section title="NTS Next Protocol Negotiation">
           <t>
-            The NTS Next Protocol Negotiation record has a record type
+            The NTS Next Protocol Negotiation record has a Record Type
             of 1. It MUST occur exactly once in every NTS-KE request
             and response. Its body consists of a sequence of 16-bit
             unsigned integers in network byte order. Each integer
@@ -474,7 +474,7 @@ Client -----+---------------------------------+---------------->
             material and MUST NOT proceed to the Next Protocol.
           </t>
           <t>
-            The following error code are defined.
+            The following error codes are defined.
             <list>
               <t>
                 Error code 0 means &quot;Unrecognized Critical
@@ -550,7 +550,7 @@ Client -----+---------------------------------+---------------->
             target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> (Numeric
             Identifier 15). That is, if the client includes
             AEAD_AES_SIV_CMAC_256 in its AEAD Algorithm Negotiation
-            record, and the server accepts Protocol ID 0 (NTPv4); in
+            record, and the server accepts Protocol ID 0 (NTPv4) in
             its NTS Next Protocol Negotiation record, then the
             server's AEAD Algorithm Negotiation record MUST NOT be
             empty.
@@ -684,7 +684,7 @@ Client -----+---------------------------------+---------------->
           server packet (mode 4), its body SHALL contain the same
           octet string as was provided in the client packet to which
           the server is responding. Its use in modes other than
-          client/server is not defined.
+          client-server is not defined.
         </t>
         <t>
           The Unique Identifier extension field provides the client
@@ -746,21 +746,21 @@ Client -----+---------------------------------+---------------->
           SHALL be as follows:
           <list>
             <t>
-              Nonce length: two octets in network byte order, giving
+              Nonce length: Two octets in network byte order, giving
               the length of the Nonce field and interpreted as an
               unsigned integer.
             </t>
             <t>
-              Nonce: a nonce as required by the negotiated AEAD Algorithm.
+              Nonce: A nonce as required by the negotiated AEAD Algorithm.
             </t>
             <t>
-              Ciphertext: the output of the negotiated AEAD
+              Ciphertext: The output of the negotiated AEAD
               Algorithm. The structure of this field is determined by
               the negotiated algorithm, but it typically contains an
               authentication tag in addition to the actual ciphertext.
             </t>
             <t>
-              Padding: between 1 and 24 octets of padding, with every
+              Padding: Between 1 and 24 octets of padding, with every
               octet set to the number of padding octets included,
               e.g., &quot;01&quot;, &quot;02 02&quot;, or &quot;03 03
               03&quot;. The number of padding bytes SHOULD be chosen
@@ -1151,16 +1151,16 @@ Client -----+---------------------------------+---------------->
         <list>
           <t>
             Type Number (REQUIRED): An integer in the range 0&ndash;32767
-            inclusive
+            inclusive.
           </t>
           <t>
-            Description (REQUIRED): short text description of the
-            purpose of the field
+            Description (REQUIRED): A short text description of the
+            purpose of the field.
           </t>
           <t>
             Set Critical Bit (REQUIRED): One of &quot;MUST&quot;,
             &quot;SHOULD&quot;, &quot;MAY&quot;,  &quot;SHOULD NOT&quot;,
-            or &quot;MUST NOT&quot;
+            or &quot;MUST NOT&quot;.
           </t>
           <t>
             Reference (REQUIRED): A reference to a document specifying
@@ -1234,15 +1234,15 @@ Client -----+---------------------------------+---------------->
         Entries SHALL have the following fields:
         <list>
           <t>
-            Protocol ID (REQUIRED): a integer in the range 0-65535
+            Protocol ID (REQUIRED): An integer in the range 0-65535
             inclusive, functioning as an identifier.
           </t>
           <t>
-            Protocol Name (REQUIRED): a short text string naming the
+            Protocol Name (REQUIRED): A short text string naming the
             protocol being identified.
           </t>
           <t>
-            Reference (RECOMMENDED): a reference to a relevant
+            Reference (RECOMMENDED): A reference to a relevant
             specification document. If no relevant document exists, a
             point-of-contact for questions regarding the entry SHOULD
             be listed here in lieu.
@@ -1278,9 +1278,9 @@ Client -----+---------------------------------+---------------->
         &quot;Network Time Security Warning Codes&quot;. Entries in
         each SHALL have the following fields:
         <list>
-          <t>Number (REQUIRED): a integer in the range 0-65535 inclusive</t>
-          <t>Description (REQUIRED): a short text description of the condition.</t>
-          <t>Reference (REQUIRED): a reference to a relevant specification document.</t>
+          <t>Number (REQUIRED): An integer in the range 0-65535 inclusive.</t>
+          <t>Description (REQUIRED): A short text description of the condition.</t>
+          <t>Reference (REQUIRED): A reference to a relevant specification document.</t>
         </list>
         The policy for allocation of new entries in these registries
         SHALL vary by their Number, as follows:
@@ -1429,7 +1429,7 @@ Client -----+---------------------------------+---------------->
 	  verify that the X.509 certificate chain presented by the
 	  server is valid and rooted in a trusted certificate
 	  authority. <xref target="RFC5280"/> and <xref
-	  target="RFC6125"/> specifies how such verification is to be
+	  target="RFC6125"/> specify how such verification is to be
 	  performed in general. However, the expectation that the
 	  client does not yet have a correctly-set system clock at the
 	  time of certificate verification presents difficulties with
@@ -1681,13 +1681,13 @@ Client -----+---------------------------------+---------------->
 	  <t hangText="DDoS">
 	    Distributed Denial of Service
 	  </t>
-          <t hangText="NTP  ">
+      <t hangText="NTP ">
 	    Network Time Protocol <xref target="RFC5905"/>
 	  </t>
-          <t hangText="NTS  ">
+      <t hangText="NTS ">
 	    Network Time Security
 	  </t>
-          <t hangText="TLS">
+      <t hangText="TLS ">
 	    Transport Layer Security
 	  </t>
 	</list>
