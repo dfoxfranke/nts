@@ -1341,7 +1341,7 @@ Client -----+---------------------------------+---------------->
           <t>The code is released under a Apache License 2.0 license. </t>
 
           <t>The source code is available at:
-          https://www.ostfalia.de/cms/en/</t>
+          https://gitlab.com/MLanger/nts/</t>
         </section>
 
         <section title="Contact Information">
@@ -1387,18 +1387,16 @@ Client -----+---------------------------------+---------------->
 
       <section title="Interoperability ">
         <t>The Interoperability tests distinguished between NTS key
-        exchange and time exchange message. For the 
+        exchange and NTS time exchange messages. For the 
         NTS key exchange, interoperability  between
-        the two implementations  have been verified successfully for the 
-        case that PoC 1 represents the server and PoC 2 the client and 
-        vice versa. The Interoperability tests for the NTS time exchange
-        revealed a misunderstanding of this draft by the 
-        PoC 1 implementation. After appropriate correction, 
-        interoperability of NTS time exchange messages have been verified
+        the two implementations  has been verified successfully. 
+        Interoperability of NTS time exchange messages has been verified
         successfully for the case that PoC 1 represents the server and 
-        PoC 2 the client. These tests successfully 
-        demonstrate that implementations that comply to this draft 
-        are able to interoperate.
+        PoC 2 the client.</t>
+        
+        <t>These tests successfully 
+        demonstrate that there are at least two running implementations 
+        of this draft which are able to interoperate.
         </t>
       </section>
     </section>
