@@ -760,19 +760,11 @@ Client -----+---------------------------------+---------------->
               authentication tag in addition to the actual ciphertext.
             </t>
             <t>
-              Padding: Between 1 and 24 octets of padding, with every
-              octet set to the number of padding octets included,
-              e.g., &quot;01&quot;, &quot;02 02&quot;, or &quot;03 03
-              03&quot;. The number of padding bytes SHOULD be chosen
-              in order to comply with the <xref target="RFC7822">RFC
-              7822</xref> requirement that (in the absence of a legacy
-              MAC) extension fields have a total length in octets
-              (including the four octets for the type and length
-              fields) which is at least 28 and divisible by 4. At
-              least one octet of padding MUST be included, so that
-              implementations can unambiguously delimit the end of the
-              ciphertext from the start of the padding by examining
-	      the last octet to determine the padding length.
+              Padding: several octets of padding, with every octet set
+              to the number of padding octets included, e.g.,
+              &quot;01&quot;, &quot;02 02&quot;, or &quot;03 03
+              03&quot;. Constraints on the number of padding octets
+              included are enumerated below.
             </t>
           </list>
         </t>
@@ -806,6 +798,43 @@ Client -----+---------------------------------+---------------->
             </t>
           </list>
         </t>
+	<t>
+	  The number of padding octets included SHALL conform to the
+	  following constraints:
+	  <list>
+	    <t>
+	      The number MUST be at least 1, so that the final octet
+	      of the extension field always gives the padding length.
+	    </t>
+	    <t>
+	      The number MUST NOT be greater than 255, since high
+	      numbers are unrepresentable in a single octet
+	    </t>
+	    <t>
+	      The number MUST result in an extension field length
+	      which is legal per <xref target="RFC7822"/>. That is,
+	      the number of padding octets must be chosen so that the
+	      total length of the extension field (including the Field
+	      Type and Length subfields) is a multiple of 4 greater
+	      than or equal to 16, and greater than or equal to 28 if
+	      the extension field is the last one in the packet.
+	    </t>
+	    <t>
+	      For mode 3 (client) packets only, the number MUST be at
+	      least MAX(MIN(N_MAX, 16) - N_len, 0) + 4, where `N_len`
+	      represents the actual length of the nonce and N_MAX is,
+	      per <xref target="RFC5116"/>, the maximum permitted
+	      nonce length for the AEAD algorithm in use. This
+	      constraint ensures that servers can always use an
+	      adequately long nonce without causing the size of their
+	      response packet to exceed the size of the request
+	      packet. Servers SHOULD enforce this constraint by
+	      dropping client packets that do not conform to it.
+	      Clients MUST NOT enforce it since it is not binding on
+	      mode 4 (server) packets to begin with.
+	    </t>
+	  </list>
+	</t>
         <t>
           The NTS Authenticator and Encrypted Extension Fields
           extension field MUST NOT be included in NTP packets whose
@@ -1422,6 +1451,13 @@ Client -----+---------------------------------+---------------->
           it wants to get back, rather than being permitted simply to
           specify a desired quantity.
         </t>
+	<t>
+	  Due to the <xref target="RFC7822"/> requirement that extensions
+	  be padded and aligned to four-octet boundaries, response size
+	  may still in some cases exceed request size by up to three
+	  octets. This is sufficiently inconsequential that we have
+	  declined to address it.
+	</t>
       </section>
       <section title="Initial verification of server certificates">
 	<t>
