@@ -322,6 +322,12 @@
         non-error responses each SHALL include exactly one NTS Next
         Protocol Negotiation record.
       </t>
+      <t>
+	Clients and servers MAY enforce length limits on requests
+	and responses, however servers MUST accept requests of
+	at least 1024 octets, and clients SHOULD accept responses
+	of at least 65536 octets.
+      </t>
       <figure anchor="ntske-record">
         <artwork><![CDATA[
 0                   1                   2                   3
