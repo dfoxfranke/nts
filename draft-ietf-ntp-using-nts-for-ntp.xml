@@ -1174,228 +1174,290 @@ Client -----+---------------------------------+---------------->
       </t>
     </section>
 
-      <section title="IANA Considerations" anchor="iana-considerations">
-      <t>
-        IANA is requested to allocate two entries, identical except
-        for the Transport Protocol, in the Service Name and Transport
-        Protocol Port Number Registry as follows:
-        <list>
-          <t>Service Name: nts</t>
-          <t>Transport Protocol: tcp, udp</t>
-          <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
-          <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
-          <t>Description: Network Time Security</t>
-          <t>Reference: [[this memo]]</t>
-          <t>Port Number: [[TBD1]], selected by IANA from the user port range</t>
-        </list>
-      </t>
-      <t>
-        IANA is requested to allocate the following entry in the
-        Application-Layer Protocol Negotation (ALPN) Protocol IDs
-        registry:
-        <list>
-          <t>Protocol: Network Time Security Key Establishment, version 1</t>
-          <t>
-            Identification
-            Sequence:<vspace/>&nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x73&nbsp;0x6B&nbsp;0x65&nbsp;0x2F&nbsp;0x31&nbsp;("ntske/1")
-          </t>
-          <t>Reference: [[this memo]]</t>
-        </list>
-        <vspace/>
-      </t>
-      <t>
-        IANA is requested to allocate the following entry in the TLS
-        Exporter Label Registry:
-      </t>
-      <texttable>
-        <ttcol>Value</ttcol>
-        <ttcol>DTLS-OK</ttcol>
-        <ttcol>Reference</ttcol>
-        <ttcol>Note</ttcol>
-        <c>EXPORTER-network-time-security/1</c>
-        <c>Y</c>
-        <c>[[this memo]]</c>
-        <c/>
-      </texttable>
-      <t>
-        IANA is requested to allocate the following entry in the registry
-        of NTP Kiss-o'-Death codes:
-      </t>
-      <texttable>
-        <ttcol>Code</ttcol><ttcol>Meaning</ttcol>
-        <c>NTSN</c><c>NTS NAK</c>
-      </texttable>
-      <t>
-        IANA is requested to allocate the following entries in the
-        NTP Extensions Field Types registry:
-      </t>
-      <texttable>
-        <ttcol>Field Type</ttcol>
-        <ttcol>Meaning</ttcol>
-        <ttcol>Reference</ttcol>
-        <c>[[TBD2]]</c><c>Unique Identifier</c><c>[[this memo]]</c>
-        <c>[[TBD3]]</c><c>NTS Cookie</c><c>[[this memo]]</c>
-        <c>[[TBD4]]</c><c>NTS Cookie Placeholder</c><c>[[this memo]]</c>
-        <c>[[TBD5]]</c><c>NTS Authenticator and Encrypted Extension Fields</c><c>[[this memo]]</c>
-      </texttable>
-      <t>
-        IANA is requested to create a new registry entitled
-        &quot;Network Time Security Key Establishment Record Types&quot;.
-        Entries SHALL have the following fields:
-        <list>
-          <t>
-            Type Number (REQUIRED): An integer in the range 0&ndash;32767
-            inclusive.
-          </t>
-          <t>
-            Description (REQUIRED): A short text description of the
-            purpose of the field.
-          </t>
-          <t>
-            Set Critical Bit (REQUIRED): One of &quot;MUST&quot;,
-            &quot;SHOULD&quot;, &quot;MAY&quot;,  &quot;SHOULD NOT&quot;,
-            or &quot;MUST NOT&quot;.
-          </t>
-          <t>
-            Reference (REQUIRED): A reference to a document specifying
-            the semantics of the record.
-          </t>
-        </list>
-      </t>
-      <t>
-        The policy for allocation of new entries in this registry SHALL vary
-        by the Type Number, as follows:
-        <list>
-          <t>0&ndash;1023: IETF Review</t>
-          <t>1024&ndash;16383: Specification Required</t>
-          <t>16384&ndash;32767: Private and Experimental Use</t>
-        </list>
-      </t>
-      <t>
-        Applications for new entries SHALL specify the contents of the
-        Description, Set Critical Bit and Reference fields and which
-        of the above ranges the Type Number should be allocated
-        from. Applicants MAY request a specific Type Number, and such
-        requests MAY be granted at the registrar's discretion.
-      </t>
-      <t>
-        The initial contents of this registry SHALL be as follows:
-      </t>
-      <texttable>
-        <ttcol>Field Number</ttcol>
-        <ttcol>Description</ttcol>
-        <ttcol>Critical</ttcol>
-        <ttcol>Reference</ttcol>
+    <section title="IANA Considerations" anchor="iana-considerations">
+      <section title="Service Name and Transport Protocol Port Number Registry">
+        <t>
+          IANA is requested to allocate two entries, identical except for the
+          Transport Protocol, in the <xref target="RFC6335">Service Name and
+          Transport Protocol Port Number Registry</xref> as follows:
+          <list>
+            <t>Service Name: nts</t>
+            <t>Transport Protocol: tcp, udp</t>
+            <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
+            <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
+            <t>Description: Network Time Security</t>
+            <t>Reference: [[this memo]]</t>
+            <t>Port Number: [[TBD1]], selected by IANA from the system port
+              range</t>
+          </list>
+        </t>
+      </section>
 
-        <c>0</c>
-        <c>End of message</c>
-        <c>MUST</c>
-        <c>[[this memo]]</c>
+      <section title="TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs Registry">
+        <t>
+          IANA is requested to allocate the following entry in the
+          <xref target="RFC7301">TLS Application-Layer Protocol Negotiation
+            (ALPN) Protocol IDs registry</xref>:
+          <list>
+            <t>Protocol: Network Time Security Key Establishment, version 1</t>
+            <t>
+              Identification Sequence:<vspace/>
+              &nbsp;&nbsp;0x6E&nbsp;0x74&nbsp;0x73&nbsp;0x6B&nbsp;0x65&nbsp;0x2F&nbsp;0x31&nbsp;(&quot;ntske/1&quot;)
+            </t>
+            <t>Reference: [[this memo]], <xref target="nts-ke"/></t>
+          </list>
+        </t>
+      </section>
 
-        <c>1</c>
-        <c>NTS next protocol negotiation</c>
-        <c>MUST</c>
-        <c>[[this memo]]</c>
+      <section title="TLS Exporter Labels Registry">
+        <t>
+          IANA is requested to allocate the following entry in the
+          <xref target="RFC5705">TLS Exporter Labels Registry</xref>:
+        </t>
+        <texttable>
+          <ttcol>Value</ttcol>
+          <ttcol>DTLS-OK</ttcol>
+          <ttcol>Recommended</ttcol>
+          <ttcol>Reference</ttcol>
+          <ttcol>Note</ttcol>
 
-        <c>2</c>
-        <c>Error</c>
-        <c>MUST</c>
-        <c>[[this memo]]</c>
+          <c>EXPORTER-network- time-security/1</c>
+          <c>Y</c>
+          <c>Y</c>
+          <c>[[this memo]], <xref target="key-extraction"/></c>
+          <c/>
+        </texttable>
+      </section>
 
-        <c>3</c>
-        <c>Warning</c>
-        <c>MUST</c>
-        <c>[[this memo]]</c>
+      <section title="NTP Kiss-o'-Death Codes Registry">
+        <t>
+          IANA is requested to allocate the following entry in the
+          <xref target="RFC5905">registry of NTP Kiss-o'-Death Codes</xref>:
+        </t>
+        <texttable>
+          <ttcol>Code</ttcol>
+          <ttcol>Meaning</ttcol>
+          <ttcol>Reference</ttcol>
 
-        <c>4</c>
-        <c>AEAD algorithm negotiation</c>
-        <c>MAY</c>
-        <c>[[this memo]]</c>
+          <c>NTSN</c>
+          <c>Network Time Security (NTS) negative-acknowledgment (NAK)</c>
+          <c>[[this memo]], <xref target="protocol-details"/></c>
+        </texttable>
+      </section>
 
-        <c>5</c>
-        <c>New cookie for NTPv4</c>
-        <c>SHOULD NOT</c>
-        <c>[[this memo]]</c>
+      <section title="NTP Extension Field Types Registry">
+        <t>
+          IANA is requested to allocate the following entries in the
+          <xref target="RFC5905">NTP Extension Field Types registry</xref>:
+        </t>
+        <texttable>
+          <ttcol>Field Type</ttcol>
+          <ttcol>Meaning</ttcol>
+          <ttcol>Reference</ttcol>
 
-        <c>16384&ndash;32767</c>
-        <c>Reserved for Private &amp; Experimental Use</c>
-        <c>MAY</c>
-        <c>[[this memo]]</c>
-      </texttable>
-      <t>
-        IANA is requested to create a new registry entitled
-        &quot;Network Time Security Next Protocols&quot;.
-        Entries SHALL have the following fields:
-        <list>
-          <t>
-            Protocol ID (REQUIRED): An integer in the range 0-65535
-            inclusive, functioning as an identifier.
-          </t>
-          <t>
-            Protocol Name (REQUIRED): A short text string naming the
-            protocol being identified.
-          </t>
-          <t>
-            Reference (RECOMMENDED): A reference to a relevant
-            specification document. If no relevant document exists, a
-            point-of-contact for questions regarding the entry SHOULD
-            be listed here in lieu.
-          </t>
-        </list>
-      </t>
-      <t>
-        Applications for new entries in this registry SHALL specify
-        all desired fields, and SHALL be granted upon approval by a
-        Designated Expert. Protocol IDs 32768-65535 SHALL be reserved
-        for Private or Experimental Use, and SHALL NOT be
-        registered.
-      </t>
-      <t>
-        The initial contents of this registry SHALL be as follows:
-      </t>
-      <texttable>
-        <ttcol>Protocol ID</ttcol>
-        <ttcol>Human-Readable Name</ttcol>
-        <ttcol>Reference</ttcol>
+          <c>[[TBD2]]</c>
+          <c>Unique Identifier</c>
+          <c>[[this memo]],
+            <xref target="unique-identifier-extension-field"/></c>
 
-        <c>0</c>
-        <c>Network Time Protocol version 4 (NTPv4)</c>
-        <c>[[this memo]]</c>
+          <c>[[TBD3]]</c>
+          <c>NTS Cookie</c>
+          <c>[[this memo]], <xref target="nts-cookie-extension-field"/></c>
 
-        <c>32768-65535</c>
-        <c>Reserved for Private or Experimental Use</c>
-        <c>Reserved by [[this memo]]</c>
-      </texttable>
-      <t>
-        IANA is requested to create two new registries entitled
-        &quot;Network Time Security Error Codes&quot; and
-        &quot;Network Time Security Warning Codes&quot;. Entries in
-        each SHALL have the following fields:
-        <list>
-          <t>Number (REQUIRED): An integer in the range 0-65535 inclusive.</t>
-          <t>Description (REQUIRED): A short text description of the condition.</t>
-          <t>Reference (REQUIRED): A reference to a relevant specification document.</t>
-        </list>
-        The policy for allocation of new entries in these registries
-        SHALL vary by their Number, as follows:
-        <list>
-          <t>0&ndash;1023: IETF Review</t>
-          <t>1024&ndash;32767: Specification Required</t>
-          <t>32768&ndash;65535: Private and Experimental Use</t>
-        </list>
-      </t>
-      <t>
-        The initial contents of the Network Time Security Error Codes Registry SHALL be as follows:
-      </t>
-      <texttable>
-        <ttcol>Number</ttcol><ttcol>Description</ttcol><ttcol>Reference</ttcol>
-        <c>0</c><c>Unrecognized Critical Extension</c><c>[[this memo]]</c>
-        <c>1</c><c>Bad Request</c><c>[[this memo]]</c>
-      </texttable>
-      <t>
-        The Network Time Security Warning Codes Registry SHALL initially be empty.
-      </t>
+          <c>[[TBD4]]</c>
+          <c>NTS Cookie Placeholder</c>
+          <c>[[this memo]],
+            <xref target="nts-cookie-placeholder-extension-field"/></c>
+
+          <c>[[TBD5]]</c>
+          <c>NTS Authenticator and Encrypted Extension Fields</c>
+          <c>[[this memo]], <xref target="nts-aeef-extension-field"/></c>
+        </texttable>
+      </section>
+
+      <section title="Network Time Security Key Establishment Record Types Registry">
+        <t>
+          IANA is requested to create a new registry entitled
+          &quot;Network Time Security Key Establishment Record Types&quot;.
+          Entries SHALL have the following fields:
+          <list>
+            <t>
+              Record Type Number (REQUIRED): An integer in the range
+              0&ndash;32767 inclusive.
+            </t>
+            <t>
+              Description (REQUIRED): A short text description of the purpose of
+              the field.
+            </t>
+            <t>
+              Set Critical Bit (REQUIRED): One of &quot;MUST&quot;,
+              &quot;SHOULD&quot;, &quot;MAY&quot;,  &quot;SHOULD NOT&quot;, or
+              &quot;MUST NOT&quot;.
+            </t>
+            <t>
+              Reference (REQUIRED): A reference to a document specifying the
+              semantics of the record.
+            </t>
+          </list>
+        </t>
+        <t>
+          The policy for allocation of new entries in this registry SHALL vary
+          by the Record Type Number, as follows:
+          <list>
+            <t>0&ndash;1023: IETF Review.</t>
+            <t>1024&ndash;16383: Specification Required.</t>
+            <t>16384&ndash;32767: Private and Experimental Use.</t>
+          </list>
+        </t>
+        <t>
+          Applications for new entries SHALL specify the contents of the
+          Description, Set Critical Bit, and Reference fields as well as which
+          of the above ranges the Record Type Number should be allocated from.
+          Applicants MAY request a specific Record Type Number and such requests
+          MAY be granted at the registrar's discretion.
+        </t>
+        <t>
+          The initial contents of this registry SHALL be as follows:
+        </t>
+        <texttable>
+          <ttcol>Record Type Number</ttcol>
+          <ttcol>Description</ttcol>
+          <ttcol>Set Critical Bit</ttcol>
+          <ttcol>Reference</ttcol>
+
+          <c>0</c>
+          <c>End of Message</c>
+          <c>MUST</c>
+          <c>[[this memo]], <xref target="end-of-message"/></c>
+
+          <c>1</c>
+          <c>NTS Next Protocol Negotiation</c>
+          <c>MUST</c>
+          <c>[[this memo]],
+            <xref target="nts-next-protocol-negotiation"/></c>
+
+          <c>2</c>
+          <c>Error</c>
+          <c>MUST</c>
+          <c>[[this memo]], <xref target="nts-error"/></c>
+
+          <c>3</c>
+          <c>Warning</c>
+          <c>MUST</c>
+          <c>[[this memo]], <xref target="nts-warning"/></c>
+
+          <c>4</c>
+          <c>AEAD Algorithm Negotiation</c>
+          <c>MAY</c>
+          <c>[[this memo]], <xref target="aead-algorithm-negotiation"/></c>
+
+          <c>5</c>
+          <c>New Cookie for NTPv4</c>
+          <c>SHOULD NOT</c>
+          <c>[[this memo]], <xref target="new-cookie-for-ntpv4"/></c>
+
+          <c>6</c>
+          <c>NTP Server Negotiation</c>
+          <c>SHOULD</c>
+          <c>[[this memo]], <xref target="ntp-server-negotiation"/></c>
+
+          <c>16384&ndash;32767</c>
+          <c>Reserved for Private &amp; Experimental Use</c>
+          <c>MAY</c>
+          <c>[[this memo]]</c>
+        </texttable>
+      </section>
+
+      <section title="Network Time Security Next Protocols Registry">
+        <t>
+          IANA is requested to create a new registry entitled
+          &quot;Network Time Security Next Protocols&quot;. Entries SHALL have
+          the following fields:
+          <list>
+            <t>
+              Protocol ID (REQUIRED): An integer in the range 0-65535 inclusive,
+              functioning as an identifier.
+            </t>
+            <t>
+              Protocol Name (REQUIRED): A short text string naming the protocol
+              being identified.
+            </t>
+            <t>
+              Reference (RECOMMENDED): A reference to a relevant specification
+              document. If no relevant document exists, a point-of-contact for
+              questions regarding the entry SHOULD be listed here in lieu.
+            </t>
+          </list>
+        </t>
+        <t>
+          Applications for new entries in this registry SHALL specify all
+          desired fields and SHALL be granted upon approval by a Designated
+          Expert. Protocol IDs 32768-65535 SHALL be reserved for Private or
+          Experimental Use and SHALL NOT be registered.
+        </t>
+        <t>
+          The initial contents of this registry SHALL be as follows:
+        </t>
+        <texttable>
+          <ttcol>Protocol ID</ttcol>
+          <ttcol>Protocol Name</ttcol>
+          <ttcol>Reference</ttcol>
+
+          <c>0</c>
+          <c>Network Time Protocol version 4 (NTPv4)</c>
+          <c>[[this memo]]</c>
+
+          <c>32768-65535</c>
+          <c>Reserved for Private or Experimental Use</c>
+          <c>Reserved by [[this memo]]</c>
+        </texttable>
+      </section>
+
+      <section title="Network Time Security Error and Warning Codes Registries">
+        <t>
+          IANA is requested to create two new registries entitled
+          &quot;Network Time Security Error Codes&quot; and
+          &quot;Network Time Security Warning Codes&quot;. Entries in each SHALL
+          have the following fields:
+          <list>
+            <t>Number (REQUIRED): An integer in the range 0-65535 inclusive</t>
+            <t>Description (REQUIRED): A short text description of the
+              condition.</t>
+            <t>Reference (REQUIRED): A reference to a relevant specification
+              document.</t>
+          </list>
+          The policy for allocation of new entries in these registries SHALL
+          vary by their Number, as follows:
+          <list>
+            <t>0&ndash;1023: IETF Review.</t>
+            <t>1024&ndash;32767: Specification Required.</t>
+            <t>32768&ndash;65535: Private and Experimental Use.</t>
+          </list>
+        </t>
+        <t>
+          The initial contents of the Network Time Security Error Codes Registry
+          SHALL be as follows:
+        </t>
+        <texttable>
+          <ttcol>Number</ttcol>
+          <ttcol>Description</ttcol>
+          <ttcol>Reference</ttcol>
+
+          <c>0</c>
+          <c>Unrecognized Critical Extension</c>
+          <c>[[this memo]], <xref target="nts-error"/></c>
+
+          <c>1</c>
+          <c>Bad Request</c>
+          <c>[[this memo]], <xref target="nts-error"/></c>
+        </texttable>
+        <t>
+          The Network Time Security Warning Codes Registry SHALL initially
+          be empty.
+        </t>
+      </section>
     </section>
+
     <section title="Implementation Status">
       <t>This section records the status of known implementations of the
       protocol defined by this specification at the time of posting of this
@@ -1731,6 +1793,7 @@ Client -----+---------------------------------+---------------->
       <?rfc include='reference.RFC.5746'?>
       <?rfc include='reference.RFC.5905'?>
       <?rfc include='reference.RFC.6125'?>
+      <?rfc include='reference.RFC.6335'?>
       <?rfc include='reference.RFC.7465'?>
       <?rfc include='reference.RFC.7507'?>
       <?rfc include='reference.RFC.7627'?>
