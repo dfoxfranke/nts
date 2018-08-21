@@ -178,86 +178,128 @@
 	</t>
       </section>
 
-      <section title="Protocol overview">
-	<t>
-	  The Network Time Protocol includes many different operating
-	  modes to support various network topologies. In addition to
-	  its best-known and most-widely-used client-server mode, it
-	  also includes modes for synchronization between symmetric
-	  peers, a control mode for server monitoring and administration
-	  and a broadcast mode. These various modes have differing and
-	  partly contradictory requirements for security and
-	  performance. Symmetric and control modes demand mutual
-	  authentication and mutual replay protection, and for certain
-	  message types control mode may require confidentiality as well
-	  as authentication. Client-server mode places more stringent
-	  requirements on resource utilization than other modes, because
-	  servers may have vast number of clients and be unable to
-	  afford to maintain per-client state. However, client-server
-	  mode also has more relaxed security needs, because only the
-	  client requires replay protection: it is harmless for stateless servers
-	  to process replayed packets. The security demands of symmetric
-	  and control modes, on the other hand, are in conflict with the
-	  resource-utilization demands of client-server mode: any scheme
-	  which provides replay protection inherently involves
-	  maintaining some state to keep track of what messages have
-	  already been seen.
-	</t>
+      <section title="Protocol Overview">
+        <t>
+          The Network Time Protocol includes many different operating modes to
+          support various network topologies. In addition to its best-known and
+          most-widely-used client-server mode, it also includes modes for
+          synchronization between symmetric peers, a control mode for server
+          monitoring and administration, and a broadcast mode. These various
+          modes have differing and partly contradictory requirements for
+          security and performance. Symmetric and control modes demand mutual
+          authentication and mutual replay protection. Additionally, for certain
+          message types control mode may require confidentiality as well as
+          authentication. Client-server mode places more stringent requirements
+          on resource utilization than other modes, because servers may have
+          vast number of clients and be unable to afford to maintain per-client
+          state. However, client-server mode also has more relaxed security
+          needs, because only the client requires replay protection: it is
+          harmless for stateless servers to process replayed packets. The
+          security demands of symmetric and control modes, on the other hand,
+          are in conflict with the resource-utilization demands of client-server
+          mode: any scheme which provides replay protection inherently involves
+          maintaining some state to keep track of what messages have already
+          been seen.
+        </t>
 
-	<t>
-	  This memo specifies NTS exclusively for the client-server mode
-    of NTP. To this end, NTS is structured as a suite of two protocols:
+        <t>
+          This memo specifies NTS exclusively for the client-server mode of NTP.
+          To this end, NTS is structured as a suite of two protocols:
 
-	  <list>
-	    <t>
-	      The "NTS Extension Fields for NTPv4" are a collection of
-	      NTP extension fields for cryptographically securing
-	      NTPv4 using previously-established key material. They
-	      are suitable for securing client-server mode because the
-	      server can implement them without retaining per-client
-	      state, but on the other hand are suitable *only* for
-	      client-server mode because only the client, and not the
-	      server, is protected from replay.
-	    </t>
+          <list>
+            <t>
+              The "NTS Extension Fields for NTPv4" are a collection of NTP
+              extension fields for cryptographically securing NTPv4 using
+              previously-established key material. They are suitable for
+              securing client-server mode because the server can implement them
+              without retaining per-client state. All state is kept by the
+              client and provided to the server in the form of an encrypted
+              cookie supplied with each request. On the other hand, the NTS
+              Extension Fields are suitable *only* for client-server mode
+              because only the client, and not the server, is protected from
+              replay.
+            </t>
 
-	    <t>
-        The &quot;NTS Key Establishment&quot; protocol (NTS-KE)
-        is a mechanism for establishing key material for use with
-        the NTS Extension Fields for NTPv4. It uses TLS to
-        exchange keys and negotiate some additional protocol
-        options, but then quickly closes the TLS channel and
-        permits the server to discard all associated state.
-      </t>
-	  </list>
-	</t>
+            <t>
+              The &quot;NTS Key Establishment&quot; protocol (NTS-KE) is a
+              mechanism for establishing key material for use with the NTS
+              Extension Fields for NTPv4. It uses TLS to exchange keys, provide
+              the client with an initial supply of cookies, and negotiate some
+              additional protocol options. After this exchange, the TLS channel
+              is closed with no per-client state remaining on the server side.
+            </t>
+          </list>
+        </t>
 
-	<t>
-	  The typical protocol flow is as follows.
-    The client connects to the server on the NTS TCP
-	  port and the two parties perform a TLS handshake. Via the TLS
-	  channel, the parties negotiate some additional protocol
-	  parameters and the server sends the client a supply of
-	  cookies.  The parties use <xref target="RFC5705">TLS key
-	  export</xref> to extract key material which will be used in
-	  the next phase of the protocol.  This negotiation takes only a
-	  single round trip, after which the server closes the
-	  connection and discards all associated state. At this point
-	  the NTS-KE phase of the protocol is complete.
-	</t>
-	<t>
-	  Time synchronization proceeds over the NTP UDP port. The
-	  client sends the server an NTP client packet which includes
-	  several extension fields. Included among these fields are a
-	  cookie (previously provided by the server), and an
-	  authentication tag, computed using key material extracted from
-	  the NTS-KE handshake. The server uses the cookie to recover
-	  this key material (previously discarded to avoid maintaining
-	  state) and sends back an authenticated response. The response
-	  includes a fresh, encrypted cookie which the client then sends
-	  back in the clear with its next request. (This constant
-	  refreshing of cookies is necessary in order to achieve NTS's
-	  unlinkability goal.)
-	</t>
+        <t>
+          The typical protocol flow is as follows: The client connects to an
+          NTS-KE server on the NTS TCP port and the two parties perform a TLS
+          handshake. Via the TLS channel, the parties negotiate some additional
+          protocol parameters and the server sends the client a supply of
+          cookies along with a list of one or more IP addresses to NTP servers
+          for which the cookies are valid. The parties use
+          <xref target="RFC5705">TLS key export</xref> to extract key material
+          which will be used in the next phase of the protocol. This negotiation
+          takes only a single round trip, after which the server closes the
+          connection and discards all associated state. At this point the NTS-KE
+          phase of the protocol is complete. Ideally, the client never needs to
+          connect to the NTS-KE server again.
+        </t>
+        <t>
+          Time synchronization proceeds with one of the indicated NTP servers
+          over the NTP UDP port. The client sends the server an NTP client
+          packet which includes several extension fields. Included among these
+          fields are a cookie (previously provided by the key exchange server)
+          and an authentication tag, computed using key material extracted from
+          the NTS-KE handshake.  The NTP server uses the cookie to recover this
+          key material and send back an authenticated response. The response
+          includes a fresh, encrypted cookie which the client then sends back in
+          the clear in a subsequent request. (This constant refreshing of
+          cookies is necessary in order to achieve NTS's unlinkability goal.)
+        </t>
+        <t>
+          <xref target="protocol-overview"/> provides an overview of the
+          high-level interaction between the client, the NTS-KE server, and the
+          NTP server. Note that the cookies' data format and the exchange of
+          secrets between NTS-KE and NTP servers are not part of this
+          specification and are implementation dependent. However, a suggested
+          format for NTS cookies is provided in
+          <xref target="suggested-format-for-nts-cookies"/>.
+        </t>
+        <figure anchor="protocol-overview"
+          title="Overview of High-Level Interactions in NTS">
+          <artwork><![CDATA[
+                                                     +--------------+
+                                                     |              |
+                                                 +-> | NTP Server 1 |
+                                                 |   |              |
+                           Shared cookie         |   +--------------+
++---------------+      encryption parameters     |   +--------------+
+|               |    (Implementation dependent)  |   |              |
+| NTS-KE Server | <------------------------------+-> | NTP Server 2 |
+|               |                                |   |              |
++---------------+                                |   +--------------+
+       ^                                         |          .
+       |                                         |          .
+       | 1. Negotiate parameters,                |          .
+       |    receive initial cookie               |   +--------------+
+       |    supply, generate AEAD keys,          |   |              |
+       |    and receive NTP server IP            +-> | NTP Server N |
+       |    addresses using "NTS Key                 |              |
+       |    Establishment" protocol.                 +--------------+
+       |                                                    ^
+       |                                                    |
+       |             +----------+                           |
+       |             |          |                           |
+       +-----------> |  Client  | <-------------------------+
+                     |          |  2. Perform authenticated
+                     +----------+     time synchronization
+                                      and generate new
+                                      cookies using "NTS
+                                      Extension Fields for
+                                      NTPv4".]]>
+          </artwork>
+        </figure>
       </section>
     </section>
 
