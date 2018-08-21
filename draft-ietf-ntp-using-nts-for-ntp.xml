@@ -1842,6 +1842,8 @@ Client -----+---------------------------------+---------------->
 
   <back>
     <references title="Normative References">
+      <?rfc include='reference.RFC.0768'?>
+      <?rfc include='reference.RFC.0793'?>      
       <?rfc include='reference.RFC.2119'?>
       <?rfc include='reference.RFC.4291'?>
       <?rfc include='reference.RFC.5116'?>
