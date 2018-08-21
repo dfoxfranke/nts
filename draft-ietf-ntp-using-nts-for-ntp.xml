@@ -351,36 +351,33 @@
       </t>
     </section>
 
-    <section title="The NTS Key Establishment protocol">
+    <section title="The NTS Key Establishment Protocol" anchor="nts-ke">
       <t>
-        The NTS key establishment protocol is conducted via TCP port
-        [[TBD1]].  The two endpoints carry out a TLS handshake in
-        conformance with <xref target="tls-profile"/>, with the client
-        offering (via an <xref target="RFC7301">ALPN</xref>
-        extension), and the server accepting, an application-layer
-        protocol of &quot;ntske/1&quot;.  Immediately following a
-        successful handshake, the client SHALL send a single request
-        (as Application Data encapsulated in the TLS-protected
-        channel), then the server SHALL send a single response
-        followed by a TLS "Close notify" alert and then discard the
-        channel state.
+        The NTS key establishment protocol is conducted via TCP port [[TBD1]].
+        The two endpoints carry out a TLS handshake in conformance with
+        <xref target="tls-profile"/>, with the client offering (via an
+        <xref target="RFC7301">ALPN</xref> extension), and the server accepting,
+        an application-layer protocol of &quot;ntske/1&quot;. Immediately
+        following a successful handshake, the client SHALL send a single request
+        as Application Data encapsulated in the TLS-protected channel. Then, the
+        server SHALL send a single response followed by a TLS
+        &quot;Close notify&quot; alert and then discard the channel state.
       </t>
       <t>
-        The client's request and the server's response each SHALL
-        consist of a sequence of records formatted according to <xref
-        target="ntske-record"/>. The sequence SHALL be terminated by a
-        &quot;End of Message&quot; record, which has a Record Type of
-        zero and a zero-length body. Furthermore, requests and
-        non-error responses each SHALL include exactly one NTS Next
-        Protocol Negotiation record.
+        The client's request and the server's response each SHALL consist of a
+        sequence of records formatted according to
+        <xref target="ntske-record"/>. Requests and non-error responses each
+        SHALL include exactly one NTS Next Protocol Negotiation record. The
+        sequence SHALL be terminated by a &quot;End of Message&quot; record. The
+        requirement that all NTS-KE messages be terminated by an End of Message
+        record makes them self-delimiting.
       </t>
       <t>
-	Clients and servers MAY enforce length limits on requests
-	and responses, however servers MUST accept requests of
-	at least 1024 octets, and clients SHOULD accept responses
-	of at least 65536 octets.
+        Clients and servers MAY enforce length limits on requests and responses,
+        however, servers MUST accept requests of at least 1024 octets and
+        clients SHOULD accept responses of at least 65536 octets.
       </t>
-      <figure anchor="ntske-record">
+      <figure anchor="ntske-record" title="NTS-KE Record Format">
         <artwork><![CDATA[
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -396,61 +393,56 @@
         </artwork>
       </figure>
       <t>
-        The requirement that all NTS-KE messages be terminated by an
-        End of Message record makes them self-delimiting.
-      </t>
-      <t>
         The fields of an NTS-KE record are defined as follows:
         <list>
           <t>
-            C (Critical Bit): Determines the disposition of
-            unrecognized Record Types. Implementations which receive a
-            record with an unrecognized Record Type MUST ignore the
-            record if the Critical Bit is 0, and MUST treat it as an
-            error if the Critical Bit is 1.
+            C (Critical Bit): Determines the disposition of unrecognized Record
+            Types. Implementations which receive a record with an unrecognized
+            Record Type MUST ignore the record if the Critical Bit is 0 and MUST
+            treat it as an error if the Critical Bit is 1.
           </t>
           <t>
-            Record Type: A 15-bit integer in network byte order. The
-            semantics of record types 0&ndash;5 are specified in this
-            memo; additional type numbers SHALL be tracked through the
-            IANA Network Time Security Key Establishment Record Types
-            registry.
+            Record Type Number: A 15-bit integer in network byte order. The
+            semantics of record types 0&ndash;6 are specified in this memo.
+            Additional type numbers SHALL be tracked through the IANA Network
+            Time Security Key Establishment Record Types registry.
           </t>
           <t>
-            Body Length: The length of the Record Body field, in
-            octets, as a 16-bit integer in network byte order. Record
-            bodies MAY have any representable length and need not be
-            aligned to a word boundary.
+            Body Length: The length of the Record Body field, in octets, as a
+            16-bit integer in network byte order. Record bodies MAY have any
+            representable length and need not be aligned to a word boundary.
           </t>
           <t>
-            Record Body: The syntax and semantics of this field SHALL
-            be determined by the Record Type.
+            Record Body: The syntax and semantics of this field SHALL be
+            determined by the Record Type.
           </t>
         </list>
       </t>
       <t>
-	For clarity regarding bit-endianness: the Critical Bit is the
-	most-significant bit of the first octet. In C, given a network
-	buffer `unsigned char b[]` containing an NTS-KE record, the
-	critical bit is `b[0] &gt;&gt; 7` while the record type is
-	`((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
+        For clarity regarding bit-endianness: the Critical Bit is the
+        most-significant bit of the first octet. In C, given a network buffer
+        `unsigned char b[]` containing an NTS-KE record, the critical bit is
+        `b[0] &gt;&gt; 7` while the record type is
+        `((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
       </t>
       <t>
-       <xref target="fig_NTSKeyExchange"/> provides a schematic
-       overview of the key exchange. It displays the protocol
-       steps to be performed by the NTS client and server and
-       record types to be exchanged.
-      <figure anchor="fig_NTSKeyExchange" title="NTS Key Exchange messages">
-          <artwork><![CDATA[                +---------------------------------------+
-                | - verify client request message       |
-                | - extract TLS key material            |
-                | - generate KE response message        |
-                |   - included Record Types:            |
-                |       - NTS Next Protocol Negotiation |
-                |       - AEAD Alg. Negotiation         |
-                |       - New Cookie for NTPv4          |
-                |       - <New Cookie for NTPv4>        |
-                |       - End of Message                |
+        <xref target="fig_NTSKeyExchange"/> provides a schematic overview of the
+        key exchange. It displays the protocol steps to be performed by the NTS
+        client and server and record types to be exchanged.
+      </t>
+      <figure anchor="fig_NTSKeyExchange" title="NTS Key Exchange Messages">
+        <artwork><![CDATA[
+                +---------------------------------------+
+                | - Verify client request message.      |
+                | - Extract TLS key material.           |
+                | - Generate KE response message.       |
+                |   - Include Record Types:             |
+                |       o NTS Next Protocol Negotiation |
+                |       o AEAD Algorithm Negotiation    |
+                |       o NTP Server Negotiation        |
+                |       o New Cookie for NTPv4          |
+                |       o <New Cookie for NTPv4>        |
+                |       o End of Message                |
                 +-----------------+---------------------+
                                   |
                                   |
@@ -466,183 +458,247 @@ Client -----+---------------------------------+---------------->
             |                                 |
             |                                 |
 +-----------+----------------------+   +------+-----------------+
-|- generate KE request message     |   |- verify server response|
-| - include Record Types:          |   |  message               |
-|  o NTS Next Protocol Negotiation |   |- extract cookie(s)     |
-|  o AEAD Alg. Negotiation         |   |                        |
+|- Generate KE request message.    |   |- Verify server response|
+| - Include Record Types:          |   |  message.              |
+|  o NTS Next Protocol Negotiation |   |- Extract cookie(s).    |
+|  o AEAD Algorithm Negotiation    |   |                        |
+|  o <NTP Server Negotiation>      |   |                        |
 |  o End of Message                |   |                        |
-+----------------------------------+   +------------------------+
-
-]]></artwork>
++----------------------------------+   +------------------------+]]>
+        </artwork>
       </figure>
-      </t>
+
       <section title="NTS-KE Record Types">
-        <t>The following NTS-KE Record Types are defined.</t>
-        <section title="End of Message">
+        <t>The following NTS-KE Record Types are defined:</t>
+
+        <section title="End of Message" anchor="end-of-message">
           <t>
-            The End of Message record has a Record Type number of 0
-            and an zero-length body. It MUST occur exactly once as the
-            final record of every NTS-KE request and response. The
+            The End of Message record has a Record Type number of 0 and a
+            zero-length body. It MUST occur exactly once as the final record of
+            every NTS-KE request and response. The Critical Bit MUST be set.
+          </t>
+        </section>
+
+        <section title="NTS Next Protocol Negotiation"
+          anchor="nts-next-protocol-negotiation">
+          <t>
+            The NTS Next Protocol Negotiation record has a Record Type number
+            of 1. It MUST occur exactly once in every NTS-KE request and
+            response. Its body consists of a sequence of 16-bit unsigned
+            integers in network byte order. Each integer represents a Protocol
+            ID from the IANA Network Time Security Next Protocols registry. The
             Critical Bit MUST be set.
           </t>
-        </section>
-        <section title="NTS Next Protocol Negotiation">
           <t>
-            The NTS Next Protocol Negotiation record has a Record Type
-            of 1. It MUST occur exactly once in every NTS-KE request
-            and response. Its body consists of a sequence of 16-bit
-            unsigned integers in network byte order. Each integer
-            represents a Protocol ID from the IANA Network Time
-            Security Next Protocols registry. The Critical Bit MUST be
-            set.
-          </t>
-          <t>
-            The Protocol IDs listed in the client's NTS Next
-            Protocol Negotiation record denote those protocols which
-            the client wishes to speak using the key material
-            established through this NTS-KE session. The Protocol
-            IDs listed in the server's response MUST comprise a
-            subset of those listed in the request, and denote those
-            protocols which the server is willing and able to speak
-            using the key material established through this NTS-KE
-            session. The client MAY proceed with one or more of
-            them. The request MUST list at least one protocol, but the
-            response MAY be empty.
+            The Protocol IDs listed in the client's NTS Next Protocol
+            Negotiation record denote those protocols which the client wishes to
+            speak using the key material established through this NTS-KE
+            session. The Protocol IDs listed in the server's response MUST
+            comprise a subset of those listed in the request and denote those
+            protocols which the server is willing and able to speak using the
+            key material established through this NTS-KE session. The client MAY
+            proceed with one or more of them. The request MUST list at least one
+            protocol, but the response MAY be empty.
           </t>
         </section>
-        <section title="Error">
+
+        <section title="Error" anchor="nts-error">
           <t>
-            The Error record has a Record Type number of 2. Its body
-            is exactly two octets long, consisting of an unsigned
-            16-bit integer in network byte order, denoting an error
-            code. The Critical Bit MUST be set.
+            The Error record has a Record Type number of 2. Its body is exactly
+            two octets long, consisting of an unsigned 16-bit integer in network
+            byte order, denoting an error code. The Critical Bit MUST be set.
           </t>
           <t>
-            Clients MUST NOT include Error records in their request.
-            If clients receive a server response which includes an
-            Error record, they MUST discard any negotiated key
-            material and MUST NOT proceed to the Next Protocol.
+            Clients MUST NOT include Error records in their request. If clients
+            receive a server response which includes an Error record, they MUST
+            discard any negotiated key material and MUST NOT proceed to the Next
+            Protocol.
           </t>
           <t>
-            The following error codes are defined.
+            The following error codes are defined:
             <list>
               <t>
-                Error code 0 means &quot;Unrecognized Critical
-                Record&quot;. The server MUST respond with this error
-                code if the request included a record which the server
-                did not understand and which had its Critical Bit
-                set. The client SHOULD NOT retry its request without
-                modification.
+                Error code 0 means &quot;Unrecognized Critical Record&quot;. The
+                server MUST respond with this error code if the request included
+                a record which the server did not understand and which had its
+                Critical Bit set. The client SHOULD NOT retry its request
+                without modification.
               </t>
               <t>
-                Error code 1 means &quot;Bad Request&quot;. The server
-                MUST respond with this error if, upon the expiration
-                of an implementation-defined timeout, it has not yet
-                received a complete and syntactically well-formed
-                request from the client. This error is likely to be
-                the result of a dropped packet, so the client SHOULD
-                start over with a new TLS handshake and retry its
-                request.
+                Error code 1 means &quot;Bad Request&quot;. The server MUST
+                respond with this error if, upon the expiration of an
+                implementation-defined timeout, it has not yet received a
+                complete and syntactically well-formed request from the client.
               </t>
             </list>
           </t>
         </section>
-        <section title="Warning">
+
+        <section title="Warning" anchor="nts-warning">
           <t>
-            The Warning record has a Record Type number of 3. Its body
-            is exactly two octets long, consisting of an unsigned
-            16-bit integer in network byte order, denoting a warning
-            code. The Critical Bit MUST be set.
+            The Warning record has a Record Type number of 3. Its body is
+            exactly two octets long, consisting of an unsigned 16-bit integer in
+            network byte order, denoting a warning code. The Critical Bit MUST
+            be set.
           </t>
           <t>
-            Clients MUST NOT include Warning records in their request.
-            If clients receive a server response which includes a
-            Warning record, they MAY discard any negotiated key
-            material and abort without proceeding to the Next
-            Protocol. Unrecognized warning codes MUST be treated as
-            errors.
+            Clients MUST NOT include Warning records in their request. If
+            clients receive a server response which includes a Warning record,
+            they MAY discard any negotiated key material and abort without
+            proceeding to the Next Protocol. Unrecognized warning codes MUST be
+            treated as errors.
           </t>
           <t>
             This memo defines no warning codes.
           </t>
         </section>
-        <section title="AEAD Algorithm Negotiation">
+
+        <section title="AEAD Algorithm Negotiation"
+          anchor="aead-algorithm-negotiation">
           <t>
-            The AEAD Algorithm Negotiation record has a Record Type
-            number of 4. Its body consists of a sequence of unsigned
-            16-bit integers in network byte order, denoting Numeric
-            Identifiers from the IANA <xref target="RFC5116">AEAD
-            registry</xref>. The Critical Bit MAY be set.
+            The AEAD Algorithm Negotiation record has a Record Type number of 4.
+            Its body consists of a sequence of unsigned 16-bit integers in
+            network byte order, denoting Numeric Identifiers from the IANA
+            <xref target="RFC5116">AEAD registry</xref>. The Critical Bit MAY be
+            set.
           </t>
           <t>
-            If the NTS Next Protocol Negotiation record offers
-            Protocol ID 0 (for NTPv4), then this record MUST be
-            included exactly once. Other protocols MAY require it as
-            well.
+            If the NTS Next Protocol Negotiation record offers Protocol ID 0
+            (for NTPv4), then this record MUST be included exactly once. Other
+            protocols MAY require it as well.
           </t>
           <t>
             When included in a request, this record denotes which AEAD
-            algorithms the client is willing to use to secure the Next
-            Protocol, in decreasing preference order. When included in
-            a response, this record denotes which algorithm the server
-            chooses to use, or is empty if the server supports none of
-            the algorithms offered. In requests, the list MUST
-            include at least one algorithm. In responses, it MUST
-            include at most one. Honoring the client's preference
-            order is OPTIONAL: servers may select among any of the
-            client's offered choices, even if they are able to support
-            some other algorithm which the client prefers more.
+            algorithms the client is willing to use to secure the Next Protocol,
+            in decreasing preference order. When included in a response, this
+            record denotes which algorithm the server chooses to use. It is
+            empty if the server supports none of the algorithms offered. In
+            requests, the list MUST include at least one algorithm. In
+            responses, it MUST include at most one. Honoring the client's
+            preference order is OPTIONAL: servers may select among any of the
+            client's offered choices, even if they are able to support some
+            other algorithm which the client prefers more.
           </t>
           <t>
             Server implementations of <xref
-            target="nts-extension-fields-for-ntpv4">NTS extension
-            fields for NTPv4</xref> MUST support <xref
-            target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> (Numeric
-            Identifier 15). That is, if the client includes
-            AEAD_AES_SIV_CMAC_256 in its AEAD Algorithm Negotiation
-            record, and the server accepts Protocol ID 0 (NTPv4) in
-            its NTS Next Protocol Negotiation record, then the
-            server's AEAD Algorithm Negotiation record MUST NOT be
-            empty.
+            target="nts-extension-fields-for-ntpv4">NTS extension fields for
+            NTPv4</xref> MUST support <xref
+            target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> (Numeric Identifier
+            15). That is, if the client includes AEAD_AES_SIV_CMAC_256 in its
+            AEAD Algorithm Negotiation record and the server accepts Protocol
+            ID 0 (NTPv4) in its NTS Next Protocol Negotiation record, then the
+            server's AEAD Algorithm Negotiation record MUST NOT be empty.
           </t>
         </section>
+
         <section title="New Cookie for NTPv4" anchor="new-cookie-for-ntpv4">
           <t>
-            The New Cookie for NTPv4 record has a Record Type number
-            of 5. The contents of its body SHALL be
-            implementation-defined and clients MUST NOT attempt to
-            interpret them. See <xref
-            target="suggested-format-for-nts-cookies"/> for a
-            suggested construction.
+            The New Cookie for NTPv4 record has a Record Type number of 5. The
+            contents of its body SHALL be implementation-defined and clients
+            MUST NOT attempt to interpret them. See <xref
+            target="suggested-format-for-nts-cookies"/> for a suggested
+            construction.
           </t>
           <t>
-            Clients MUST NOT send records of this type. Servers MUST
-            send at least one record of this type, and SHOULD send
-            eight of them, if they accept Protocol ID 0 (NTPv4) as a
-            Next Protocol. The Critical Bit SHOULD NOT be set.
+            Clients MUST NOT send records of this type. Servers MUST send at
+            least one record of this type, and SHOULD send eight of them, if the
+            Next Protocol Negotiation response record contains Protocol ID 0
+            (NTPv4) and the AEAD Algorithm Negotiation response record is not
+            empty. The Critical Bit SHOULD NOT be set.
+          </t>
+        </section>
+
+        <section title="NTP Server Negotiation"
+          anchor="ntp-server-negotiation">
+          <t>
+            The NTP Server Negotiation record has a Record Type number of 6. The
+            record MAY be sent by a client in a request and SHOULD be sent by a
+            server as part of a reply. Its body consists of a sequence of IPv4
+            and/or IPv6 addresses. Both address types are represented by 16
+            octets in network byte order. To achieve this, IPv4 addresses are
+            represented as &quot;IPv4-mapped IPv6 addresses&quot; in the format
+            specified in <xref target="RFC4291">RFC 4291, Section
+            2.5.5.2</xref>. For example: The IPv4 address 192.0.2.1 would be
+            mapped to the IPv6 address space as ::ffff:192.0.2.1. The Critical
+            Bit SHOULD be set.
+          </t>
+          <t>
+            When used in a request, the NTP Server Negotiation record is the
+            client's way of indicating to the KE server which NTP servers it
+            wishes to receive cookies for. Honoring the client's NTP server
+            preferences is OPTIONAL. When used in a response, this record
+            informs the client about which NTP servers the received cookies can
+            be used with in the next phase of the protocol. The client SHOULD
+            NOT attempt to use the received cookies with any other NTP servers
+            than those indicated by the KE server.
+          </t>
+          <t>
+            If a response does not include this record, the client SHOULD assume
+            that the received cookies are valid for use with an NTP server at
+            the same network address as the key exchange server.
           </t>
         </section>
       </section>
-      <section title="Key Extraction (generally)">
+
+      <section title="Key Extraction (generally)" anchor="key-extraction">
         <t>
-          Following a successful run of the NTS-KE protocol, key
-          material SHALL be extracted according to <xref
-          target="RFC5705">RFC 5705</xref>. Inputs to the exporter
-          function are to be constructed in a manner specific to the
-          negotiated Next Protocol. However, all protocols which
-          utilize NTS-KE MUST conform to the following two
-          rules:
+          Following a successful run of the NTS-KE protocol, key material SHALL
+          be extracted according to <xref target="RFC5705">RFC 5705</xref>.
+          Inputs to the exporter function are to be constructed in a manner
+          specific to the negotiated Next Protocol. However, all protocols which
+          utilize NTS-KE MUST conform to the following two rules:
           <list>
             <t>
               The disambiguating label string MUST be
               &quot;EXPORTER-network-time-security/1&quot;.
             </t>
             <t>
-              The per-association context value MUST be provided, and
-              MUST begin with the two-octet Protocol ID which was
-              negotiated as a Next Protocol.
+              The per-association context value MUST be provided and MUST begin
+              with the two-octet Protocol ID which was negotiated as a Next
+              Protocol.
             </t>
           </list>
+        </t>
+      </section>
+
+      <section title="Key Extraction (for NTPv4)">
+        <t>
+          Following a successful run of the NTS-KE protocol wherein Protocol
+          ID 0 (NTPv4) is selected as a Next Protocol, two AEAD keys SHALL be
+          extracted: a client-to-server (C2S) key and a server-to-client (S2C)
+          key. These keys SHALL be computed according to <xref
+          target="RFC5705">RFC 5705</xref>, using the following inputs.
+          <list>
+            <t>
+              The disambiguating label string SHALL be
+              &quot;EXPORTER-network-time-security/1&quot;.
+            </t>
+            <t>
+              The per-association context value SHALL consist of the following
+              five octets:
+              <list>
+                <t>
+                  The first two octets SHALL be zero (the Protocol ID for
+                  NTPv4).
+                </t>
+                <t>
+                  The next two octets SHALL be the Numeric Identifier of the
+                  negotiated AEAD Algorithm in network byte order.
+                </t>
+                <t>
+                  The final octet SHALL be 0x00 for the C2S key and 0x01 for the
+                  S2C key.
+                </t>
+              </list>
+            </t>
+          </list>
+          Implementations wishing to derive additional keys for private or
+          experimental use MUST NOT do so by extending the above-specified
+          syntax for per-association context values. Instead, they SHOULD use
+          their own disambiguating label string. Note that <xref
+          target="RFC5705">RFC 5705</xref> provides that disambiguating label
+          strings beginning with &quot;EXPERIMENTAL&quot; MAY be used without
+          IANA registration.
         </t>
       </section>
     </section>
@@ -1707,6 +1763,7 @@ Client -----+---------------------------------+---------------->
   <back>
     <references title="Normative References">
       <?rfc include='reference.RFC.2119'?>
+      <?rfc include='reference.RFC.4291'?>
       <?rfc include='reference.RFC.5116'?>
       <?rfc include='reference.RFC.5297'?>
       <?rfc include='reference.RFC.5705'?>
