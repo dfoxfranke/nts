@@ -1163,6 +1163,43 @@ Client -----+---------------------------------+---------------->
       </t>
     </section>
 
+    <section title="Usage of NTP Pools" anchor="usage-of-ntp-pools">
+      <t>
+        Many NTP server pools exist. Some of them have thousands of individual
+        servers spread out over several continents. Due to their size and
+        prevalence, it can be expected that a significant portion of NTP users
+        are users of NTP pools.
+      </t>
+      <t>
+        The separation of the initial NTS key exchange from the authenticated
+        NTP protocol simplifies the implementation of NTS on pool
+        infrastructures. Since NTS key exchange over TLS is expected to be a
+        rare occurrence in comparison with the normal authenticated NTP request
+        and response traffic, even large pools should require a relatively small
+        number of NTS-KE servers. This eliminates the need for complex
+        certificate infrastructures. The lower timing and hardware requirements
+        on NTS-KE servers also provide for load-balancing solutions that aren't
+        suitable for NTP servers, such as virtual machine implementations that
+        are started and stopped as needed.
+      </t>
+      <t>
+        The ability for NTS-KE servers to freely choose what NTP servers they
+        will issue cookies for means that each pool can implement whatever
+        secret-sharing system between NTS-KE and NTP servers it deems suitable.
+        For example, in a large pool where the trust in the individual NTP
+        server administrators is relatively low, it may be necessary to have
+        separate shared secrets for each possible pair of NTS-KE and NTP
+        servers. It should also be noted that not all NTS-KE servers in a pool
+        must have the ability to issue cookies for all NTP servers in that pool.
+      </t>
+      <t>
+        Due to their freedom to choose what servers to issue cookies for, NTS-KE
+        servers can perform a number of functions in addition to authenticating
+        themselves to clients and issuing cookies. This includes load-balancing
+        and geographic assignment of clients to NTP servers.
+      </t>
+    </section>
+
       <section title="IANA Considerations" anchor="iana-considerations">
       <t>
         IANA is requested to allocate two entries, identical except
