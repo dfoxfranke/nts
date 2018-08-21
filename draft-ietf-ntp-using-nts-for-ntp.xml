@@ -125,9 +125,9 @@
 
 	  <list style="symbols">
 	    <t>
-	      Identity: Through the use of the X.509 PKI,
-	      implementations may cryptographically establish the
-	      identity of the parties they are communicating with.
+        Identity: Through the use of the X.509 public key infrastructure,
+        implementations may cryptographically establish the identity of
+        the parties they are communicating with.
 	    </t>
 	    <t>
 	      Authentication: Implementations may cryptographically
@@ -159,9 +159,10 @@
 	      came from the same client.
 	    </t>
 	    <t>
-	      Non-amplification: Implementations (especially server implementations) may avoid acting as
-	      DDoS amplifiers by never responding to a request with a
-	      packet larger than the request packet.
+        Non-amplification: Implementations (especially server
+        implementations) may avoid acting as distributed
+        denial-of-service (DDoS) amplifiers by never responding to a
+        request with a packet larger than the request packet.
 	    </t>
 	    <t>
 	      Scalability: Server implementations may serve large
