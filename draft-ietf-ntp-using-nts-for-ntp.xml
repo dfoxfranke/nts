@@ -18,60 +18,56 @@
 
     <author fullname="Daniel Fox Franke" initials="D." surname="Franke">
       <address>
-        <email>dfoxfranke@akamai.com</email>
+        <email>dfoxfranke@gmail.com</email>
         <uri>https://www.dfranke.us</uri>
       </address>
     </author>
 
     <author fullname="Dieter Sibold" initials="D." surname="Sibold">
       <organization abbrev="PTB">Physikalisch-Technische
-      Bundesanstalt</organization>
-
+        Bundesanstalt</organization>
       <address>
         <postal>
           <street>Bundesallee 100</street>
-
           <city>Braunschweig</city>
-
           <code>D-38116</code>
-
           <region/>
-
           <country>Germany</country>
         </postal>
-
         <phone>+49-(0)531-592-8420</phone>
-
         <facsimile>+49-531-592-698420</facsimile>
-
         <email>dieter.sibold@ptb.de</email>
       </address>
     </author>
 
     <author fullname="Kristof Teichel" initials="K." surname="Teichel">
       <organization abbrev="PTB">Physikalisch-Technische
-      Bundesanstalt</organization>
-
+        Bundesanstalt</organization>
       <address>
         <postal>
           <street>Bundesallee 100</street>
-
           <city>Braunschweig</city>
-
           <region/>
-
           <code>D-38116</code>
-
           <country>Germany</country>
         </postal>
-
         <phone>+49-(0)531-592-4471</phone>
-
         <facsimile/>
-
         <email>kristof.teichel@ptb.de</email>
-
         <uri/>
+      </address>
+    </author>
+
+    <author fullname="Marcus Dansarie" initials="M." surname="Dansarie">
+      <address>
+        <email>marcus@dansarie.se</email>
+      </address>
+    </author>
+
+    <author fullname="Ragnar Sundblad" initials="R." surname="Sundblad">
+      <organization>Netnod</organization>
+      <address>
+        <email>ragge@netnod.se</email>
       </address>
     </author>
 
@@ -1806,14 +1802,21 @@ Client -----+---------------------------------+---------------->
     </section>
 
     <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>The authors would like to thank Richard Barnes, Steven
-      Bellovin, Scott Fluhrer, Sharon Goldberg, Russ Housley, Martin
-      Langer, Miroslav Lichvar, Aanchal Malhotra, Dave Mills, Danny
-      Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen Roettger,
-      Kurt Roeckx, Kyle Rose, Rich Salz, Brian Sniffen, Susan Sons,
-      Douglas Stebila, Harlan Stenn, Martin Thomson, and Richard Welty
-      for contributions to this document and comments on the design of
-      NTS.</t>
+      <t>
+        The authors would like to thank Richard Barnes, Steven Bellovin,
+        Scott Fluhrer, Sharon Goldberg, Russ Housley, Martin Langer,
+        Miroslav Lichvar, Aanchal Malhotra, Dave Mills, Danny Mayer,
+        Karen O'Donoghue, Eric K. Rescorla, Stephen Roettger, Kurt Roeckx,
+        Kyle Rose, Rich Salz, Brian Sniffen, Susan Sons, Douglas Stebila,
+        Harlan Stenn, Martin Thomson, and Richard Welty for contributions
+        to this document and comments on the design of NTS.
+      </t>
+      <t>
+        The idea of separation of the NTS-KE server from the NTP server was
+        added by Marcus Dansarie and Ragnar Sundblad. Thanks for this work goes
+        to Patrik F&auml;ltstr&ouml;m (Faltstrom) and Joachim
+        Str&ouml;mbergsson (Strombergsson) for review and ideas.
+      </t>
     </section>
   </middle>
 
