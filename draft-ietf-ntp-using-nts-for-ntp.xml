@@ -169,6 +169,11 @@
 	      numbers of clients without having to retain any
 	      client-specific state.
 	    </t>
+      <t>
+        Resilience: Attacks on or faults in parts of the NTS
+        infrastructure should not completely prohibit clients from
+        performing time synchronization.
+      </t>
 	  </list>
 	</t>
       </section>
