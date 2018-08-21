@@ -1582,159 +1582,167 @@ Client -----+---------------------------------+---------------->
         </t>
       </section>
     </section>
-    <section title="Security considerations">
-      <section title="Avoiding DDoS amplification">
+
+    <section title="Security Considerations">
+      <section title="Sensitivity to DDoS attacks">
         <t>
-          Certain non-standard and/or deprecated features of the Network
-          Time Protocol enable clients to send a request to a server
-          which causes the server to send a response much larger than
-          the request. Servers which enable these features can be abused
-          in order to amplify traffic volume in distributed
-          denial-of-service (DDoS) attacks by sending them a request
-          with a spoofed source IP. In recent years, attacks of this nature
-          have become an endemic nuisance.
+          The introduction of NTS brings with it the introduction of asymmetric
+          cryptography to NTP. Asymmetric cryptography is necessary for initial
+          server authentication and AEAD key extraction. Asymmetric
+          cryptosystems are generally orders of magnitude slower than their
+          symmetric counterparts. This makes it much harder to build systems
+          that can serve requests at a rate corresponding to the full line speed
+          of the network connection. This, in turn, opens up a new possibility
+          for DDoS attacks on NTP services.
         </t>
         <t>
-          NTS is designed to avoid contributing any further to this
-          problem by ensuring that NTS-related extension fields included in
-          server responses will be the same size as the NTS-related
-          extension fields sent by the client. In particular, this is why
-          the client is required to send a separate and appropriately
-          padded-out NTS Cookie Placeholder extension field for every cookie
-          it wants to get back, rather than being permitted simply to
-          specify a desired quantity.
+          The main protection against these attacks in NTS lies in that the use
+          of asymmetric cryptosystems is only necessary in the initial NTS-KE
+          phase of the protocol. Since the protocol design enables separation of
+          the NTS-KE and NTP servers, a successful DDoS attack on an NTS-KE
+          server separated from the NTP service it supports will not affect NTP
+          users that have already performed initial authentication, AEAD key
+          extraction, and cookie exchange. Furthermore, as noted in
+          <xref target="usage-of-ntp-pools"/>, NTP-KE capacity is easier to
+          scale up and down than NTP server capacity.
         </t>
-	<t>
-	  Due to the <xref target="RFC7822"/> requirement that extensions
-	  be padded and aligned to four-octet boundaries, response size
-	  may still in some cases exceed request size by up to three
-	  octets. This is sufficiently inconsequential that we have
-	  declined to address it.
-	</t>
-      </section>
-      <section title="Initial verification of server certificates">
-	<t>
-	  NTS's security goals are undermined if the client fails to
-	  verify that the X.509 certificate chain presented by the
-	  server is valid and rooted in a trusted certificate
-	  authority. <xref target="RFC5280"/> and <xref
-	  target="RFC6125"/> specify how such verification is to be
-	  performed in general. However, the expectation that the
-	  client does not yet have a correctly-set system clock at the
-	  time of certificate verification presents difficulties with
-	  verifying that the certificate is within its validity
-	  period, i.e., that the current time lies between the times
-	  specified in the certificate's notBefore and notAfter
-	  fields, and it may be operationally necessary in some cases
-	  for a client to accept a certificate which appears to be
-	  expired or not yet valid. While there is no perfect solution
-	  to this problem, there are several mitigations the client
-	  can implement to make it more difficult for an adversary to
-	  successfully present an expired certificate:
-	  <list>
-	    <t>
-	      Check whether the system time is in fact unreliable. If
-	      the system clock has previously been synchronized since
-	      last boot, then on operating systems which implement a
-	      kernel-based phase-locked-loop API, a call to
-	      ntp_gettime() should show a maximum error less than
-	      NTP_PHASE_MAX. In this case, the clock SHOULD be
-	      considered reliable and certificates can be strictly
-	      validated.
-	    </t>
-	    <t>
-	      Allow the system administrator to specify that
-	      certificates should *always* be strictly validated. Such
-	      a configuration is appropriate on systems which have a
-	      battery-backed clock and which can reasonably prompt the
-	      user to manually set an approximately-correct time if it
-	      appears to be needed.
-	    </t>
-	    <t>
-	      Once the clock has been synchronized, periodically write
-	      the current system time to persistent storage. Do not accept
-	      any certificate whose notAfter field is earlier than the last
-	      recorded time.
-	    </t>
-	    <t>
-	      Do not process time packets from servers if the time
-	      computed from them falls outside the validity period of
-	      the server's certificate.
-	    </t>
-	    <t>
-	      Use multiple time sources. The ability to pass off an
-	      expired certificate is only useful to an adversary who
-	      has compromised the corresponding private key. If the
-	      adversary has compromised only a minority of servers,
-	      NTP's selection algorithm (<xref target="RFC5905"/>
-	      section 11.2.1) will protect the client from accepting
-	      bad time from the adversary-controlled servers.
-	    </t>
-	  </list>
-	</t>
-      </section>
-      <section title="Usage of NTP pools">
         <t>
-	  Additional standardization work and infrastructure
-	  development is necessary before NTS can be used with public
-	  NTP server pools. First, a scheme will need to be specified
-	  for determining what constitutes an acceptable certificate
-	  for a pool server, such as establishing a value required to
-	  be contained in its Extended Key Usage attribute, and how to
-	  determine, given the DNS name of a pool, what Subject
-	  Alternative Name to expect in the certificates of its
-	  members. Implementing any such specification will
-	  necessitate infrastructure work: pool organizers will need
-	  to act as certificate authorities, regularly monitor the
-	  behavior of servers to which certificates have been issued,
-	  and promptly revoke the certificate of any server found to
-	  be serving incorrect time.
-	</t>
+          NTS users should also consider that they are not fully protected
+          against DDoS attacks by on-path adversaries. In addition to dropping
+          packets and attacks such as those described in
+          <xref target="DelayAttack"/>, an on-path attacker can send spoofed
+          kiss-o'-death replies, which are not authenticated, in response to NTP
+          requests. This could result in significantly increased load on the
+          NTS-KE server. Implementers have to weigh the user's need for
+          unlinkability against the added resilience that comes with cookie
+          reuse in cases of NTS-KE server unavailability.
+        </t>
       </section>
-      <section anchor="DelayAttack" title="Delay attacks">
+
+      <section title="Avoiding DDoS Amplification">
         <t>
-	  In a packet delay attack, an adversary with the ability to
-	  act as a man-in-the-middle delays time synchronization
-	  packets between client and server asymmetrically <xref
-	  target="RFC7384"/>. Since NTP's formula for computing time
-	  offset relies on the assumption that network latency is
-	  roughly symmetrical, this leads to the client to compute an
-	  inaccurate value <xref target="Mizrahi"/>. The delay attack
-	  does not reorder or modify the content of the exchanged
-	  synchronization packets. Therefore, cryptographic means do
-	  not provide a feasible way to mitigate this attack. However,
-	  the maximum error that an adversary can introduce is bounded
-	  by half of the round trip delay.
-	</t>
-	<t>
-	  <xref target="RFC5905"/> specifies a parameter called
-	  MAXDIST which denotes the maximum round-trip latency
-	  (including not only the immediate round trip between client
-	  and server but the whole distance back to the reference
-	  clock as reported in the Root Delay field) that a client
-	  will tolerate before concluding that the server is
-	  unsuitable for synchronization. The standard value for
-	  MAXDIST is one second, although some implementations use
-	  larger values. Whatever value a client chooses, the maximum
-	  error which can be introduced by a delay attack is
-	  MAXDIST/2.
-	</t>
-	<t>
-	  Usage of multiple time sources, or multiple network paths to
-	  a given time source <xref target="Shpiner"/>, may also serve
-	  to mitigate delay attacks if the adversary is in control of
-	  only some of the paths.
-	</t>
+          Certain non-standard and/or deprecated features of the Network Time
+          Protocol enable clients to send a request to a server which causes the
+          server to send a response much larger than the request. Servers which
+          enable these features can be abused in order to amplify traffic volume
+          in DDoS attacks by sending them a request with a spoofed source IP. In
+          recent years, attacks of this nature have become an endemic nuisance.
+        </t>
+        <t>
+          NTS is designed to avoid contributing any further to this problem by
+          ensuring that NTS-related extension fields included in server
+          responses will be the same size as the NTS-related extension fields
+          sent by the client. In particular, this is why the client is required
+          to send a separate and appropriately padded-out NTS Cookie Placeholder
+          extension field for every cookie it wants to get back, rather than
+          being permitted simply to specify a desired quantity.
+        </t>
+        <t>
+          Due to the <xref target="RFC7822">RFC 7822</xref> requirement that
+          extensions be padded and aligned to four-octet boundaries, response
+          size may still in some cases exceed request size by up to three
+          octets. This is sufficiently inconsequential that we have declined to
+          address it.
+        </t>
       </section>
-      <section title="Random number generation">
+
+      <section title="Initial Verification of Server Certificates">
         <t>
-	  At various points in NTS, the generation of
-	  cryptographically secure random numbers is required.
-    Whenever this draft specifies the use of random numbers,
-    then cryptographically secure random number generation MUST
-    be used. See <xref target="RFC4086"/> for guidelines concerning
-    this topic.
-	</t>
+          NTS's security goals are undermined if the client fails to verify that
+          the X.509 certificate chain presented by the NTS-KE server is valid
+          and rooted in a trusted certificate authority. <xref
+          target="RFC5280">RFC 5280</xref> and <xref target="RFC6125"> RFC
+          6125</xref> specify how such verification is to be performed in
+          general. However, the expectation that the client does not yet have a
+          correctly-set system clock at the time of certificate verification
+          presents difficulties with verifying that the certificate is within
+          its validity period, i.e., that the current time lies between the
+          times specified in the certificate's notBefore and notAfter fields. It
+          may be operationally necessary in some cases for a client to accept a
+          certificate which appears to be expired or not yet valid. While there
+          is no perfect solution to this problem, there are several mitigations
+          the client can implement to make it more difficult for an adversary to
+          successfully present an expired certificate:
+          <list>
+            <t>
+              Check whether the system time is in fact unreliable. If the system
+              clock has previously been synchronized since last boot, then on
+              operating systems which implement a kernel-based phase-locked-loop
+              API, a call to ntp_gettime() should show a maximum error less than
+              NTP_PHASE_MAX. In this case, the clock SHOULD be considered
+              reliable and certificates can be strictly validated.
+            </t>
+            <t>
+              Allow the system administrator to specify that certificates should
+              *always* be strictly validated. Such a configuration is
+              appropriate on systems which have a battery-backed clock and which
+              can reasonably prompt the user to manually set an
+              approximately-correct time if it appears to be needed.
+            </t>
+            <t>
+              Once the clock has been synchronized, periodically write the
+              current system time to persistent storage. Do not accept any
+              certificate whose notAfter field is earlier than the last recorded
+              time.
+            </t>
+            <t>
+              Do not process time packets from servers if the time computed from
+              them falls outside the validity period of the server's
+              certificate.
+            </t>
+            <t>
+              Use multiple time sources. The ability to pass off an expired
+              certificate is only useful to an adversary who has compromised the
+              corresponding private key. If the adversary has compromised only a
+              minority of servers, NTP's selection algorithm (<xref
+              target="RFC5905">RFC 5905 section 11.2.1</xref>) will protect the
+              client from accepting bad time from the adversary-controlled
+              servers.
+            </t>
+          </list>
+        </t>
+      </section>
+
+      <section anchor="DelayAttack" title="Delay Attacks">
+        <t>
+          In a packet delay attack, an adversary with the ability to act as a
+          man-in-the-middle delays time synchronization packets between client
+          and server asymmetrically <xref target="RFC7384"/>. Since NTP's
+          formula for computing time offset relies on the assumption that
+          network latency is roughly symmetrical, this leads to the client to
+          compute an inaccurate value <xref target="Mizrahi"/>. The delay attack
+          does not reorder or modify the content of the exchanged
+          synchronization packets. Therefore, cryptographic means do not provide
+          a feasible way to mitigate this attack. However, the maximum error
+          that an adversary can introduce is bounded by half of the round trip
+          delay.
+        </t>
+        <t>
+          <xref target="RFC5905">RFC 5905</xref> specifies a parameter called
+          MAXDIST which denotes the maximum round-trip latency (including not
+          only the immediate round trip between client and server, but the whole
+          distance back to the reference clock as reported in the Root Delay
+          field) that a client will tolerate before concluding that the server
+          is unsuitable for synchronization. The standard value for MAXDIST is
+          one second, although some implementations use larger values. Whatever
+          value a client chooses, the maximum error which can be introduced by a
+          delay attack is MAXDIST/2.
+        </t>
+        <t>
+          Usage of multiple time sources, or multiple network paths to a given
+          time source <xref target="Shpiner"/>, may also serve to mitigate delay
+          attacks if the adversary is in control of only some of the paths.
+        </t>
+      </section>
+
+      <section title="Random Number Generation">
+        <t>
+          At various points in NTS, the generation of cryptographically secure
+          random numbers is required. Whenever this draft specifies the use of
+          random numbers, cryptographically secure random number generation MUST
+          be used. <xref target="RFC4086">RFC 4086</xref> contains guidelines
+          concerning this topic.
+        </t>
       </section>
     </section>
 
