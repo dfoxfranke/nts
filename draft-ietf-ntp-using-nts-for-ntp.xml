@@ -692,251 +692,196 @@ Client -----+---------------------------------+---------------->
       </section>
     </section>
 
-    <section title="NTS Extension Fields for NTPv4" anchor="nts-extension-fields-for-ntpv4">
-      <section title="Key Extraction (for NTPv4)">
-      <t>
-        Following a successful run of the NTS-KE protocol wherein
-        Protocol ID 0 (NTPv4) is selected as a Next Protocol, two AEAD
-        keys SHALL be extracted: a client-to-server (C2S) key and a
-        server-to-client (S2C) key. These keys SHALL be computed
-        according to <xref target="RFC5705">RFC 5705</xref>, using the
-        following inputs.
-        <list>
-          <t>
-            The disambiguating label string SHALL be
-            &quot;EXPORTER-network-time-security/1&quot;.
-          </t>
-          <t>
-            The per-association context value SHALL consist of the
-            following five octets:
-            <list>
-              <t>
-                The first two octets SHALL be zero (the Protocol ID
-                for NTPv4).
-              </t>
-              <t>
-                The next two octets SHALL be the Numeric Identifier of
-                the negotiated AEAD Algorithm, in network byte order.
-              </t>
-              <t>
-                The final octet SHALL be 0x00 for the C2S key and 0x01
-                for the S2C key.
-              </t>
-            </list>
-          </t>
-        </list>
-        Implementations wishing to derive additional keys for private
-        or experimental use MUST NOT do so by extending the
-        above-specified syntax for per-association context values.
-        Instead, they SHOULD use their own disambiguating label
-        string. Note that RFC 5705 provides that disambiguating label
-        strings beginning with &quot;EXPERIMENTAL&quot; MAY be used
-        without IANA registration.
-      </t>
-      </section>
-      <section title="Packet structure overview">
+    <section title="NTS Extension Fields for NTPv4"
+      anchor="nts-extension-fields-for-ntpv4">
+      <section title="Packet Structure Overview">
         <t>
           In general, an NTS-protected NTPv4 packet consists of:
           <list>
             <t>
-              The usual 48-octet NTP header, which is authenticated
-              but not encrypted.
+              The usual 48-octet NTP header which is authenticated but not
+              encrypted.
             </t>
             <t>
               Some extension fields which are authenticated but not encrypted.
             </t>
             <t>
               An extension field which contains AEAD output (i.e., an
-              authentication tag and possible ciphertext). The
-              corresponding plaintext, if non-empty, consists of some
-              extension fields which benefit from both encryption and
-              authentication.
+              authentication tag and possible ciphertext). The corresponding
+              plaintext, if non-empty, consists of some extension fields which
+              benefit from both encryption and authentication.
             </t>
             <t>
-              Possibly, some additional extension fields which are
-              neither encrypted nor authenticated. These are discarded
-              by the receiver.
+              Possibly, some additional extension fields which are neither
+              encrypted nor authenticated. These are discarded by the
+              receiver.
             </t>
           </list>
         </t>
         <t>
-          Always included among the authenticated or
-          authenticated-and-encrypted extension fields are a cookie
-          extension field and a unique-identifier extension field. The
-          purpose of the cookie extension field is to enable the
-          server to offload storage of session state onto the
-          client. The purpose of the unique-identifier extension field
-          is to protect the client from replay attacks.
-        </t>
-      </section>
-      <section title="The Unique Identifier extension field">
-        <t>
-          The Unique Identifier extension field has a Field Type of
-          [[TBD2]]. When the extension field is included in a client
-          packet (mode 3), its body SHALL consist of a string of
-          octets generated uniformly at random. The string MUST be at
-          least 32 octets long.  When the extension field is included in a
-          server packet (mode 4), its body SHALL contain the same
-          octet string as was provided in the client packet to which
-          the server is responding. Its use in modes other than
-          client-server is not defined.
-        </t>
-        <t>
-          The Unique Identifier extension field provides the client
-          with a cryptographically strong means of detecting replayed
-          packets. It MAY also be used standalone, without NTS, in
-          which case it provides the client with a means of detecting
-          spoofed packets from off-path attackers. Historically, NTP's
-          origin timestamp field has played both these roles, but for
-          cryptographic purposes this is suboptimal because it is only
-          64 bits long and, depending on implementation details, most
-          of those bits may be predictable. In contrast, the Unique
-          Identifier extension field enables a degree of
-          unpredictability and collision-resistance more consistent
-          with cryptographic best practice.
-        </t>
-      </section>
-      <section title="The NTS Cookie extension field" anchor="nts-cookie-extension-field">
-        <t>
-          The NTS Cookie extension field has a Field Type of
-          [[TBD3]]. Its purpose is to carry information which enables
-          the server to recompute keys and other session state without
-          having to store any per-client state. The contents of its
-          body SHALL be implementation-defined and clients MUST NOT
-          attempt to interpret them. See <xref
-          target="suggested-format-for-nts-cookies"/> for a
-          suggested construction.  The NTS Cookie extension field
-          MUST NOT be included in NTP packets whose mode is other than
-          3 (client) or 4 (server).
-        </t>
-      </section>
-      <section title="The NTS Cookie Placeholder extension field">
-        <t>
-          The NTS Cookie Placeholder extension field has a Field Type
-          of [[TBD4]].  When this extension field is included in a
-          client packet (mode 3), it communicates to the server that
-          the client wishes it to send additional cookies in its
-          response. This extension field MUST NOT be included in NTP
-          packets whose mode is other than 3.
-        </t>
-        <t>
-          Whenever an NTS Cookie Placeholder extension field is
-          present, it MUST be accompanied by an NTS Cookie extension
-          field, and the body length of the NTS Cookie Placeholder
-          extension field MUST be the same as the body length of the
-          NTS Cookie extension field. (This length requirement serves
-          to ensure that the response will not be larger than the
-          request, in order to improve timekeeping precision and
-          prevent DDoS amplification). The contents of the NTS Cookie
-          Placeholder extension field's body are undefined and, aside
-          from checking its length, MUST be ignored by the server.
+          Always included among the authenticated or authenticated-and-encrypted
+          extension fields are a cookie extension field and a unique identifier
+          extension field. The purpose of the cookie extension field is to
+          enable the server to offload storage of session state onto the client.
+          The purpose of the unique identifier extension field is to protect the
+          client from replay attacks.
         </t>
       </section>
 
-      <section title="The NTS Authenticator and Encrypted Extension Fields extension field">
+      <section title="The Unique Identifier Extension Field"
+        anchor="unique-identifier-extension-field">
         <t>
-          The NTS Authenticator and Encrypted Extension Fields extension field is
-          the central cryptographic element of an NTS-protected NTP
-          packet. Its Field Type is [[TBD5]] and the format of its body
-          SHALL be as follows:
+          The Unique Identifier extension field provides the client with a
+          cryptographically strong means of detecting replayed packets. It has a
+          Field Type of [[TBD2]]. When the extension field is included in a
+          client packet (mode 3), its body SHALL consist of a string of octets
+          generated uniformly at random. The string MUST be at least 32 octets
+          long. When the extension field is included in a server packet
+          (mode 4), its body SHALL contain the same octet string as was provided
+          in the client packet to which the server is responding. All server
+          packets generated by NTS-implementing servers in response to client
+          packets containing this extension field MUST also contain this field
+          with the same content as in the client's request. The field's use in
+          modes other than client-server is not defined.
+        </t>
+        <t>
+          This extension field MAY also be used standalone, without NTS, in
+          which case it provides the client with a means of detecting spoofed
+          packets from off-path attackers. Historically, NTP's origin timestamp
+          field has played both these roles, but for cryptographic purposes this
+          is suboptimal because it is only 64 bits long and, depending on
+          implementation details, most of those bits may be predictable. In
+          contrast, the Unique Identifier extension field enables a degree of
+          unpredictability and collision resistance more consistent with
+          cryptographic best practice.
+        </t>
+      </section>
+
+      <section title="The NTS Cookie Extension Field"
+        anchor="nts-cookie-extension-field">
+        <t>
+          The NTS Cookie extension field has a Field Type of [[TBD3]]. Its
+          purpose is to carry information which enables the server to recompute
+          keys and other session state without having to store any per-client
+          state. The contents of its body SHALL be implementation-defined and
+          clients MUST NOT attempt to interpret them. See <xref
+          target="suggested-format-for-nts-cookies"/> for a suggested
+          construction.  The NTS Cookie extension field MUST NOT be included in
+          NTP packets whose mode is other than 3 (client) or 4 (server).
+        </t>
+      </section>
+
+      <section title="The NTS Cookie Placeholder Extension Field"
+        anchor="nts-cookie-placeholder-extension-field">
+        <t>
+          The NTS Cookie Placeholder extension field has a Field Type of
+          [[TBD4]].  When this extension field is included in a client packet
+          (mode 3), it communicates to the server that the client wishes it to
+          send additional cookies in its response. This extension field MUST NOT
+          be included in NTP packets whose mode is other than 3.
+        </t>
+        <t>
+          Whenever an NTS Cookie Placeholder extension field is present, it MUST
+          be accompanied by an NTS Cookie extension field. The body length of
+          the NTS Cookie Placeholder extension field MUST be the same as the
+          body length of the NTS Cookie extension field. This length requirement
+          serves to ensure that the response will not be larger than the
+          request, in order to improve timekeeping precision and prevent DDoS
+          amplification. The contents of the NTS Cookie Placeholder extension
+          field's body are undefined and, aside from checking its length, MUST
+          be ignored by the server.
+        </t>
+      </section>
+
+      <section title="The NTS Authenticator and Encrypted Extension Fields Extension Field"
+        anchor="nts-aeef-extension-field">
+        <t>
+          The NTS Authenticator and Encrypted Extension Fields extension field
+          is the central cryptographic element of an NTS-protected NTP packet.
+          Its Field Type is [[TBD5]]. It SHALL be formatted according to
+          <xref target="fig-aeef-field"/> and include the following fields:
           <list>
             <t>
-              Nonce length: Two octets in network byte order, giving
-              the length of the Nonce field and interpreted as an
+              Nonce length: Two octets in network byte order, giving the length
+              of the Nonce field, excluding any padding, interpreted as an
               unsigned integer.
             </t>
             <t>
-              Nonce: A nonce as required by the negotiated AEAD Algorithm.
+              Ciphertext Length: Two octets in network byte order, giving the
+              length of the Ciphertext field, excluding any padding, interpreted
+              as an unsigned integer.
             </t>
             <t>
-              Ciphertext: The output of the negotiated AEAD
-              Algorithm. The structure of this field is determined by
-              the negotiated algorithm, but it typically contains an
-              authentication tag in addition to the actual ciphertext.
+              Nonce: A nonce as required by the negotiated AEAD Algorithm. The
+              field is zero-padded to a word (four octets) boundary.
             </t>
             <t>
-              Padding: several octets of padding, with every octet set
-              to the number of padding octets included, e.g.,
-              &quot;01&quot;, &quot;02 02&quot;, or &quot;03 03
-              03&quot;. Constraints on the number of padding octets
-              included are enumerated below.
+              Ciphertext: The output of the negotiated AEAD Algorithm. The
+              structure of this field is determined by the negotiated algorithm,
+              but it typically contains an authentication tag in addition to the
+              actual ciphertext. The field is zero-padded to a word (four
+              octets) boundary.
             </t>
           </list>
         </t>
+        <figure anchor="fig-aeef-field"
+          title="NTS Authenticator and Encrypted Extension Fields Extension Field Format">
+          <artwork><![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Nonce Length         |      Ciphertext Length        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+.                                                               .
+.          Nonce, including up to 3 bytes padding               .
+.                                                               .
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+.                                                               .
+.        Ciphertext, including up to 3 bytes padding            .
+.                                                               .
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+]]>
+          </artwork>
+        </figure>
         <t>
-          The Ciphertext field SHALL be formed by providing the
-          following inputs to the negotiated AEAD Algorithm:
+          The Ciphertext field SHALL be formed by providing the following inputs
+          to the negotiated AEAD Algorithm:
           <list>
             <t>
-              K: For packets sent from the client to the server, the
-              C2S key SHALL be used. For packets sent from the server
-              to the client, the S2C key SHALL be used.
+              K: For packets sent from the client to the server, the C2S key
+              SHALL be used. For packets sent from the server to the client, the
+              S2C key SHALL be used.
             </t>
             <t>
-              A: The associated data SHALL consist of the portion of
-              the NTP packet beginning from the start of the NTP
-              header and ending at the end of the last extension field
-              which precedes the NTS Authenticator and Encrypted
-              Extension Fields extension field.
+              A: The associated data SHALL consist of the portion of the NTP
+              packet beginning from the start of the NTP header and ending at
+              the end of the last extension field which precedes the NTS
+              Authenticator and Encrypted Extension Fields extension field.
             </t>
             <t>
-              P: The plaintext SHALL consist of all (if any) NTP
-              extension fields to be encrypted. The format of any such
-              fields SHALL be in accordance with <xref
-              target="RFC7822">RFC 7822</xref>, and if multiple
-              extension fields are present they SHALL be joined by
+              P: The plaintext SHALL consist of all (if any) NTP extension
+              fields to be encrypted. The format of any such fields SHALL be in
+              accordance with <xref target="RFC7822">RFC 7822</xref>. If
+              multiple extension fields are present they SHALL be joined by
               concatenation.
             </t>
             <t>
-              N: The nonce SHALL be formed however required by the
-              negotiated AEAD Algorithm.
+              N: The nonce SHALL be formed however required by the negotiated
+              AEAD Algorithm.
             </t>
           </list>
         </t>
-	<t>
-	  The number of padding octets included SHALL conform to the
-	  following constraints:
-	  <list>
-	    <t>
-	      The number MUST be at least 1, so that the final octet
-	      of the extension field always gives the padding length.
-	    </t>
-	    <t>
-	      The number MUST NOT be greater than 255, since high
-	      numbers are unrepresentable in a single octet
-	    </t>
-	    <t>
-	      The number MUST result in an extension field length
-	      which is legal per <xref target="RFC7822"/>. That is,
-	      the number of padding octets must be chosen so that the
-	      total length of the extension field (including the Field
-	      Type and Length subfields) is a multiple of 4 greater
-	      than or equal to 16, and greater than or equal to 28 if
-	      the extension field is the last one in the packet.
-	    </t>
-	    <t>
-	      For mode 3 (client) packets only, the number MUST be at
-	      least MAX(MIN(N_MAX, 16) - N_len, 0) + 4, where `N_len`
-	      represents the actual length of the nonce and N_MAX is,
-	      per <xref target="RFC5116"/>, the maximum permitted
-	      nonce length for the AEAD algorithm in use. This
-	      constraint ensures that servers can always use an
-	      adequately long nonce without causing the size of their
-	      response packet to exceed the size of the request
-	      packet. Servers SHOULD enforce this constraint by
-	      dropping client packets that do not conform to it.
-	      Clients MUST NOT enforce it since it is not binding on
-	      mode 4 (server) packets to begin with.
-	    </t>
-	  </list>
-	</t>
         <t>
-          The NTS Authenticator and Encrypted Extension Fields
-          extension field MUST NOT be included in NTP packets whose
-          mode is other than 3 (client) or 4 (server).
+          The NTS Authenticator and Encrypted Extension Fields extension field
+          MUST NOT be included in NTP packets whose mode is other than 3
+          (client) or 4 (server).
         </t>
       </section>
     </section>
+
     <section title="Protocol details">
         <t>
           A client sending an NTS-protected request SHALL include the
