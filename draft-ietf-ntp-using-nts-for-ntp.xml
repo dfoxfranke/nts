@@ -1692,28 +1692,25 @@ Client -----+---------------------------------+---------------->
 
   <back>
     <references title="Normative References">
-      <?rfc include='reference.RFC.2119'?>
-      <?rfc include='reference.RFC.5116'?>
-      <?rfc include='reference.RFC.5297'?>
-      <?rfc include='reference.RFC.5705'?>
-      <?rfc include='reference.RFC.5746'?>
-      <?rfc include='reference.RFC.5905'?>
-      <?rfc include='reference.RFC.6125'?>
-      <?rfc include='reference.RFC.7465'?>
-      <?rfc include='reference.RFC.7507'?>
-      <?rfc include='reference.RFC.7627'?>
-      <?rfc include='reference.RFC.7301'?>
-      <?rfc include='reference.RFC.7822'?>
+      <?rfc include='reference.RFC.2119.xml'?>
+      <?rfc include='reference.RFC.5116.xml'?>
+      <?rfc include='reference.RFC.5297.xml'?>
+      <?rfc include='reference.RFC.5705.xml'?>
+      <?rfc include='reference.RFC.5905.xml'?>
+      <?rfc include='reference.RFC.6125.xml'?>
+      <?rfc include='reference.RFC.7301.xml'?>
+      <?rfc include='reference.RFC.7507.xml'?>
+      <?rfc include='reference.RFC.7822.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
     </references>
 
     <references title="Informative References">
-      <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-00'?>
-      <?rfc include='reference.RFC.4086'?>
-      <?rfc include='reference.RFC.5077'?>
-      <?rfc include="reference.RFC.5280'?>
-      <?rfc include='reference.RFC.7384'?>
-      <?rfc include='reference.RFC.5869'?>
+      <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-02.xml'?>
+      <?rfc include='reference.RFC.4086.xml'?>
+      <?rfc include='reference.RFC.5077.xml'?>
+      <?rfc include="reference.RFC.5280.xml'?>
+      <?rfc include='reference.RFC.5869.xml'?>
+      <?rfc include='reference.RFC.7384.xml'?>
       <reference anchor="Mizrahi" target="">
         <front>
           <title>A game theoretic analysis of delay attacks against time
