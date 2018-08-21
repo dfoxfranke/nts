@@ -1098,85 +1098,79 @@ Client -----+---------------------------------+---------------->
       </t>
     </section>
 
-    <section title="Suggested format for NTS cookies" anchor="suggested-format-for-nts-cookies">
+    <section title="Suggested Format for NTS Cookies"
+      anchor="suggested-format-for-nts-cookies">
       <t>
-	This section is non-normative. It gives a suggested way for
-	servers to construct NTS cookies. All normative requirements
-	are stated in <xref target="new-cookie-for-ntpv4"/> and <xref
-	target="nts-cookie-extension-field"/>.
+        This section is non-normative. It gives a suggested way for servers to
+        construct NTS cookies. All normative requirements are stated in
+        <xref target="new-cookie-for-ntpv4"/> and <xref
+        target="nts-cookie-extension-field"/>.
       </t>
       <t>
-        The role of cookies in NTS is closely analogous to that of
-        session cookies in TLS. Accordingly, the thematic resemblance
-        of this section to <xref target="RFC5077">RFC 5077</xref> is
-        deliberate, and the reader should likewise take heed of its
-        security considerations.
+        The role of cookies in NTS is closely analogous to that of session
+        cookies in TLS. Accordingly, the thematic resemblance of this section to
+        <xref target="RFC5077">RFC 5077</xref> is deliberate and the reader
+        should likewise take heed of its security considerations.
       </t>
       <t>
-        Servers should select an AEAD algorithm which they will use to
-        encrypt and authenticate cookies. The chosen algorithm should
-        be one such as <xref
-        target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which resists
-        accidental nonce reuse, and it need not be the same as the
-        one that was negotiated with the client. Servers should
-        randomly generate and store a master AEAD key `K`. Servers
-        should additionally choose a non-secret, unique value `I` as
-        key-identifier for `K`.
+        Servers should select an AEAD algorithm which they will use to encrypt
+        and authenticate cookies. The chosen algorithm should be one such as
+        <xref target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which resists
+        accidental nonce reuse. It need not be the same as the one that was
+        negotiated with the client. Servers should randomly generate and store a
+        master AEAD key `K`. Servers should additionally choose a non-secret,
+        unique value `I` as key-identifier for `K`.
       </t>
       <t>
-        Servers should periodically (e.g., once daily) generate a new
-        pair (I,K) and immediately switch to using these values for
-        all newly-generated cookies. Immediately following each such
-        key rotation, servers should securely erase any keys generated
-        two or more rotation periods prior. Servers should continue to
-        accept any cookie generated using keys that they have not yet
-        erased, even if those keys are no longer current. Erasing old
-        keys provides for forward secrecy, limiting the scope of what
-        old information can be stolen if a master key is somehow
-        compromised. Holding on to a limited number of old keys allows
-        clients to seamlessly transition from one generation to the
-        next without having to perform a new NTS-KE handshake.
+        Servers should periodically (e.g., once daily) generate a new pair (I,K)
+        and immediately switch to using these values for all newly-generated
+        cookies. Immediately following each such key rotation, servers should
+        securely erase any keys generated two or more rotation periods prior.
+        Servers should continue to accept any cookie generated using keys that
+        they have not yet erased, even if those keys are no longer current.
+        Erasing old keys provides for forward secrecy, limiting the scope of
+        what old information can be stolen if a master key is somehow
+        compromised. Holding on to a limited number of old keys allows clients
+        to seamlessly transition from one generation to the next without having
+        to perform a new NTS-KE handshake.
       </t>
       <t>
-        The need to keep keys synchronized across load-balanced
-        clusters can make automatic key rotation challenging. However,
-        the task can be accomplished without the need for central
-        key-management infrastructure by using a ratchet, i.e., making
-        each new key a deterministic, cryptographically pseudo-random
-        function of its predecessor. A recommended concrete
-        implementation of this approach is to use <xref
-        target="RFC5869">HKDF</xref> to derive new keys, using the
-        key's predecessor as Input Keying Material and its key identifier
-        as a salt.
+        The need to keep keys synchronized between NTS-KE and NTP servers as
+        well as across load-balanced clusters can make automatic key rotation
+        challenging. However, the task can be accomplished without the need for
+        central key-management infrastructure by using a ratchet, i.e., making
+        each new key a deterministic, cryptographically pseudo-random function
+        of its predecessor. A recommended concrete implementation of this
+        approach is to use <xref target="RFC5869">HKDF</xref> to derive new
+        keys, using the key's predecessor as Input Keying Material and its key
+        identifier as a salt.
       </t>
       <t>
-        To form a cookie, servers should first form a plaintext `P`
-        consisting of the following fields:
+        To form a cookie, servers should first form a plaintext `P` consisting
+        of the following fields:
         <list>
-          <t>The AEAD algorithm negotiated during NTS-KE</t>
-          <t>The S2C key</t>
-          <t>The C2S key</t>
+          <t>The AEAD algorithm negotiated during NTS-KE.</t>
+          <t>The S2C key.</t>
+          <t>The C2S key.</t>
         </list>
       </t>
       <t>
-        Servers should then generate a nonce `N` uniformly at random,
-        and form AEAD output `C` by encrypting `P` under key `K` with
-        nonce `N` and no associated data.
+        Servers should then generate a nonce `N` uniformly at random, and form
+        AEAD output `C` by encrypting `P` under key `K` with nonce `N` and no
+        associated data.
       </t>
       <t>
         The cookie should consist of the tuple `(I,N,C)`.
       </t>
       <t>
-        To verify and decrypt a cookie provided by the client, first
-        parse it into its components `I`, `N`, and `C`. Use `I` to
-        look up its decryption key `K`. If the key whose identifier is
-        `I` has been erased or never existed, decryption fails; reply
-        with an NTS NAK. Otherwise, attempt to decrypt and verify
-        ciphertext `C` using key `K` and nonce `N` with no associated
-        data. If decryption or verification fails, reply with an NTS
-        NAK. Otherwise, parse out the contents of the resulting
-        plaintext `P` to obtain the negotiated AEAD algorithm, S2C key,
-        and C2S key.
+        To verify and decrypt a cookie provided by the client, first parse it
+        into its components `I`, `N`, and `C`. Use `I` to look up its decryption
+        key `K`. If the key whose identifier is `I` has been erased or never
+        existed, decryption fails; reply with an NTS NAK. Otherwise, attempt to
+        decrypt and verify ciphertext `C` using key `K` and nonce `N` with no
+        associated data. If decryption or verification fails, reply with an NTS
+        NAK. Otherwise, parse out the contents of the resulting plaintext `P` to
+        obtain the negotiated AEAD algorithm, S2C key, and C2S key.
       </t>
     </section>
 
