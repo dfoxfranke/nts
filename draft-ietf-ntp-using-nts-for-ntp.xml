@@ -1748,58 +1748,61 @@ Client -----+---------------------------------+---------------->
 
     <section title="Privacy Considerations">
       <section title="Unlinkability" anchor="Unlinkability">
-        <t>Unlinkability prevents a device from being tracked when it changes
-        network addresses (e.g. because said device moved between different
-        networks). In other words, unlinkability thwarts an attacker that
-        seeks to link a new network address used by a device with a network
-        address that it was formerly using, because of recognizable data that
-        the device persistently sends as part of an NTS-secured NTP
-        association. This is the justification for continually supplying the
-        client with fresh cookies, so that a cookie never represents
-        recognizable data in the sense outlined above. </t>
-
-        <t>NTS's unlinkability objective is merely to not leak any additional
-        data that could be used to link a device's network address. NTS does
-        not rectify legacy linkability issues that are already present in NTP.
-        Thus, a client that requires unlinkability must also minimize
-        information transmitted in a client query (mode 3) packet as described
-        in the draft <xref target="I-D.ietf-ntp-data-minimization"/>.
+        <t>
+          Unlinkability prevents a device from being tracked when it changes
+          network addresses (e.g., because said device moved between different
+          networks). In other words, unlinkability thwarts an attacker that
+          seeks to link a new network address used by a device with a network
+          address that it was formerly using through recognizable data that the
+          device persistently sends as part of an NTS-secured NTP association.
+          This is the justification for continually supplying the client with
+          fresh cookies, so that a cookie never represents recognizable data in
+          the sense outlined above.
         </t>
-
-        <t>The unlinkability objective only holds for time synchronization
-        traffic, as opposed to key exchange traffic. This implies that it
-        cannot be guaranteed for devices that function not only as time
-        clients, but also as time servers (because the latter can be
-        externally triggered to send authentication data). </t>
-
-        <t>It should also be noted that it could be possible to link devices
-        that operate as time servers from their time synchronization traffic,
-        using information exposed in (mode 4) server response packets (e.g.
-        reference ID, reference time, stratum, poll).&nbsp; Also, devices that
-        respond to NTP control queries could be linked using the information
-        revealed by control queries. </t>
+        <t>
+          NTS's unlinkability objective is merely to not leak any additional
+          data that could be used to link a device's network address. NTS does
+          not rectify legacy linkability issues that are already present in NTP.
+          Thus, a client that requires unlinkability must also minimize
+          information transmitted in a client query (mode 3) packet as described
+          in the <xref target="I-D.ietf-ntp-data-minimization">NTP Client Data
+          Minimization Internet-Draft</xref>.
+        </t>
+        <t>
+          The unlinkability objective only holds for time synchronization
+          traffic, as opposed to key exchange traffic. This implies that it
+          cannot be guaranteed for devices that function not only as time
+          clients, but also as time servers (because the latter can be
+          externally triggered to send authentication data).
+        </t>
+        <t>
+          It should also be noted that it could be possible to link devices that
+          operate as time servers from their time synchronization traffic, using
+          information exposed in (mode 4) server response packets (e.g.,
+          reference ID, reference time, stratum, poll). Also, devices that
+          respond to NTP control queries could be linked using the information
+          revealed by control queries.
+        </t>
       </section>
+
       <section title="Confidentiality">
-	<t>
-	  NTS does not protect the confidentiality of information in
-	  NTP's header fields. When clients implement <xref
-	  target="I-D.ietf-ntp-data-minimization"/>, client packet
-	  headers do not contain any information which the client
-	  could conceivably wish to keep secret: one field is random,
-	  and all others are fixed. Information in server packet
-	  headers is likewise public: the origin timestamp is copied
-	  from the client's (random) transmit timestamp, and all other
-	  fields are set the same regardless of the identity of the
-	  client making the request.
-	</t>
-	<t>
-	  Future extension fields could hypothetically contain
-	  sensitive information, in which case NTS provides a
-	  mechanism for encrypting them.
-	</t>
+        <t>
+          NTS does not protect the confidentiality of information in NTP's
+          header fields. When clients implement <xref
+          target="I-D.ietf-ntp-data-minimization">NTP Client Data
+          Minimization</xref>, client packet headers do not contain any
+          information which the client could conceivably wish to keep secret:
+          one field is random and all others are fixed. Information in server
+          packet headers is likewise public: the origin timestamp is copied from
+          the client's (random) transmit timestamp and all other fields are set
+          the same regardless of the identity of the client making the request.
+        </t>
+        <t>
+          Future extension fields could hypothetically contain sensitive
+          information, in which case NTS provides a mechanism for encrypting
+          them.
+        </t>
       </section>
-
-
     </section>
 
     <section anchor="Acknowledgements" title="Acknowledgements">
