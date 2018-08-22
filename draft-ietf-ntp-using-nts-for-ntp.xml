@@ -1613,6 +1613,9 @@ Client -----+---------------------------------+---------------->
         reference ID, reference time, stratum, poll).&nbsp; Also, devices that
         respond to NTP control queries could be linked using the information
         revealed by control queries. </t>
+        
+        <t>Note that the unlinkability objective does not prevent a client device
+        to be tracked by its time servers.</t>
       </section>
       <section title="Confidentiality">
 	<t>
