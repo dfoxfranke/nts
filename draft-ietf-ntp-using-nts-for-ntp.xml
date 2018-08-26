@@ -1781,13 +1781,15 @@ Client -----+---------------------------------+---------------->
 
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
-      Bellovin, Scott Fluhrer, Sharon Goldberg, Russ Housley, Martin
-      Langer, Miroslav Lichvar, Aanchal Malhotra, Dave Mills, Danny
-      Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen Roettger,
-      Kurt Roeckx, Kyle Rose, Rich Salz, Brian Sniffen, Susan Sons,
-      Douglas Stebila, Harlan Stenn, Martin Thomson, and Richard Welty
-      for contributions to this document and comments on the design of
-      NTS.</t>
+      Bellovin, Marcus Dansarie,Patrik F&auml;ltstr&ouml;m
+      (Faltstrom), Scott Fluhrer, Sharon Goldberg, Russ Housley,
+      Martin Langer, Miroslav Lichvar, Aanchal Malhotra, Dave Mills,
+      Danny Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen
+      Roettger, Kurt Roeckx, Kyle Rose, Rich Salz, Brian Sniffen,
+      Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
+      Str&ouml;mbergsson (Strombergsson), Ragnar Sundblad, Martin
+      Thomson, and Richard Welty for contributions to this document
+      and comments on the design of NTS.</t>
     </section>
   </middle>
 
