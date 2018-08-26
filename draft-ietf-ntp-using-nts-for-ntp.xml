@@ -1577,9 +1577,9 @@ Client -----+---------------------------------+---------------->
           the NTS-KE and NTP servers, a successful DDoS attack on an NTS-KE
           server separated from the NTP service it supports will not affect NTP
           users that have already performed initial authentication, AEAD key
-          extraction, and cookie exchange. Furthermore, as noted in
+          extraction, and cookie exchange. <!--Furthermore, as noted in
           <xref target="usage-of-ntp-pools"/>, NTP-KE capacity is easier to
-          scale up and down than NTP server capacity.
+          scale up and down than NTP server capacity.-->
         </t>
         <t>
           NTS users should also consider that they are not fully protected
@@ -1805,21 +1805,21 @@ Client -----+---------------------------------+---------------->
       <?rfc include='reference.RFC.5905'?>
       <?rfc include='reference.RFC.6125'?>
       <?rfc include='reference.RFC.6335'?>
+      <?rfc include='reference.RFC.7301'?>
       <?rfc include='reference.RFC.7465'?>
       <?rfc include='reference.RFC.7507'?>
       <?rfc include='reference.RFC.7627'?>
-      <?rfc include='reference.RFC.7301'?>
       <?rfc include='reference.RFC.7822'?>
       <?rfc include='reference.RFC.8174'?>
     </references>
 
     <references title="Informative References">
-      <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-00'?>
+      <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-02'?>
       <?rfc include='reference.RFC.4086'?>
       <?rfc include='reference.RFC.5077'?>
       <?rfc include="reference.RFC.5280'?>
-      <?rfc include='reference.RFC.7384'?>
       <?rfc include='reference.RFC.5869'?>
+      <?rfc include='reference.RFC.7384'?>
       <reference anchor="Mizrahi" target="">
         <front>
           <title>A game theoretic analysis of delay attacks against time
