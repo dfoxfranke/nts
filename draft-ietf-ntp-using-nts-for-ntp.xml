@@ -1207,19 +1207,23 @@ Client -----+---------------------------------+---------------->
     <section title="IANA Considerations" anchor="iana-considerations">
       <section title="Service Name and Transport Protocol Port Number Registry">
         <t>
-          IANA is requested to allocate two entries, identical except for the
-          Transport Protocol, in the <xref target="RFC6335">Service Name and
-          Transport Protocol Port Number Registry</xref> as follows:
+          IANA is requested to allocate the following entry in the
+          <xref target="RFC6335">Service Name and Transport Protocol
+          Port Number Registry</xref>:
           <list>
-            <t>Service Name: nts</t>
-            <t>Transport Protocol: tcp, udp</t>
+            <t>Service Name: ntske</t>
+            <t>Transport Protocol: tcp</t>
             <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
             <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
-            <t>Description: Network Time Security</t>
+            <t>Description: Network Time Security Key Exchange</t>
             <t>Reference: [[this memo]]</t>
-            <t>Port Number: [[TBD1]], selected by IANA from the system port
+            <t>Port Number: [[TBD1]], selected by IANA from the User Port
               range</t>
           </list>
+        </t>
+        <t>
+          [[RFC EDITOR: Replace all instances of [[TBD1]] in this
+          document with the IANA port assignment.]]
         </t>
       </section>
 
@@ -1303,6 +1307,10 @@ Client -----+---------------------------------+---------------->
           <c>NTS Authenticator and Encrypted Extension Fields</c>
           <c>[[this memo]], <xref target="nts-aeef-extension-field"/></c>
         </texttable>
+        <t>
+          [[RFC EDITOR: Replace all instances of [[TBD2]], [[TBD3]], [[TBD4]], and
+          [[TBD5]] in this document with the respective IANA assignments.
+        </t>
       </section>
 
       <section title="Network Time Security Key Establishment Record Types Registry">
@@ -1320,11 +1328,6 @@ Client -----+---------------------------------+---------------->
               the field.
             </t>
             <t>
-              Set Critical Bit (REQUIRED): One of &quot;MUST&quot;,
-              &quot;SHOULD&quot;, &quot;MAY&quot;,  &quot;SHOULD NOT&quot;, or
-              &quot;MUST NOT&quot;.
-            </t>
-            <t>
               Reference (REQUIRED): A reference to a document specifying the
               semantics of the record.
             </t>
@@ -1334,9 +1337,9 @@ Client -----+---------------------------------+---------------->
           The policy for allocation of new entries in this registry SHALL vary
           by the Record Type Number, as follows:
           <list>
-            <t>0&ndash;1023: IETF Review.</t>
-            <t>1024&ndash;16383: Specification Required.</t>
-            <t>16384&ndash;32767: Private and Experimental Use.</t>
+            <t>0&ndash;1023: IETF Review</t>
+            <t>1024&ndash;16383: Specification Required</t>
+            <t>16384&ndash;32767: Private and Experimental Use</t>
           </list>
         </t>
         <t>
@@ -1352,48 +1355,39 @@ Client -----+---------------------------------+---------------->
         <texttable>
           <ttcol>Record Type Number</ttcol>
           <ttcol>Description</ttcol>
-          <ttcol>Set Critical Bit</ttcol>
           <ttcol>Reference</ttcol>
 
           <c>0</c>
           <c>End of Message</c>
-          <c>MUST</c>
           <c>[[this memo]], <xref target="end-of-message"/></c>
 
           <c>1</c>
           <c>NTS Next Protocol Negotiation</c>
-          <c>MUST</c>
           <c>[[this memo]],
             <xref target="nts-next-protocol-negotiation"/></c>
 
           <c>2</c>
           <c>Error</c>
-          <c>MUST</c>
           <c>[[this memo]], <xref target="nts-error"/></c>
 
           <c>3</c>
           <c>Warning</c>
-          <c>MUST</c>
           <c>[[this memo]], <xref target="nts-warning"/></c>
 
           <c>4</c>
           <c>AEAD Algorithm Negotiation</c>
-          <c>MAY</c>
           <c>[[this memo]], <xref target="aead-algorithm-negotiation"/></c>
 
           <c>5</c>
           <c>New Cookie for NTPv4</c>
-          <c>SHOULD NOT</c>
           <c>[[this memo]], <xref target="new-cookie-for-ntpv4"/></c>
 
           <c>6</c>
           <c>NTP Server Negotiation</c>
-          <c>SHOULD</c>
           <c>[[this memo]], <xref target="ntp-server-negotiation"/></c>
 
           <c>16384&ndash;32767</c>
           <c>Reserved for Private &amp; Experimental Use</c>
-          <c>MAY</c>
           <c>[[this memo]]</c>
         </texttable>
       </section>
@@ -1413,17 +1407,17 @@ Client -----+---------------------------------+---------------->
               being identified.
             </t>
             <t>
-              Reference (RECOMMENDED): A reference to a relevant specification
-              document. If no relevant document exists, a point-of-contact for
-              questions regarding the entry SHOULD be listed here in lieu.
+              Reference (REQUIRED): A reference to a relevant specification
+              document.
             </t>
           </list>
-        </t>
-        <t>
-          Applications for new entries in this registry SHALL specify all
-          desired fields and SHALL be granted upon approval by a Designated
-          Expert. Protocol IDs 32768-65535 SHALL be reserved for Private or
-          Experimental Use and SHALL NOT be registered.
+          The policy for allocation of new entries in these registries
+          SHALL vary by their Protocol ID, as follows:
+          <list>
+            <t>0&ndash;1023: IETF Review</t>
+            <t>1024&ndash;32767: Specification Required</t>
+            <t>32768&ndash;65535: Private and Experimental Use</t>
+          </list>
         </t>
         <t>
           The initial contents of this registry SHALL be as follows:
@@ -1459,9 +1453,9 @@ Client -----+---------------------------------+---------------->
           The policy for allocation of new entries in these registries SHALL
           vary by their Number, as follows:
           <list>
-            <t>0&ndash;1023: IETF Review.</t>
-            <t>1024&ndash;32767: Specification Required.</t>
-            <t>32768&ndash;65535: Private and Experimental Use.</t>
+            <t>0&ndash;1023: IETF Review</t>
+            <t>1024&ndash;32767: Specification Required</t>
+            <t>32768&ndash;65535: Private and Experimental Use</t>
           </list>
         </t>
         <t>
@@ -1480,11 +1474,25 @@ Client -----+---------------------------------+---------------->
           <c>1</c>
           <c>Bad Request</c>
           <c>[[this memo]], <xref target="nts-error"/></c>
+
+          <c>32768-65535</c>
+          <c>Reserved for Private or Experimental Use</c>
+          <c>Reserved by [[this memo]]</c>
         </texttable>
         <t>
-          The Network Time Security Warning Codes Registry SHALL initially
-          be empty.
+          The Network Time Security Warning Codes Registry SHALL
+          initally be empty except for the reserved range, i.e.:
         </t>
+        <texttable>
+          <ttcol>Number</ttcol>
+          <ttcol>Description</ttcol>
+          <ttcol>Reference</ttcol>
+
+          <c>32768-65535</c>
+          <c>Reserved for Private or Experimental Use</c>
+          <c>Reserved by [[this memo]]</c>
+        </texttable>
+
       </section>
     </section>
 
