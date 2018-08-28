@@ -327,37 +327,19 @@
         Network Time Security makes use of TLS for NTS key establishment.
       </t>
       <t>
-        Since securing time protocols is (as of 2017) a novel
-        application of TLS, no backward-compatibility concerns exist
-        to justify using obsolete, insecure, or otherwise broken TLS
-        features or versions. We therefore put forward the following
-        requirements and guidelines, roughly representing 2017's best
-        practices.
+        Since the NTS protocol is new as of this publication, no
+        backward-compatibility concerns exist to justify using
+        obsolete, insecure, or otherwise broken TLS features or
+        versions. Implementations MUST conform with <xref
+        target="RFC7525"/> or with a later revision of BCP
+        195. Furthermore:
       </t>
       <t>
-        Implementations MUST NOT negotiate TLS versions
-        earlier than 1.2.
-      </t>
-      <t>
-        Implementations willing to negotiate more than one possible
-        version of TLS SHOULD NOT respond to handshake failures by
-        retrying with a downgraded protocol version. If they do, they
-        MUST implement <xref target="RFC7507"/>.
-      </t>
-      <t>
-        TLS clients MUST NOT offer, and TLS servers MUST NOT select,
-        RC4 cipher suites. <xref target="RFC7465"/>
-      </t>
-      <t>
-        TLS 1.2 clients SHOULD offer, and TLS servers SHOULD accept, the
-        <xref target="RFC5746">TLS Renegotiation Indication
-        Extension</xref>. Regardless, they MUST NOT initiate or permit
-        insecure renegotiation.
-      </t>
-      <t>
-        TLS 1.2 clients SHOULD offer, and TLS 1.2 servers SHOULD accept, the
-        <xref target="RFC7627">TLS Session Hash and Extended Master
-        Secret Extension</xref>.
+        Implementations MUST NOT negotiate TLS versions earlier than
+        1.2, SHOULD negotiate TLS 1.3 <xref target="RFC8446"/> or
+        later when possible, and MAY refuse to negotiate any TLS
+        version which has been superseded by a later supported
+        version.
       </t>
       <t>
         Use of the <xref target="RFC7301">Application-Layer Protocol
@@ -1855,10 +1837,12 @@ Client -----+---------------------------------+---------------->
       <?rfc include='reference.RFC.6335'?>
       <?rfc include='reference.RFC.7301'?>
       <?rfc include='reference.RFC.7465'?>
+      <?rfc include='reference.RFC.7525'?>
       <?rfc include='reference.RFC.7507'?>
       <?rfc include='reference.RFC.7627'?>
       <?rfc include='reference.RFC.7822'?>
       <?rfc include='reference.RFC.8174'?>
+      <?rfc include='reference.RFC.8446'?>
     </references>
 
     <references title="Informative References">
