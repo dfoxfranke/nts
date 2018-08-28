@@ -75,6 +75,18 @@
       </address>
     </author>
 
+    <author fullname="Marcus Dansarie" initials="M." surname="Dansarie">
+      <address>
+        <email>marcus@dansarie.se</email>
+      </address>
+    </author>
+     <author fullname="Ragnar Sundblad" initials="R." surname="Sundblad">
+      <organization>Netnod</organization>
+      <address>
+        <email>ragge@netnod.se</email>
+      </address>
+    </author>
+
     <date day="01" month="July" year="2018"/>
 
     <area>Internet Area</area>
@@ -901,28 +913,25 @@ Client -----+---------------------------------+---------------->
           </list>
         </t>
         <t>
-          For mode 4 (server) packets, no Additional Padding field is
-          ever required.  For mode 3 (client) packets, the length of
-          the Additional Padding field SHALL be computed as follows.
-          Let `N_LEN` be the padded length of the the Nonce field. Let
-          `N_MAX` be, as specified by <xref target="RFC5116">RFC
-          5116</xref>, the maximum permitted nonce length for the
-          negotiated AEAD algorithm. Let `N_REQ` be the lesser of 16
-          and N_MAX, rounded up to the nearest multiple of 4.  If
-          N_LEN is greater or equal to N_REQ, then no Additional
-          Padding field is required. Otherwise, the Additional Padding
-          field SHALL be at least N_REQ - N_LEN octets in
-          length.
-        </t>
-        <t>
           The purpose of the Additional Padding field is to ensure
           that servers can always choose a nonce whose length is
           adequate to ensure its uniqueness, even if the client
           chooses a shorter one, and still ensure that the overall
-          length of the server's response will not exceed the length
-          of the request. Servers MUST enforce the above length
-          requirements on the Additional Padding field by discarding
-          any packet which does not conform to them.
+          length of the server's response packet. does not exceed the
+          length of the request. For mode 4 (server) packets, no
+          Additional Padding field is ever required.  For mode 3
+          (client) packets, the length of the Additional Padding field
+          SHALL be computed as follows.  Let `N_LEN` be the padded
+          length of the the Nonce field. Let `N_MAX` be, as specified
+          by <xref target="RFC5116">RFC 5116</xref>, the maximum
+          permitted nonce length for the negotiated AEAD
+          algorithm. Let `N_REQ` be the lesser of 16 and N_MAX,
+          rounded up to the nearest multiple of 4.  If N_LEN is
+          greater than or equal to N_REQ, then no Additional Padding
+          field is required. Otherwise, the Additional Padding field
+          SHALL be at least N_REQ - N_LEN octets in length. Servers
+          MUST enforce this requirement by discarding any packet which
+          does not conform to it.
         </t>
         <t>
           The NTS Authenticator and Encrypted Extension Fields extension field
@@ -1820,15 +1829,14 @@ Client -----+---------------------------------+---------------->
 
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
-      Bellovin, Marcus Dansarie, Patrik F&auml;ltstr&ouml;m
-      (Faltstrom), Scott Fluhrer, Sharon Goldberg, Russ Housley,
-      Martin Langer, Miroslav Lichvar, Aanchal Malhotra, Dave Mills,
-      Danny Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen
-      Roettger, Kurt Roeckx, Kyle Rose, Rich Salz, Brian Sniffen,
-      Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
-      Str&ouml;mbergsson (Strombergsson), Ragnar Sundblad, Martin
-      Thomson, and Richard Welty for contributions to this document
-      and comments on the design of NTS.</t>
+      Bellovin, Patrik F&auml;ltstr&ouml;m (Faltstrom), Scott Fluhrer,
+      Sharon Goldberg, Russ Housley, Martin Langer, Miroslav Lichvar,
+      Aanchal Malhotra, Dave Mills, Danny Mayer, Karen O'Donoghue,
+      Eric K. Rescorla, Stephen Roettger, Kurt Roeckx, Kyle Rose, Rich
+      Salz, Brian Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn,
+      Joachim Str&ouml;mbergsson (Strombergsson), Martin Thomson, and
+      Richard Welty for contributions to this document and comments on
+      the design of NTS.</t>
     </section>
   </middle>
 
