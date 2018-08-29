@@ -10,7 +10,7 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-12"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-13"
      ipr="trust200902" submissionType="IETF">
   <front>
     <title abbrev="NTS4NTP">Network Time Security for the Network Time
@@ -87,7 +87,7 @@
       </address>
     </author>
 
-    <date day="01" month="July" year="2018"/>
+    <date day="30" month="August" year="2018"/>
 
     <area>Internet Area</area>
 
@@ -1872,7 +1872,6 @@ Client -----+---------------------------------+---------------->
       <?rfc include='reference.ANSI.X3-4.1986.xml'?>
       <?rfc include='reference.RFC.2119.xml'?>
       <?rfc include='reference.RFC.3986.xml'?>
-      <?rfc include='reference.RFC.4291.xml'?>
       <?rfc include='reference.RFC.5116.xml'?>
       <?rfc include='reference.RFC.5297.xml'?>
       <?rfc include='reference.RFC.5705.xml'?>
