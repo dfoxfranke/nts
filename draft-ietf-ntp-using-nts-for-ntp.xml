@@ -605,37 +605,71 @@ Client -----+---------------------------------+---------------->
           </t>
         </section>
 
-        <section title="NTP Server Negotiation"
-          anchor="ntp-server-negotiation">
+        <section title="NTPv4 Server Negotiation"
+                 anchor="ntp-server-negotiation">
           <t>
-            The NTP Server Negotiation record has a Record Type number of 6. The
-            record MAY be sent by a client in a request and SHOULD be sent by a
-            server as part of a reply. Its body consists of a sequence of IPv4
-            and/or IPv6 addresses. Both address types are represented by 16
-            octets in network byte order. To achieve this, IPv4 addresses are
-            represented as &quot;IPv4-mapped IPv6 addresses&quot; in the format
-            specified in <xref target="RFC4291">RFC 4291, Section
-            2.5.5.2</xref>. For example: The IPv4 address 192.0.2.1 would be
-            mapped to the IPv6 address space as ::ffff:192.0.2.1. The Critical
-            Bit SHOULD be set.
+            The NTPv4 Server Negotiation record has a Record Type
+            number of 6. Its body consists of an <xref
+            target="ANSI.X3-4.1986">ASCII-encoded</xref> string
+            conforming to the syntax of the Host subcomponent of a URI
+            (<xref target="RFC3986"/>). IPv6 addresses MUST NOT
+            include zone identifiers <xref target="RFC6874"/>.
           </t>
           <t>
-            When used in a request, the NTP Server Negotiation record is the
-            client's way of indicating to the KE server which NTP servers it
-            wishes to receive cookies for. Honoring the client's NTP server
-            preferences is OPTIONAL. When used in a response, this record
-            informs the client about which NTP servers the received cookies can
-            be used with in the next phase of the protocol. The client SHOULD
-            NOT attempt to use the received cookies with any other NTP servers
-            than those indicated by the KE server.
+            When NTPv4 is negotiated as a Next Protocol and this
+            record is sent by the server, the body specifies the
+            hostname or IP address of the NTPv4 server with which the
+            client should associate and which will accept the supplied
+            cookies. If no record of this type is sent, the client
+            SHALL interpret this as a directive to associate with an
+            NTPv4 server at the same IP address as the NTS-KE server.
+            Servers MUST NOT send more than one record of this type.
           </t>
           <t>
-            If a response does not include this record, the client SHOULD assume
-            that the received cookies are valid for use with an NTP server at
-            the same network address as the key exchange server.
+            When this record is sent by the client, it indicates that
+            the client wishes to associate with the specified NTP
+            server. The NTS-KE server MAY incorporate this request when
+            deciding what NTPv4 Server Negotiation records to respond
+            with, but honoring the client's preference is
+            OPTIONAL. The client MUST NOT send more than one record of
+            this type.
+          </t>
+          <t>
+            Servers MAY set the Critical Bit on records of this type;
+            clients SHOULD NOT.
           </t>
         </section>
-      </section>
+
+        <section title="NTPv4 Port Negotiation"
+                 anchor="ntp-port-negotiation">
+          <t>
+            The NTPv4 Port Negotiation record has a Record Type number
+            of 7. Its body consists of a 16-bit unsigned integer in
+            network byte order, denoting a UDP port number.
+          </t>
+          <t>
+            When NTPv4 is negotiated as a Next Protocol and this
+            record is sent by the server, the body specifies the port
+            number of the NTPv4 server with which the client should
+            associate and which will accept the supplied cookies. If
+            no record of this type is sent, the client SHALL assume
+            a default of 123 (the registered port number for NTP).
+          </t>
+          <t>
+            When this record is sent by the client in conjunction with
+            a NTPv4 Server Negotiation record, it indicates that the
+            client wishes to associate with the NTP server at the
+            specified port. The NTS-KE server MAY incorporate this
+            request when deciding what NTPv4 Server Negotiation and
+            NTPv4 Port Negotiation records to respond with, but
+            honoring the client's preference is OPTIONAL.
+          </t>
+          <t>
+            Servers MAY set the Critical Bit on records of this type;
+            clients SHOULD NOT.
+          </t>
+        </section>
+      </section>      
 
       <section title="Key Extraction (generally)" anchor="key-extraction">
         <t>
@@ -1383,8 +1417,12 @@ Client -----+---------------------------------+---------------->
           <c>[[this memo]], <xref target="new-cookie-for-ntpv4"/></c>
 
           <c>6</c>
-          <c>NTP Server Negotiation</c>
+          <c>NTPv4 Server Negotiation</c>
           <c>[[this memo]], <xref target="ntp-server-negotiation"/></c>
+
+          <c>7</c>
+          <c>NTPv4 Port Negotiation</c>
+          <c>[[this memo]], <xref target="ntp-port-negotiation"/></c>
 
           <c>16384&ndash;32767</c>
           <c>Reserved for Private &amp; Experimental Use</c>
@@ -1746,7 +1784,6 @@ Client -----+---------------------------------+---------------->
           attacks if the adversary is in control of only some of the paths.
         </t>
       </section>
-
       <section title="Random Number Generation">
         <t>
           At various points in NTS, the generation of cryptographically secure
@@ -1832,7 +1869,9 @@ Client -----+---------------------------------+---------------->
 
   <back>
     <references title="Normative References">
+      <?rfc include='reference.ANSI.X3-4.1986.xml'?>
       <?rfc include='reference.RFC.2119.xml'?>
+      <?rfc include='reference.RFC.3986.xml'?>
       <?rfc include='reference.RFC.4291.xml'?>
       <?rfc include='reference.RFC.5116.xml'?>
       <?rfc include='reference.RFC.5297.xml'?>
@@ -1840,6 +1879,7 @@ Client -----+---------------------------------+---------------->
       <?rfc include='reference.RFC.5905.xml'?>
       <?rfc include='reference.RFC.6125.xml'?>
       <?rfc include='reference.RFC.6335.xml'?>
+      <?rfc include='reference.RFC.6874.xml'?>
       <?rfc include='reference.RFC.7301.xml'?>
       <?rfc include='reference.RFC.7525.xml'?>
       <?rfc include='reference.RFC.7507.xml'?>
