@@ -110,15 +110,12 @@
         Network Time Protocol (NTP).
       </t>
       <t>
-        NTS is structured as a suite of two loosely coupled
-        sub-protocols: the NTS Key Establishment Protocol (NTS-KE) and
-        NTS Extensions for NTPv4. NTS-KE handles NTS service
-        authentication, initial handshaking, and key extraction over
-        TLS. Encryption and authentication during NTP time
-        synchronization is performed through NTS extension fields in
-        otherwise standard NTP packets. Except for during the initial
-        NTS-KE process, all state required by the protocol is held by
-        the client in opaque cookies.
+        NTS is structured as a suite of two loosely coupled sub-protocols. 
+        The first (NTS-KE) handles initial authentication and key 
+        establishment over TLS. The second handles encryption and 
+        authentication during NTP time via extension fields in the 
+        NTP packets, and holds all required state only on the 
+        client via opaque cookies.
       </t>
     </abstract>
   </front>
