@@ -996,44 +996,42 @@ Client -----+---------------------------------+---------------->
         <figure anchor="fig_NTSTimeSyncMessage"
           title="NTS Time Synchronization Messages">
           <artwork><![CDATA[
-                  +---------------------------------------+
-                  | - Verify time request message.        |
-                  | - Generate time response message.     |
-                  |   - Include NTPv4 extension fields:   |
-                  |      o Unique Identifier EF           |
-                  |      o NTS Cookie EF                  |
-                  |      o <NTS Cookie EF>                |
-                  |                                       |
-                  | - Generate AEAD tag of NTP message.   |
-                  | - Add NTS Authentication and          |
-                  |   Encrypted Extension Fields EF.      |
-                  | - Transmit time response packet.      |
-                  +-----------------+---------------------+
-                                    |
-                                    |
-  Server -----------+---------------+-----+----------------------->
-                    ^                      \
-                   /                        \
-    Time request  /                          \   Time response
-    (mode 3)     /                            \  (mode 4)
-                /                              \
-               /                                V
-  Client -----+---------------------------------+---------------->
-              |                                 |
-              |                                 |
-              |                                 |
-  +-----------+-----------------------+   +-----+------------------+
-  |- Generate time request message.   |   |- Verify time response  |
-  | - Include NTPv4 extension fields: |   |  message.              |
-  |    o Unique Identifier EF         |   |- Extract cookie(s).    |
-  |    o NTS Cookie EF                |   |- Time synchronization  |
-  |    o <NTS Cookie Placeholder EF>  |   |  processing.           |
-  |                                   |   +------------------------+
-  |- Generate AEAD tag of NTP message.|
-  |- Add NTS Authentication and       |
-  |  Encrypted Extension Fields EF.   |
-  |- Transmit time request packet.    |
-  +-----------------------------------+]]>
+                +---------------------------------------+
+                | - Verify time request message         |
+                | - Generate time response message      |
+                |   - Included NTPv4 extension fields   |
+                |      o Unique Identifier EF           |
+                |      o NTS Authentication and         |
+                |        Encrypted Extension Fields EF  |
+                |        - NTS Cookie EF                |
+                |        - <NTS Cookie EF>              |
+                | - Transmit time request packet        |
+                +-----------------+---------------------+
+                                  |
+                                  |
+Server -----------+---------------+-----+----------------------->
+                  ^                      \          
+                 /                        \      
+  Time request  /                          \   Time response
+  (mode 3)     /                            \  (mode 4)  
+              /                              \   
+             /                                V 
+Client -----+---------------------------------+---------------->
+            |                                 |
+            |                                 |
+            |                                 |
++-----------+----------------------+   +------+-----------------+
+|- Generate time request message   |   |- Verify time response  |
+| - Include NTPv4 Extension fields |   |  message               |
+|    o Unique Identifier EF        |   |- Extract cookie(s)     |
+|    o NTS Cookie EF               |   |- Time synchronization  |
+|    o <NTS Cookie Placeholder EF> |   |  processing            |
+|                                  |   +------------------------+
+|- Generate AEAD tag of NTP message|
+|- Add NTS Authentication and      |
+|  Encrypted Extension Fields EF   |
+|- Transmit time request packet    | 
++----------------------------------+]]>
           </artwork>
         </figure>
         <t>
