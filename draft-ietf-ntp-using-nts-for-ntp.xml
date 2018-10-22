@@ -17,8 +17,16 @@
     Protocol</title>
 
     <author fullname="Daniel Fox Franke" initials="D." surname="Franke">
+      <organization abbrev="Akamai">Akamai Technologies</organization>
       <address>
-        <email>dfoxfranke@gmail.com</email>
+        <postal>
+          <street>150 Broadway</street>
+          <city>Cambridge</city>
+          <region>MA</region>
+          <code>02142</code>
+          <country>United States</country>
+        </postal>
+        <email>dafranke@akamai.com</email>
         <uri>https://www.dfranke.us</uri>
       </address>
     </author>
