@@ -121,7 +121,7 @@
         NTS is structured as a suite of two loosely coupled sub-protocols. 
         The first (NTS-KE) handles initial authentication and key 
         establishment over TLS. The second handles encryption and 
-        authentication during NTP time via extension fields in the 
+        authentication during NTP time synchronization via extension fields in the 
         NTP packets, and holds all required state only on the 
         client via opaque cookies.
       </t>
