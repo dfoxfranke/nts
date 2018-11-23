@@ -1,20 +1,20 @@
                 +---------------------------------------+
-                | - verify time request message         |
-                | - generate time response message      |
-                |   - included NTPv4 extension fields   |
+                | - Verify time request message         |
+                | - Generate time response message      |
+                |   - Included NTPv4 extension fields   |
                 |      o Unique Identifier EF           |
                 |      o NTS Authentication and         |
                 |        Encrypted Extension Fields EF  |
                 |        - NTS Cookie EF                |
                 |        - <NTS Cookie EF>              |
-                | - transmit time request packet        |
+                | - Transmit time request packet        |
                 +-----------------+---------------------+
                                   |
                                   |
-Server -------- --+---------------+-----+----------------------->
+Server -----------+---------------+-----+----------------------->
                   ^                      \          
                  /                        \      
-  time request  /                          \   time response
+  Time request  /                          \   Time response
   (mode 3)     /                            \  (mode 4)  
               /                              \   
              /                                V 
@@ -23,14 +23,14 @@ Client -----+---------------------------------+---------------->
             |                                 |
             |                                 |
 +-----------+----------------------+   +------+-----------------+
-|- generate time request message   |   |- verify time response  |
-| - include NTPv4 Extension fields |   |  message               |
-|    o Unique Identifier EF        |   |- extract cookie(s)     |
-|    o NTS Cookie EF               |   |- time synchronization  |
+|- Generate time request message   |   |- Verify time response  |
+| - Include NTPv4 Extension fields |   |  message               |
+|    o Unique Identifier EF        |   |- Extract cookie(s)     |
+|    o NTS Cookie EF               |   |- Time synchronization  |
 |    o <NTS Cookie Placeholder EF> |   |  processing            |
 |                                  |   +------------------------+
-|- generate AEAD tag of NTP message|
-|- add NTS Authentication and      |
+|- Generate AEAD tag of NTP message|
+|- Add NTS Authentication and      |
 |  Encrypted Extension Fields EF   |
-|- transmit time request packet    | 
+|- Transmit time request packet    | 
 +----------------------------------+   
