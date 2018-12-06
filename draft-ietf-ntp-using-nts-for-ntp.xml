@@ -614,7 +614,7 @@ Client -----+---------------------------------+---------------->
             hostname or IP address of the NTPv4 server with which the
             client should associate and which will accept the supplied
             cookies. If no record of this type is sent, the client
-            SHALL interpret this as a directive to associate with an
+            SHOULD interpret this as a directive to associate with an
             NTPv4 server at the same IP address as the NTS-KE server.
             Servers MUST NOT send more than one record of this type.
           </t>
