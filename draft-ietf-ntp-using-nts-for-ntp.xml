@@ -325,7 +325,10 @@
         obsolete, insecure, or otherwise broken TLS features or
         versions. Implementations MUST conform with <xref
         target="RFC7525"/> or with a later revision of BCP
-        195. Furthermore:
+        195. In particular, failure to use cipher suites that provide forward
+        secrecy will make all negotiated NTS keys recoverable by anyone
+        that gains access to the NTS-KE server's private certificate.
+        Furthermore:
       </t>
       <t>
         Implementations MUST NOT negotiate TLS versions earlier than
