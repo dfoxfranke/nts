@@ -1085,7 +1085,7 @@ Client -----+---------------------------------+---------------->
         </t>
         <t>
           We emphasize the contrast that NTS Cookie extension fields MUST NOT be
-          encrypted when sent from client to server, but MUST be encrypted from
+          encrypted when sent from client to server, but MUST be encrypted when
           sent from server to client. The former is necessary in order for the
           server to be able to recover the C2S and S2C keys, while the latter is
           necessary to satisfy the unlinkability goals discussed in <xref
@@ -1132,7 +1132,7 @@ Client -----+---------------------------------+---------------->
           extension field and that the Unique Identifier matches that of an
           outstanding request. If this check fails, the packet MUST be discarded
           without further processing. If this check passes, the client MUST comply
-          with <xref target="RFC5905">RFC 5095, Section 7.4</xref> where required.
+          with <xref target="RFC5905">RFC 5905, Section 7.4</xref> where required.
           A client MAY automatically re-run the NTS-KE protocol upon forced
           disassociation from an NTP server. In that case, it MUST be able to
           detect and stop looping between the NTS-KE and NTP servers.
