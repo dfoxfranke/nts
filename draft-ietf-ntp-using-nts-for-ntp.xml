@@ -408,7 +408,7 @@
           </t>
           <t>
             Record Type Number: A 15-bit integer in network byte order. The
-            semantics of record types 0&ndash;6 are specified in this memo.
+            semantics of record types 0&ndash;7 are specified in this memo.
             Additional type numbers SHALL be tracked through the IANA Network
             Time Security Key Establishment Record Types registry.
           </t>
@@ -852,7 +852,7 @@ Client -----+---------------------------------+---------------->
           <xref target="fig-aeef-field"/> and include the following fields:
           <list>
             <t>
-              Nonce length: Two octets in network byte order, giving the length
+              Nonce Length: Two octets in network byte order, giving the length
               of the Nonce field, excluding any padding, interpreted as an
               unsigned integer.
             </t>
@@ -941,7 +941,7 @@ Client -----+---------------------------------+---------------->
           that servers can always choose a nonce whose length is
           adequate to ensure its uniqueness, even if the client
           chooses a shorter one, and still ensure that the overall
-          length of the server's response packet. does not exceed the
+          length of the server's response packet does not exceed the
           length of the request. For mode 4 (server) packets, no
           Additional Padding field is ever required.  For mode 3
           (client) packets, the length of the Additional Padding field
@@ -1525,7 +1525,7 @@ Client -----+---------------------------------+---------------->
         </texttable>
         <t>
           The Network Time Security Warning Codes Registry SHALL
-          initally be empty except for the reserved range, i.e.:
+          initially be empty except for the reserved range, i.e.:
         </t>
         <texttable>
           <ttcol>Number</ttcol>
