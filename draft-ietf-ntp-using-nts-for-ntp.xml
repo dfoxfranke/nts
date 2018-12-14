@@ -1796,6 +1796,24 @@ Client -----+---------------------------------+---------------->
           concerning this topic.
         </t>
       </section>
+      <section title="NTS Stripping">
+        <t>
+          Implementers must be aware of the possibility of "NTS stripping"
+          attacks, where an attacker tricks clients into reverting to plain
+          NTP. Naive client implementations might, for example, revert
+          automatically to plain NTP if the NTS-KE handshake fails. A man-in-the-middle
+          attacker can easily cause this to happen. Even clients that already
+          hold valid cookies can be vulnerable, since an attacker can force a
+          client to repeat the NTS-KE handshake by sending faked NTP mode 4
+          replies with the NTS NAK kiss code. Forcing a client to repeat the
+          NTS-KE handshake can also be the first step in more advanced attacks.
+        </t>
+        <t>
+          For the reasons described here, implementations SHOULD NOT revert
+          from NTS-protected to unprotected NTP with any server without
+          explicit user action.
+        </t>
+      </section>
     </section>
 
     <section title="Privacy Considerations">
