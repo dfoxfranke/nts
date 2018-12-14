@@ -977,10 +977,7 @@ Client -----+---------------------------------+---------------->
               and MUST NOT be encrypted. The cookie MUST be one which has been
               previously provided to the client; either from the key exchange
               server during the NTS-KE handshake or from the NTP server in
-              response to a previous NTS-protected NTP request.  To protect the
-              client's privacy, the same cookie SHOULD NOT be included in multiple
-              requests. If the client does not have any cookies that it has not
-              already sent, it SHOULD initiate a re-run the NTS-KE protocol.
+              response to a previous NTS-protected NTP request.
             </t>
             <t>
               Exactly one NTS Authenticator and Encrypted Extension Fields
@@ -988,6 +985,16 @@ Client -----+---------------------------------+---------------->
               established through NTS-KE.
             </t>
           </list>
+        <t>
+          To protect the client's privacy, the client SHOULD avoid reusing
+          a cookie. If the client does not have any cookies that it has not
+          already sent, it SHOULD initiate a re-run the NTS-KE protocol. The
+          client MAY reuse cookies in order to prioritize resilience over
+          unlinkability. Which of the two that should be prioritized in any
+          particular case is dependent on the application and the user's
+          preference. <xref target="Unlinkability"/> describes the privacy
+          considerations of this in further detail.
+        </t>
         </t>
         <t>
           The client MAY include one or more NTS Cookie Placeholder extension
@@ -1146,13 +1153,6 @@ Client -----+---------------------------------+---------------->
           ones instead. As long as the NTS-KE handshake has not succeeded, the
           client SHOULD continue polling the NTP server using the cookies and
           parameters it has.
-        </t>
-        <t>
-          The client MAY reuse cookies in order to prioritize resilience over
-          unlinkability. Which of the two that should be prioritized in any
-          particular case is dependent on the application and the user's
-          preference. <xref target="Unlinkability"/> describes the privacy
-          considerations of this in further detail.
         </t>
         <t>
           To allow for NTP session restart when the NTS-KE server is unavailable
