@@ -10,7 +10,7 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-14"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-15"
      ipr="trust200902" submissionType="IETF">
   <front>
     <title abbrev="NTS4NTP">Network Time Security for the Network Time
@@ -95,7 +95,7 @@
       </address>
     </author>
 
-    <date day="22" month="October" year="2018"/>
+    <date day="15" month="December" year="2018"/>
 
     <area>Internet Area</area>
 
