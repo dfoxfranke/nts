@@ -763,7 +763,7 @@ Client -----+---------------------------------+---------------->
             </t>
             <t>
               Possibly, some additional extension fields which are neither
-              encrypted nor authenticated. These are discarded by the
+              encrypted nor authenticated. In general, these are discarded by the
               receiver.
             </t>
           </list>
