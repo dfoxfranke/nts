@@ -890,13 +890,13 @@ Client -----+---------------------------------+---------------->
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 .                                                               .
-.          Nonce, including up to 3 bytes padding               .
+.          Nonce, including up to 3 octets padding              .
 .                                                               .
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 .                                                               .
-.        Ciphertext, including up to 3 bytes padding            .
+.        Ciphertext, including up to 3 octets padding           .
 .                                                               .
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
