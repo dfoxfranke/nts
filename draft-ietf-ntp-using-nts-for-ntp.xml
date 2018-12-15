@@ -458,7 +458,7 @@ Server -----------+---------------+-----+----------------------->
                /     data                   \
               /                              \
              /                                V
-Client -----+---------------------------------+---------------->
+Client -----+---------------------------------+----------------->
             |                                 |
             |                                 |
             |                                 |
@@ -988,6 +988,7 @@ Client -----+---------------------------------+---------------->
               established through NTS-KE.
             </t>
           </list>
+        </t>
         <t>
           To protect the client's privacy, the client SHOULD avoid reusing
           a cookie. If the client does not have any cookies that it has not
@@ -997,7 +998,6 @@ Client -----+---------------------------------+---------------->
           particular case is dependent on the application and the user's
           preference. <xref target="Unlinkability"/> describes the privacy
           considerations of this in further detail.
-        </t>
         </t>
         <t>
           The client MAY include one or more NTS Cookie Placeholder extension
@@ -1034,7 +1034,7 @@ Server -----------+---------------+-----+----------------------->
   (mode 3)     /                            \  (mode 4)  
               /                              \   
              /                                V 
-Client -----+---------------------------------+---------------->
+Client -----+---------------------------------+----------------->
             |                                 |
             |                                 |
             |                                 |
