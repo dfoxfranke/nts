@@ -1145,7 +1145,8 @@ Client -----+---------------------------------+----------------->
           with <xref target="RFC5905">RFC 5905, Section 7.4</xref> where required.
           A client MAY automatically re-run the NTS-KE protocol upon forced
           disassociation from an NTP server. In that case, it MUST be able to
-          detect and stop looping between the NTS-KE and NTP servers.
+          detect and stop looping between the NTS-KE and NTP servers by rate 
+          limiting the retries using e.g. exponential retry intervals.
         </t>
         <t>
           Upon reception of the NTS NAK kiss code, the client SHOULD wait until
