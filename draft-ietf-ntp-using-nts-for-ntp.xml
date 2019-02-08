@@ -1743,13 +1743,18 @@ Client -----+---------------------------------+----------------->
               time.
             </t>
             <t>
-              Do not process time packets from servers if the time computed from
-              them falls outside the validity period of the server's
-              certificate. However, clients should not perform a new NTS-KE
-              handshake solely based on the fact that the certificate used by
-              the NTS-KE server in a previous handshake has expired, if the
-              client has previously received valid NTS protected NTP replies
-              that lay within the certificate's validity time.
+              NTP time replies are expected to be consistent with the NTS-KE TLS
+              certificate validity period, i.e. time replies received immediately after
+              an NTS-KE handshake are expected to lie within the certificate validity
+              period.
+              Implementations are recommended to check that this is the case.
+              Performing a new NTS-KE handshake based solely on the fact that the
+              certificate used by the NTS-KE server in a previous handshake has expired
+              is normally not necessary.
+              Clients that still wish to do this must take care not to cause an
+              inadvertent denial-of-service attack on the NTS-KE server, for example by
+              picking a random time in the week preceding certificate expiry to perform
+              the new handshake.
             </t>
             <t>
               Use multiple time sources. The ability to pass off an expired
