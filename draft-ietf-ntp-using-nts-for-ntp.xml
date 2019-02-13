@@ -619,9 +619,9 @@ Client -----+---------------------------------+----------------->
             The NTPv4 Server Negotiation record has a Record Type
             number of 6. Its body consists of an <xref
             target="ANSI.X3-4.1986">ASCII-encoded</xref> string.  The
-            contents of the string can be an IPv4 address using the
+            contents of the string SHALL be either an IPv4 address in
             dotted decimal notation, an IPv6 address, or a fully
-            qualified domain name (FQDN).  IPv6 addresses must conform
+            qualified domain name (FQDN).  IPv6 addresses MUST conform
             to the "Text Representation of Addresses" as specified in
             <xref target="RFC4291" /> and MUST NOT include zone
             identifiers <xref target="RFC6874"/>.  If
