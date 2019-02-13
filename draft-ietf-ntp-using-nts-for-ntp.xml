@@ -618,10 +618,16 @@ Client -----+---------------------------------+----------------->
           <t>
             The NTPv4 Server Negotiation record has a Record Type
             number of 6. Its body consists of an <xref
-            target="ANSI.X3-4.1986">ASCII-encoded</xref> string
-            conforming to the syntax of the Host subcomponent of a URI
-            (<xref target="RFC3986"/>). IPv6 addresses MUST NOT
-            include zone identifiers <xref target="RFC6874"/>.
+            target="ANSI.X3-4.1986">ASCII-encoded</xref> string.  The
+            contents of the string can be an IPv4 address using the
+            dotted decimal notation, an IPv6 address, or a fully
+            qualified domain name (FQDN).  IPv6 addresses must conform
+            to the "Text Representation of Addresses" as specified in
+            <xref target="RFC4291" /> and MUST NOT include zone
+            identifiers <xref target="RFC6874"/>.  If
+            internationalized labels are needed in the domain name,
+            the A-LABEL syntax specified in <xref target="RFC5891" />
+            MUST be used.
           </t>
           <t>
             When NTPv4 is negotiated as a Next Protocol and this
@@ -1905,10 +1911,11 @@ Client -----+---------------------------------+----------------->
     <references title="Normative References">
       <?rfc include='reference.ANSI.X3-4.1986.xml'?>
       <?rfc include='reference.RFC.2119.xml'?>
-      <?rfc include='reference.RFC.3986.xml'?>
+      <?rfc include='reference.RFC.4291.xml'?>
       <?rfc include='reference.RFC.5116.xml'?>
       <?rfc include='reference.RFC.5297.xml'?>
       <?rfc include='reference.RFC.5705.xml'?>
+      <?rfc include='reference.RFC.5891.xml'?>
       <?rfc include='reference.RFC.5905.xml'?>
       <?rfc include='reference.RFC.6125.xml'?>
       <?rfc include='reference.RFC.6335.xml'?>
