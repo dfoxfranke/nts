@@ -968,6 +968,12 @@ Client -----+---------------------------------+----------------->
           MUST NOT be included in NTP packets whose mode is other than 3
           (client) or 4 (server).
         </t>
+        <t>
+          Note, that in contrast to the NTS-KE records the length field of an 
+          extension field indicates the length of the entire extension field 
+          in octets, including the fields: Field Type, Length, Value, 
+          and Padding <xref target="RFC7822"></xref>.
+        </t>
       </section>
 
       <section title="Protocol Details" anchor="protocol-details">
