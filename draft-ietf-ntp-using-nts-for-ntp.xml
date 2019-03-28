@@ -1039,6 +1039,22 @@ Client -----+---------------------------------+----------------->
           this memo, the number of placeholder extension fields will equal the
           number of dropped packets since the last successful volley.
         </t>
+        <t>
+          In rare circumstances, it may be necessary to include fewer
+          NTS Cookie Placeholder extensions than recommended above in
+          order to prevent datagram fragmentation. When cookies adhere
+          the format recommended in <xref
+          target="suggested-format-for-nts-cookies"/> and the AEAD in
+          use is the mandatory-to-implement AEAD_AES_SIV_CMAC_256,
+          senders can include a cookie and seven placeholders and
+          still have packet size fall comfortably below 1280 octets if
+          no non-NTS-related extensions are used; 1280 octets is the
+          minimum prescribed MTU for IPv6 and is in practice also safe
+          for avoiding IPv4 fragmentation. Nonetheless, Nonetheless,
+          senders SHOULD include fewer cookies and placeholders than
+          otherwise indicated if doing so is necessary to prevent
+          fragmentation.
+        </t>
         <figure anchor="fig_NTSTimeSyncMessage"
           title="NTS Time Synchronization Messages">
           <artwork><![CDATA[
