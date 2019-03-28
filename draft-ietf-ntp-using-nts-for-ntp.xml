@@ -431,6 +431,14 @@
         `((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
       </t>
       <t>
+        Note that, although the Type-Length-Body format of an NTS-KE record is
+        similar to that of an NTP extension field, the semantics of the length
+        field differ. While the length subfield of an NTP extension field gives
+        the length of the entire extension field including the type and length
+        subfields, the length field of an NTS-KE record gives just the length
+        of the body.
+      </t>
+      <t>
         <xref target="fig_NTSKeyExchange"/> provides a schematic overview of the
         key exchange. It displays the protocol steps to be performed by the NTS
         client and server and record types to be exchanged.
@@ -930,11 +938,13 @@ Client -----+---------------------------------+----------------->
               Authenticator and Encrypted Extension Fields extension field.
             </t>
             <t>
-              P: The plaintext SHALL consist of all (if any) NTP extension
-              fields to be encrypted. The format of any such fields SHALL be in
-              accordance with <xref target="RFC7822">RFC 7822</xref>. If
-              multiple extension fields are present they SHALL be joined by
-              concatenation.
+              P: the plaintext SHALL consist of all (if any) NTP extension fields to
+              be encrypted; if multiple extension fields are present they SHALL be
+              joined by concatenation. Each such field SHALL be formatted in
+              accordance with RFC 7822 [RFC7822], except that, contrary to the RFC
+              7822 requirement that fields have a minimum length of 16 or 28 octets,
+              encrypted extension fields MAY be arbitrarily short (but still MUST be
+              a multiple of 4 octets in length).
             </t>
             <t>
               N: The nonce SHALL be formed however required by the negotiated
@@ -964,15 +974,21 @@ Client -----+---------------------------------+----------------->
           does not conform to it.
         </t>
         <t>
+          Senders are always free to include more Additional Padding
+          than mandated by the above paragraph. Theoretically, it
+          could be necessary to do so in order to bring the extension
+          field to the minimum length required by <xref
+          target="RFC7822"/>. This should never happen in practice
+          because any reasonable AEAD algorithm will have a nonce and
+          an authenticator long enough to bring the extension field to
+          its required length already.  Nonetheless, implementers are
+          advised to explicitly handle this case and ensure that the
+          extension field they emit is of legal length.
+        </t>
+        <t>
           The NTS Authenticator and Encrypted Extension Fields extension field
           MUST NOT be included in NTP packets whose mode is other than 3
           (client) or 4 (server).
-        </t>
-        <t>
-          Note, that in contrast to the NTS-KE records the length field of an 
-          extension field indicates the length of the entire extension field 
-          in octets, including the fields: Field Type, Length, Value, 
-          and Padding <xref target="RFC7822"></xref>.
         </t>
       </section>
 
