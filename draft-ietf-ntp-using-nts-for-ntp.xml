@@ -1605,7 +1605,7 @@ Client -----+---------------------------------+----------------->
       up to the individual working groups to use this information as they see
       fit".</t>
 
-      <section title="Implementation PoC 1">
+      <section title="Implementation 1">
         <t>Organization: Ostfalia University of Applied Science</t>
 
         <t>Implementor: Martin Langer</t>
@@ -1613,8 +1613,7 @@ Client -----+---------------------------------+----------------->
         <t>Maturity: Proof-of-Concept Prototype</t>
 
         <t>This implementation was used to verify consistency and to ensure
-        completeness of this specification. It also demonstrate
-        interoperability with NTP's client-server mode messages.</t>
+        completeness of this specification.</t>
 
         <section title="Coverage">
           <t>This implementation covers the complete specification.</t>
@@ -1632,14 +1631,14 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Last Update">
-          <t>The implementation was updated 3rd May 2018.</t>
+          <t>The implementation was updated 25. February 2019.</t>
         </section>
       </section>
 
-      <section title="Implementation PoC 2">
-        <t>Organization: Akamai Technologies</t>
+      <section title="Implementation 2">
+        <t>Organization: Netnod</t>
 
-        <t>Implementor: Daniel Fox Franke </t>
+        <t>Implementor: Christer Weinigel</t>
 
         <t>Maturity: Proof-of-Concept Prototype</t>
 
@@ -1647,38 +1646,127 @@ Client -----+---------------------------------+----------------->
         completeness of this specification. </t>
 
         <section title="Coverage">
-          <t>This implementation provides the client and the server for the
-          initial TLS handshake and NTS key exchange. It provides the the
-          client part of the NTS protected NTP messages. </t>
+          <t>This implementation covers the complete specification.</t>
         </section>
 
         <section title="Licensing">
-          <t>Public domain.</t>
+          <t>????</t>
 
           <t>The source code is available at:
-          https://github.com/dfoxfranke/nts-hackathon</t>
+          https://github.com/Netnod/nts-poc-python</t>
         </section>
 
         <section title="Contact Information">
-          <t>Contact Daniel Fox Franke: dfoxfranke@gmail.com</t>
+          <t>Contact Christer Weinigel: christer@weinigel.se</t>
         </section>
 
         <section title="Last Update">
-          <t>The implementation was updated 16th March 2018.</t>
+          <t>The implementation was updated 31. January 2019.</t>
+        </section>
+      </section>
+      
+      <section title="Implementation 3">
+        <t>Organization: Redhat</t>
+
+        <t>Implementor: Miroslav Lichvar</t>
+
+        <t>Maturity: ????</t>
+
+        <t>This implementation was used to verify consistency and to ensure
+        completeness of this specification. </t>
+
+        <section title="Coverage">
+          <t>This implementation covers the complete specification.</t>
+        </section>
+
+        <section title="Licensing">
+          <t>????</t>
+
+          <t>The source code is available at:
+          https://github.com/mlichvar/chrony-nts</t>
+        </section>
+
+        <section title="Contact Information">
+          <t>Contact Miroslav Lichvar: mlichvar@redhat.com</t>
+        </section>
+
+        <section title="Last Update">
+          <t>The implementation was updated 28. March 2019.</t>
+        </section>
+      </section>
+      
+      <section title="Implementation 4">
+        <t>Organization: NTPsec</t>
+
+        <t>Implementor: Hal Murray</t>
+
+        <t>Maturity:???? </t>
+
+        <t>This implementation was used to verify consistency and to ensure
+        completeness of this specification. </t>
+
+        <section title="Coverage">
+          <t>This implementation covers the complete specification.</t>
+        </section>
+
+        <section title="Licensing">
+          <t>????</t>
+
+          <t>The source code is available at:
+          https://gitlab.com/NTPsec/ntpsec</t>
+        </section>
+
+        <section title="Contact Information">
+          <t>Contact Hal Murray: hmurray@megapathdsl.net</t>
+        </section>
+
+        <section title="Last Update">
+          <t>The implementation was updated 30. March 2019.</t>
+        </section>
+      </section>
+
+      <section title="Implementation 5">
+        <t>Organization: Cloudflare</t>
+
+        <t>Implementor: Watson Ladd</t>
+
+        <t>Maturity: </t>
+
+        <t>This implementation was used to verify consistency and to ensure
+        completeness of this specification. </t>
+
+        <section title="Coverage">
+          <t>This implementation covers the server side of the 
+          NTS specification.</t>
+        </section>
+
+        <section title="Licensing">
+          <t>????</t>
+
+          <t>The source code is available at:
+          https://github.com/wbl/nts-rust</t>
+        </section>
+
+        <section title="Contact Information">
+          <t>Contact Watson Ladd: watson@cloudflare.com</t>
+        </section>
+
+        <section title="Last Update">
+          <t>The implementation was updated 21. March 2019.</t>
         </section>
       </section>
 
       <section title="Interoperability ">
         <t>The Interoperability tests distinguished between NTS key
-        exchange and NTS time exchange messages. For the
-        NTS key exchange, interoperability  between
-        the two implementations  has been verified successfully.
-        Interoperability of NTS time exchange messages has been verified
-        successfully for the case that PoC 1 represents the server and
-        PoC 2 the client.</t>
-
+        establishment protocol and NTS time exchange messages. 
+        For the implementations 1, 2, 3, and 4 pairwise interoperability of 
+        the NTS key establishment protocol and exchange
+        of NTS protected NTP messages have been verified successfully. 
+        The implementation 2 was able to successfully perform the key establishment
+        protocol against the server side of the implementation 5.
+        </t>
         <t>These tests successfully
-        demonstrate that there are at least two running implementations
+        demonstrate that there are at least four running implementations
         of this draft which are able to interoperate.
         </t>
       </section>
