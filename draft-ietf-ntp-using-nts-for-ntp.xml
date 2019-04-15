@@ -1756,6 +1756,33 @@ Client -----+---------------------------------+----------------->
         </section>
       </section>
 
+      <section title="Implementation 6">
+        <t>Organization: Netnod</t>
+
+        <t>Implementor: Michael Cardell Widerkrantz et. al.</t>
+
+        <t>Maturity: Early proof of concept</t>
+
+        <section title="Coverage">
+          <t>NTS-KE client and server.</t>
+        </section>
+
+        <section title="Licensing">
+          <t>????</t>
+
+          <t>The source code is available at:
+          https://github.com/mchackorg/gonts</t>
+        </section>
+
+        <section title="Contact Information">
+          <t>Contact Michael Cardell Widerkrantz: mc@netnod.se</t>
+        </section>
+
+        <section title="Last Update">
+          <t>The implementation was updated 24. March 2019.</t>
+        </section>
+      </section>
+
       <section title="Interoperability ">
         <t>The Interoperability tests distinguished between NTS key
         establishment protocol and NTS time exchange messages. 
