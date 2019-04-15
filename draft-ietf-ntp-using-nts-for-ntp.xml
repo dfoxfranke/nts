@@ -2082,7 +2082,7 @@ Client -----+---------------------------------+----------------->
     </references>
 
     <references title="Informative References">
-      <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-02.xml'?>
+      <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-04.xml'?>
       <?rfc include='reference.RFC.0768.xml'?>
       <?rfc include='reference.RFC.0793.xml'?>      
       <?rfc include='reference.RFC.4086.xml'?>
