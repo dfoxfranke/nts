@@ -95,7 +95,7 @@
       </address>
     </author>
 
-    <date day="28" month="March" year="2019"/>
+    <date day="17" month="April" year="2019"/>
 
     <area>Internet Area</area>
 
@@ -1650,10 +1650,11 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Licensing">
-          <t>????</t>
 
           <t>The source code is available at:
-          https://github.com/Netnod/nts-poc-python</t>
+          https://github.com/Netnod/nts-poc-python.</t>
+		
+	  <t>See LICENSE file for details on licensing (BSD 2).</t>
         </section>
 
         <section title="Contact Information">
@@ -1666,11 +1667,11 @@ Client -----+---------------------------------+----------------->
       </section>
       
       <section title="Implementation 3">
-        <t>Organization: Redhat</t>
+        <t>Organization: Red Hat</t>
 
         <t>Implementor: Miroslav Lichvar</t>
 
-        <t>Maturity: ????</t>
+        <t>Maturity: Prototype</t>
 
         <t>This implementation was used to verify consistency and to ensure
         completeness of this specification. </t>
@@ -1680,7 +1681,7 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Licensing">
-          <t>????</t>
+          <t>Kicensing is GPLv2.</t>
 
           <t>The source code is available at:
           https://github.com/mlichvar/chrony-nts</t>
@@ -1698,9 +1699,9 @@ Client -----+---------------------------------+----------------->
       <section title="Implementation 4">
         <t>Organization: NTPsec</t>
 
-        <t>Implementor: Hal Murray</t>
+        <t>Implementor: Hal Murray and NTPsec team</t>
 
-        <t>Maturity:???? </t>
+        <t>Maturity:Looking for testers. Servers running at ntp1.glypnod.com:123 and ntp2.glypnod.com:123 </t>
 
         <t>This implementation was used to verify consistency and to ensure
         completeness of this specification. </t>
@@ -1710,18 +1711,16 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Licensing">
-          <t>????</t>
+          <t>The source code is available at: https://gitlab.com/NTPsec/ntpsec. Licensing details in LICENSE.</t>
 
-          <t>The source code is available at:
-          https://gitlab.com/NTPsec/ntpsec</t>
         </section>
 
         <section title="Contact Information">
-          <t>Contact Hal Murray: hmurray@megapathdsl.net</t>
+          <t>Contact Hal Murray: hmurray@megapathdsl.net, devel@ntpsec.org</t>
         </section>
 
         <section title="Last Update">
-          <t>The implementation was updated 30. March 2019.</t>
+          <t>The implementation was updated 2019-Apr-10.</t>
         </section>
       </section>
 
@@ -1741,10 +1740,10 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Licensing">
-          <t>????</t>
-
           <t>The source code is available at:
           https://github.com/wbl/nts-rust</t>
+		
+	   <t>Licensing is ISC (details see LICENSE.txt file).</t>
         </section>
 
         <section title="Contact Information">
