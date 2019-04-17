@@ -95,7 +95,7 @@
       </address>
     </author>
 
-    <date day="15" month="April" year="2019"/>
+    <date day="17" month="April" year="2019"/>
 
     <area>Internet Area</area>
 
@@ -1650,10 +1650,11 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Licensing">
-          <t>????</t>
 
           <t>The source code is available at:
-          https://github.com/Netnod/nts-poc-python</t>
+          https://github.com/Netnod/nts-poc-python.</t>
+		
+	  <t>See LICENSE file for details on licensing (BSD 2).</t>
         </section>
 
         <section title="Contact Information">
