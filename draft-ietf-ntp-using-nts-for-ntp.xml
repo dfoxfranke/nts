@@ -938,7 +938,7 @@ Client -----+---------------------------------+----------------->
               Authenticator and Encrypted Extension Fields extension field.
             </t>
             <t>
-              P: the plaintext SHALL consist of all (if any) NTP extension fields to
+              P: The plaintext SHALL consist of all (if any) NTP extension fields to
               be encrypted; if multiple extension fields are present they SHALL be
               joined by concatenation. Each such field SHALL be formatted in
               accordance with RFC 7822 [RFC7822], except that, contrary to the RFC
@@ -1050,7 +1050,7 @@ Client -----+---------------------------------+----------------->
           still have packet size fall comfortably below 1280 octets if
           no non-NTS-related extensions are used; 1280 octets is the
           minimum prescribed MTU for IPv6 and is in practice also safe
-          for avoiding IPv4 fragmentation. Nonetheless, Nonetheless,
+          for avoiding IPv4 fragmentation. Nonetheless,
           senders SHOULD include fewer cookies and placeholders than
           otherwise indicated if doing so is necessary to prevent
           fragmentation.
@@ -1681,7 +1681,7 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Licensing">
-          <t>Kicensing is GPLv2.</t>
+          <t>Licensing is GPLv2.</t>
 
           <t>The source code is available at:
           https://github.com/mlichvar/chrony-nts</t>
