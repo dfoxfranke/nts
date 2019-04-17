@@ -2109,7 +2109,13 @@ Client -----+---------------------------------+----------------->
         <front>
           <title>Multi-path Time Protocols</title>
 
-          <author fullname="Alexander Shpiner, Yoram Revah, and Tal Mizrahi">
+          <author fullname="Alexander Shpiner" initials="A" surname="Shpiner">
+            <organization/>
+          </author>
+          <author fullname="Yoram Revah" initials="Y" surname="Revah">
+            <organization/>
+          </author>
+          <author fullname="Tal Mizrahi" initials="T" surname="Mizrahi">
             <organization/>
           </author>
 
