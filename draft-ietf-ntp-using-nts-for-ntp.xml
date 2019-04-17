@@ -1740,11 +1740,10 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Licensing">
-
           <t>The source code is available at:
           https://github.com/wbl/nts-rust</t>
 		
-	   <t>Licensing is ISC (details see LICENSE.txt file).<t>
+	   <t>Licensing is ISC (details see LICENSE.txt file).</t>
         </section>
 
         <section title="Contact Information">
