@@ -962,7 +962,7 @@ Client -----+---------------------------------+----------------->
           Additional Padding field is ever required.  For mode 3
           (client) packets, the length of the Additional Padding field
           SHALL be computed as follows.  Let `N_LEN` be the padded
-          length of the the Nonce field. Let `N_MAX` be, as specified
+          length of the Nonce field. Let `N_MAX` be, as specified
           by <xref target="RFC5116">RFC 5116</xref>, the maximum
           permitted nonce length for the negotiated AEAD
           algorithm. Let `N_REQ` be the lesser of 16 and N_MAX,
@@ -1144,7 +1144,7 @@ Client -----+---------------------------------+----------------->
           server to be able to recover the C2S and S2C keys, while the latter is
           necessary to satisfy the unlinkability goals discussed in <xref
           target="Unlinkability"/>. We emphasize also that &quot;encrypted&quot;
-          means encapsulated within the the NTS Authenticator and Encrypted
+          means encapsulated within the NTS Authenticator and Encrypted
           Extensions extension field. While the body of an NTS Cookie extension
           field will generally consist of some sort of AEAD output (regardless of
           whether the recommendations of <xref
