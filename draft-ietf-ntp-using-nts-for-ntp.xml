@@ -250,7 +250,7 @@
           NTS-KE server on the NTS TCP port and the two parties perform a TLS
           handshake. Via the TLS channel, the parties negotiate some additional
           protocol parameters and the server sends the client a supply of
-          cookies along with a list of one or more IP addresses to NTP servers
+          cookies along with an IP address to the NTP server
           for which the cookies are valid. The parties use
           <xref target="RFC5705">TLS key export</xref> to extract key material
           which will be used in the next phase of the protocol. This negotiation
