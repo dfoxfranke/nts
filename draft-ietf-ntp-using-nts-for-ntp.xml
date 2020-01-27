@@ -543,6 +543,11 @@ Client -----+---------------------------------+----------------->
                 implementation-defined timeout, it has not yet received a
                 complete and syntactically well-formed request from the client.
               </t>
+              <t>
+                Error code 2 means &quot;Internal Server Error&quot;. The server
+                MUST respond with this error if it is unable to respond properly
+                due to an internal condition.
+              </t>
             </list>
           </t>
         </section>
@@ -1562,6 +1567,10 @@ Client -----+---------------------------------+----------------->
 
           <c>1</c>
           <c>Bad Request</c>
+          <c>[[this memo]], <xref target="nts-error"/></c>
+
+          <c>2</c>
+          <c>Internal Server Error</c>
           <c>[[this memo]], <xref target="nts-error"/></c>
 
           <c>32768-65535</c>
