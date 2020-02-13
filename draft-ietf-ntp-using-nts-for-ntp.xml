@@ -10,7 +10,7 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-21"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-22"
      ipr="trust200902" submissionType="IETF">
   <front>
     <title abbrev="NTS4NTP">Network Time Security for the Network Time
@@ -86,6 +86,7 @@
     <author fullname="Marcus Dansarie" initials="M." surname="Dansarie">
       <address>
         <email>marcus@dansarie.se</email>
+        <uri>https://orcid.org/0000-0001-9246-0263</uri>
       </address>
     </author>
      <author fullname="Ragnar Sundblad" initials="R." surname="Sundblad">
@@ -95,7 +96,7 @@
       </address>
     </author>
 
-    <date day="30" month="January" year="2020"/>
+    <date day="13" month="February" year="2020"/>
 
     <area>Internet Area</area>
 
@@ -195,7 +196,8 @@
       <section title="Protocol Overview">
         <t>
           The Network Time Protocol includes many different operating modes to
-          support various network topologies. In addition to its best-known and
+          support various network topologies (see <xref target="RFC5905">RFC 5905,
+          Section 3</xref>). In addition to its best-known and
           most-widely-used client-server mode, it also includes modes for
           synchronization between symmetric peers, a control mode for server
           monitoring and administration, and a broadcast mode. These various
@@ -1808,7 +1810,16 @@ Client -----+---------------------------------+----------------->
     </section>
 
     <section title="Security Considerations">
-      <section title="Sensitivity to DDoS attacks">
+      <section title="Protected Modes">
+        <t>
+          NTS is only specified for NTP modes 3 (client) and 4 (server). The best
+          current practice for authenticating the other NTP modes is using the
+          symmetric message authentication code feature as described in
+          <xref target="RFC5905">RFC 5905</xref> and
+          <xref target="RFC8573">RFC 8573</xref>.
+        </t>
+      </section>
+      <section title="Sensitivity to DDoS Attacks">
         <t>
           The introduction of NTS brings with it the introduction of asymmetric
           cryptography to NTP. Asymmetric cryptography is necessary for initial
@@ -2098,6 +2109,7 @@ Client -----+---------------------------------+----------------->
       <?rfc include="reference.RFC.5280.xml'?>
       <?rfc include='reference.RFC.5869.xml'?>
       <?rfc include='reference.RFC.7384.xml'?>
+      <?rfc include='reference.RFC.8573.xml'?>
       <reference anchor="Mizrahi" target="">
         <front>
           <title>A game theoretic analysis of delay attacks against time
