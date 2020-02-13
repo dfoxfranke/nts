@@ -193,7 +193,7 @@
 	</t>
       </section>
 
-      <section title="Protocol Overview">
+      <section title="Protocol Overview" anchor="sec-protocol-overview">
         <t>
           The Network Time Protocol includes many different operating modes to
           support various network topologies (see <xref target="RFC5905">RFC 5905,
@@ -1818,9 +1818,12 @@ Client -----+---------------------------------+----------------->
     <section title="Security Considerations">
       <section title="Protected Modes">
         <t>
-          NTS is only specified for NTP modes 3 (client) and 4 (server). The best
-          current practice for authenticating the other NTP modes is using the
-          symmetric message authentication code feature as described in
+          NTP provides many different operating modes in order to support different
+          network topologies and to adapt to various requirements. This memo only
+          specifies NTS for NTP modes 3 (client) and 4 (server) (see
+          <xref target="sec-protocol-overview" />). The best current practice for
+          authenticating the other NTP modes is using the symmetric message
+          authentication code feature as described in
           <xref target="RFC5905">RFC 5905</xref> and
           <xref target="RFC8573">RFC 8573</xref>.
         </t>
