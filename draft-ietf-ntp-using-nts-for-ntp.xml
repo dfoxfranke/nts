@@ -10,7 +10,7 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-21"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-22"
      ipr="trust200902" submissionType="IETF">
   <front>
     <title abbrev="NTS4NTP">Network Time Security for the Network Time
@@ -95,7 +95,7 @@
       </address>
     </author>
 
-    <date day="30" month="January" year="2020"/>
+    <date day="14" month="February" year="2020"/>
 
     <area>Internet Area</area>
 
@@ -192,10 +192,12 @@
 	</t>
       </section>
 
-      <section title="Protocol Overview">
+      <section title="Protocol Overview" anchor="ProtocolOverview">
         <t>
           The Network Time Protocol includes many different operating modes to
-          support various network topologies. In addition to its best-known and
+          support various network topologies (cf. Sec. 3 of 
+          <xref target="RFC5905">RFC 5905</xref>). 
+          In addition to its best-known and
           most-widely-used client-server mode, it also includes modes for
           synchronization between symmetric peers, a control mode for server
           monitoring and administration, and a broadcast mode. These various
@@ -1808,6 +1810,13 @@ Client -----+---------------------------------+----------------->
     </section>
 
     <section title="Security Considerations">
+      <t>
+         NTP provides many different operating modes in order to support different
+         network topologies and to adapt to various requirements (cf. 
+         <xref> target="ProtocolOverview"</xref>). Note, that NTS as 
+         specified in this memo does exclusively consider the most-widely-used 
+         client-server mode. 
+      </t>
       <section title="Sensitivity to DDoS attacks">
         <t>
           The introduction of NTS brings with it the introduction of asymmetric
