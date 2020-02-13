@@ -703,7 +703,12 @@ Client -----+---------------------------------+----------------->
       <section title="Key Extraction (generally)" anchor="key-extraction">
         <t>
           Following a successful run of the NTS-KE protocol, key material SHALL
-          be extracted according to <xref target="RFC5705">RFC 5705</xref>.
+          be extracted using <xref target="RFC5705">the TLS pseudorandom
+          function (PRF)</xref> for TLS version 1.2, or
+          <xref target="RFC5869">the HMAC-based Extract-and-Expand Key
+          Derivation Function (HKDF)</xref> in accordance with
+          <xref target="RFC8446">RFC 8446, Section 7.5</xref> for TLS version 1.3.
+
           Inputs to the exporter function are to be constructed in a manner
           specific to the negotiated Next Protocol. However, all protocols which
           utilize NTS-KE MUST conform to the following two rules:
@@ -729,16 +734,17 @@ Client -----+---------------------------------+----------------->
           Following a successful run of the NTS-KE protocol wherein Protocol
           ID 0 (NTPv4) is selected as a Next Protocol, two AEAD keys SHALL be
           extracted: a client-to-server (C2S) key and a server-to-client (S2C)
-          key. These keys SHALL be computed according to <xref
-          target="RFC5705">RFC 5705</xref>, using the following inputs.
+          key. These keys SHALL be computed with the PRF defined in
+          <xref target="RFC5705">RFC 5705</xref> for TLS version 1.2, or
+          the HKDF defined in <xref target="RFC8446">RFC 8446, Section 7.5</xref>
+          for TLS version 1.3, using the following inputs.
           <list>
             <t>
-              The disambiguating label string SHALL be
-              &quot;EXPORTER-network-time-security/1&quot;.
+              The disambiguating label string (for PRF) or label (for HKDF)
+              SHALL be &quot;EXPORTER-network-time-security/1&quot;.
             </t>
             <t>
-              The per-association context value SHALL consist of the following
-              five octets:
+              The context value SHALL consist of the following five octets:
               <list>
                 <t>
                   The first two octets SHALL be zero (the Protocol ID for
@@ -2167,6 +2173,7 @@ Client -----+---------------------------------+----------------->
             </xref></t>
           <t hangText="NTS   ">Network Time Security</t>
           <t hangText="NTS-KE">Network Time Security Key Exchange</t>
+          <t hangText="PRF   ">Pseudorandom Function</t>
           <t hangText="S2C   ">Server-to-client</t>
           <t hangText="SCSV  "><xref target="RFC7507">Signaling Cipher Suite
             Value</xref></t>
