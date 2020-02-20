@@ -631,18 +631,17 @@ Client -----+---------------------------------+----------------->
         <section title="NTPv4 Server Negotiation"
                  anchor="ntp-server-negotiation">
           <t>
-            The NTPv4 Server Negotiation record has a Record Type
-            number of 6. Its body consists of an <xref
-            target="ANSI.X3-4.1986">ASCII-encoded</xref> string.  The
-            contents of the string SHALL be either an IPv4 address in
-            dotted decimal notation, an IPv6 address, or a fully
-            qualified domain name (FQDN).  IPv6 addresses MUST conform
-            to the "Text Representation of Addresses" as specified in
-            <xref target="RFC4291" /> and MUST NOT include zone
-            identifiers <xref target="RFC6874"/>.  If
-            internationalized labels are needed in the domain name,
-            the A-LABEL syntax specified in <xref target="RFC5891" />
-            MUST be used.
+            The NTPv4 Server Negotiation record has a Record Type number of 6.
+            Its body consists of an
+            <xref target="ANSI.X3-4.1986">ASCII-encoded</xref> string. The
+            contents of the string SHALL be either an IPv4 address, an IPv6
+            address, or a fully qualified domain name (FQDN). IPv4 addresses
+            MUST be in dotted decimal notation. IPv6 addresses MUST conform to
+            the "Text Representation of Addresses" as specified in
+            <xref target="RFC4291">RFC 4291</xref> and MUST NOT include zone
+            identifiers <xref target="RFC6874"/>. If a label contains at least
+            one non-ASCII character, an A-LABEL MUST be used as defined in
+            section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
           </t>
           <t>
             When NTPv4 is negotiated as a Next Protocol and this
@@ -2096,7 +2095,7 @@ Client -----+---------------------------------+----------------->
       <?rfc include='reference.RFC.5116.xml'?>
       <?rfc include='reference.RFC.5297.xml'?>
       <?rfc include='reference.RFC.5705.xml'?>
-      <?rfc include='reference.RFC.5891.xml'?>
+      <?rfc include='reference.RFC.5890.xml'?>
       <?rfc include='reference.RFC.5905.xml'?>
       <?rfc include='reference.RFC.6125.xml'?>
       <?rfc include='reference.RFC.6335.xml'?>
