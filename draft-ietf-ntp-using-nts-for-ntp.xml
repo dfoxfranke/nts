@@ -579,8 +579,8 @@ Client -----+---------------------------------+----------------->
             The AEAD Algorithm Negotiation record has a Record Type number of 4.
             Its body consists of a sequence of unsigned 16-bit integers in
             network byte order, denoting Numeric Identifiers from the IANA
-            <xref target="RFC5116">AEAD registry</xref>. The Critical Bit MAY be
-            set.
+            <xref target="IANA-AEAD">AEAD Algorithms registry</xref>. The
+            Critical Bit MAY be set.
           </t>
           <t>
             If the NTS Next Protocol Negotiation record offers Protocol ID 0
@@ -631,18 +631,17 @@ Client -----+---------------------------------+----------------->
         <section title="NTPv4 Server Negotiation"
                  anchor="ntp-server-negotiation">
           <t>
-            The NTPv4 Server Negotiation record has a Record Type
-            number of 6. Its body consists of an <xref
-            target="ANSI.X3-4.1986">ASCII-encoded</xref> string.  The
-            contents of the string SHALL be either an IPv4 address in
-            dotted decimal notation, an IPv6 address, or a fully
-            qualified domain name (FQDN).  IPv6 addresses MUST conform
-            to the "Text Representation of Addresses" as specified in
-            <xref target="RFC4291" /> and MUST NOT include zone
-            identifiers <xref target="RFC6874"/>.  If
-            internationalized labels are needed in the domain name,
-            the A-LABEL syntax specified in <xref target="RFC5891" />
-            MUST be used.
+            The NTPv4 Server Negotiation record has a Record Type number of 6.
+            Its body consists of an
+            <xref target="ANSI.X3-4.1986">ASCII-encoded</xref> string. The
+            contents of the string SHALL be either an IPv4 address, an IPv6
+            address, or a fully qualified domain name (FQDN). IPv4 addresses
+            MUST be in dotted decimal notation. IPv6 addresses MUST conform to
+            the "Text Representation of Addresses" as specified in
+            <xref target="RFC4291">RFC 4291</xref> and MUST NOT include zone
+            identifiers <xref target="RFC6874"/>. If a label contains at least
+            one non-ASCII character, an A-LABEL MUST be used as defined in
+            section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
           </t>
           <t>
             When NTPv4 is negotiated as a Next Protocol and this
@@ -1773,21 +1772,22 @@ Client -----+---------------------------------+----------------->
       </section>
 
       <section title="Implementation 6">
-        <t>Organization: Netnod</t>
+        <t>Organization: Hacklunch, independent</t>
 
-        <t>Implementor: Michael Cardell Widerkrantz et. al.</t>
+        <t>Implementor: Michael Cardell Widerkrantz, Daniel Lublin,
+          Martin Samuelsson et. al.</t>
 
-        <t>Maturity: Early proof of concept</t>
+        <t>Maturity: interoperable client, immature server</t>
 
         <section title="Coverage">
           <t>NTS-KE client and server.</t>
         </section>
 
         <section title="Licensing">
-          <t>????</t>
+          <t>Licensing is ISC (details in LICENSE file).</t>
 
-          <t>The source code is available at:
-          https://github.com/mchackorg/gonts</t>
+          <t>Source code is available at:
+            https://gitlab.com/hacklunch/ntsclient</t>
         </section>
 
         <section title="Contact Information">
@@ -1795,7 +1795,7 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Last Update">
-          <t>The implementation was updated 24. March 2019.</t>
+          <t>The implementation was updated 6. February 2020.</t>
         </section>
       </section>
 
@@ -2091,12 +2091,23 @@ Client -----+---------------------------------+----------------->
   <back>
     <references title="Normative References">
       <?rfc include='reference.ANSI.X3-4.1986.xml'?>
+      <reference anchor="IANA-AEAD" target="https://www.iana.org/assignments/aead-parameters/">
+        <front>
+          <title>
+            Authenticated Encryption with Associated Data (AEAD) Parameters
+          </title>
+          <author>
+            <organization>IANA</organization>
+          </author>
+          <date />
+        </front>
+      </reference>
       <?rfc include='reference.RFC.2119.xml'?>
       <?rfc include='reference.RFC.4291.xml'?>
       <?rfc include='reference.RFC.5116.xml'?>
       <?rfc include='reference.RFC.5297.xml'?>
       <?rfc include='reference.RFC.5705.xml'?>
-      <?rfc include='reference.RFC.5891.xml'?>
+      <?rfc include='reference.RFC.5890.xml'?>
       <?rfc include='reference.RFC.5905.xml'?>
       <?rfc include='reference.RFC.6125.xml'?>
       <?rfc include='reference.RFC.6335.xml'?>
