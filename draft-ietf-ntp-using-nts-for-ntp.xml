@@ -579,8 +579,8 @@ Client -----+---------------------------------+----------------->
             The AEAD Algorithm Negotiation record has a Record Type number of 4.
             Its body consists of a sequence of unsigned 16-bit integers in
             network byte order, denoting Numeric Identifiers from the IANA
-            <xref target="RFC5116">AEAD registry</xref>. The Critical Bit MAY be
-            set.
+            <xref target="IANA-AEAD">AEAD Algorithms registry</xref>. The
+            Critical Bit MAY be set.
           </t>
           <t>
             If the NTS Next Protocol Negotiation record offers Protocol ID 0
@@ -2090,6 +2090,17 @@ Client -----+---------------------------------+----------------->
   <back>
     <references title="Normative References">
       <?rfc include='reference.ANSI.X3-4.1986.xml'?>
+      <reference anchor="IANA-AEAD" target="https://www.iana.org/assignments/aead-parameters/">
+        <front>
+          <title>
+            Authenticated Encryption with Associated Data (AEAD) Parameters
+          </title>
+          <author>
+            <organization>IANA</organization>
+          </author>
+          <date />
+        </front>
+      </reference>
       <?rfc include='reference.RFC.2119.xml'?>
       <?rfc include='reference.RFC.4291.xml'?>
       <?rfc include='reference.RFC.5116.xml'?>
