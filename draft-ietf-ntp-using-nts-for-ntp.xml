@@ -1772,21 +1772,22 @@ Client -----+---------------------------------+----------------->
       </section>
 
       <section title="Implementation 6">
-        <t>Organization: Netnod</t>
+        <t>Organization: Hacklunch, independent</t>
 
-        <t>Implementor: Michael Cardell Widerkrantz et. al.</t>
+        <t>Implementor: Michael Cardell Widerkrantz, Daniel Lublin,
+          Martin Samuelsson et. al.</t>
 
-        <t>Maturity: Early proof of concept</t>
+        <t>Maturity: interoperable client, immature server</t>
 
         <section title="Coverage">
           <t>NTS-KE client and server.</t>
         </section>
 
         <section title="Licensing">
-          <t>????</t>
+          <t>Licensing is ISC (details in LICENSE file).</t>
 
-          <t>The source code is available at:
-          https://github.com/mchackorg/gonts</t>
+          <t>Source code is available at:
+            https://gitlab.com/hacklunch/ntsclient</t>
         </section>
 
         <section title="Contact Information">
@@ -1794,7 +1795,7 @@ Client -----+---------------------------------+----------------->
         </section>
 
         <section title="Last Update">
-          <t>The implementation was updated 24. March 2019.</t>
+          <t>The implementation was updated 6. February 2020.</t>
         </section>
       </section>
 
