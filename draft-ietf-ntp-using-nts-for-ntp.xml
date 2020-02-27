@@ -1405,8 +1405,19 @@ Client -----+---------------------------------+----------------->
           <c>[[this memo]], <xref target="nts-aeef-extension-field"/></c>
         </texttable>
         <t>
+          [[RFC EDITOR: REMOVE BEFORE PUBLICATION - The NTP WG suggests that the following values be used:
+          <figure>
+            <artwork>
+Unique Identifier    0x0104
+NTS Cookie           0x0204
+Cookie Placeholder   0x0304
+NTS Authenticator    0x0404]]
+            </artwork>
+          </figure>
+        </t>
+        <t>
           [[RFC EDITOR: Replace all instances of [[TBD2]], [[TBD3]], [[TBD4]], and
-          [[TBD5]] in this document with the respective IANA assignments.
+          [[TBD5]] in this document with the respective IANA assignments.]]
         </t>
       </section>
 
@@ -2122,8 +2133,6 @@ Client -----+---------------------------------+----------------->
 
     <references title="Informative References">
       <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-04.xml'?>
-      <?rfc include='reference.RFC.0768.xml'?>
-      <?rfc include='reference.RFC.0793.xml'?>      
       <?rfc include='reference.RFC.4086.xml'?>
       <?rfc include='reference.RFC.5077.xml'?>
       <?rfc include="reference.RFC.5280.xml'?>
@@ -2180,8 +2189,6 @@ Client -----+---------------------------------+----------------->
           <t hangText="EF    "><xref target="RFC5905">Extension Field</xref></t>
           <t hangText="HKDF  "><xref target="RFC5869">Hashed Message
             Authentication Code-based Key Derivation Function</xref></t>
-          <t hangText="IANA  ">Internet Assigned Numbers Authority</t>
-          <t hangText="IP    ">Internet Protocol</t>
           <t hangText="KoD   "><xref target="RFC5905">Kiss-o'-Death</xref></t>
           <t hangText="NTP   "><xref target="RFC5905">Network Time Protocol
             </xref></t>
@@ -2191,12 +2198,8 @@ Client -----+---------------------------------+----------------->
           <t hangText="S2C   ">Server-to-client</t>
           <t hangText="SCSV  "><xref target="RFC7507">Signaling Cipher Suite
             Value</xref></t>
-          <t hangText="TCP   "><xref target="RFC0793">Transmission Control
-            Protocol</xref></t>
           <t hangText="TLS   "><xref target="RFC8446">Transport Layer
             Security</xref></t>
-          <t hangText="UDP   "><xref target="RFC0768">User Datagram Protocol
-            </xref></t>
         </list>
       </t>
     </section>
