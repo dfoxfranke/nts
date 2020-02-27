@@ -1405,8 +1405,19 @@ Client -----+---------------------------------+----------------->
           <c>[[this memo]], <xref target="nts-aeef-extension-field"/></c>
         </texttable>
         <t>
+          [[RFC EDITOR: REMOVE BEFORE PUBLICATION - The NTP WG suggests that the following values be used:
+          <figure>
+            <artwork>
+Unique Identifier    0x0104
+NTS Cookie           0x0204
+Cookie Placeholder   0x0304
+NTS Authenticator    0x0404]]
+            </artwork>
+          </figure>
+        </t>
+        <t>
           [[RFC EDITOR: Replace all instances of [[TBD2]], [[TBD3]], [[TBD4]], and
-          [[TBD5]] in this document with the respective IANA assignments.
+          [[TBD5]] in this document with the respective IANA assignments.]]
         </t>
       </section>
 
