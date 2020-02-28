@@ -85,13 +85,28 @@
 
     <author fullname="Marcus Dansarie" initials="M." surname="Dansarie">
       <address>
+        <postal>
+          <street />
+          <city />
+          <region />
+          <code />
+          <country>Sweden</country>
+        </postal>
         <email>marcus@dansarie.se</email>
         <uri>https://orcid.org/0000-0001-9246-0263</uri>
       </address>
     </author>
+
      <author fullname="Ragnar Sundblad" initials="R." surname="Sundblad">
       <organization>Netnod</organization>
       <address>
+        <postal>
+          <street />
+          <city />
+          <region />
+          <code />
+          <country>Sweden</country>
+        </postal>
         <email>ragge@netnod.se</email>
       </address>
     </author>
