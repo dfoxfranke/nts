@@ -1,0 +1,306 @@
+Detailed comments on 
+
+draft-ietf-ntp-using-nts-for-ntp-22
+
+Section 1.2, p 6
+
+   supply of cookies along with an IP address to the NTP server for
+....
+   Time synchronization proceeds with one of the indicated NTP servers
+
+The cookies are for one server, what are "the indicated NTP servers"
+(plural).
+
+Section 4, p 8
+
+   in the TLS-protected channel.  Then, the server SHALL send a single
+   response 
+and
+   The client's request and the server's response
+but 
+                                                    Requests and
+   non-error responses each SHALL include exactly one NTS Next Protocol
+   Negotiation record.
+
+Is there a single request and single response, or plural requests
+and responses?  If there are many, do they have to have the same
+Next Protocol?
+
+Section 4, page 9
+
+      unrecognized Record Type MUST ignore the record if the Critical
+      Bit is 0 and MUST treat it as an error if the Critical Bit is 1.
+If it is an error, what then?  The server can reply with an Error record
+type, if so, what would the code be?  What would the client do?
+
+   significant bit of the first octet.  In C, given a network buffer
+
+There is a bit called "C" discussed on this page, took me aback a bit.
+Probably not a problem, but if there's an opportunity to say "In the C 
+language", maybe you should.
+
+Section 4.1.2 page 11
+
+   Protocol IDs listed in the server's response MUST comprise a subset
+   of those listed in the request and denote those protocols which the
+   server is willing and able to speak using the key material
+   established through this NTS-KE session.
+
+It is clear that the server in "server's response" is the NTS-KE server,
+but I believe that the server in "server is willing and able to speak" is
+the NTP server that the client will eventually contact.  Right?
+
+                        The request MUST list at least one protocol,
+   but the response MAY be empty.
+
+If the request is empty, what is the client to do?  retry with a
+different set of protocols?  Close the TLS channel?
+
+[There is text saying the the TLS session has minimal impact because
+only one request and one response are exchanged, but retries change
+that. And Section 4 intro page 8 says
+   client SHALL send a single request as Application Data encapsulated
+   in the TLS-protected channel.  Then, the server SHALL send a single
+   response followed by a TLS "Close notify" alert and then discard the
+   channel state.
+which makes retries unlikely.]
+
+Protocol ID 0 is the only defined protocol now, but is it MTI for
+the server to support Protocol ID 0 always? 
+
+Section 4.1.3 page 11
+
+   Clients MUST NOT include Error records in their request.
+
+What if it does?  Does the server drop, respond with an Error, send the
+TLS "Close notify" alert, what? If responding with Error, what code - 
+Bad Request or Internal Error?  (I'm not sure format errors fit in the 
+Bad Request description, tho' they certainly fit the name.)
+
+                                                  If clients
+   receive a server response which includes an Error record, they MUST
+   discard any negotiated key material and MUST NOT proceed to the Next
+   Protocol.
+
+Does "negotiated key material" mean the TLS negotiated material?
+
+Does the client retry with a new request? (next paragraph would seem to 
+indicate retries are possible with modification, Section 4 intro pg 8 
+makes retries sound impossible.)
+
+If the client is discarding the TLS negotiated materials, does the client close the TLS channel and start over from the beginning?  That Section 4
+intro page 8 makes it sound like the client will be forced start over.
+
+   The following error codes are defined:
+
+In all these cases, what does the server do after it sends the Error
+code?
+
+Section 4.1.5, page 12
+
+                                                             It is
+   empty if the server supports none of the algorithms offered.
+
+If it is empty, what does the client do?  retry with a new request?
+(yadayada about whether the Section 4 intro page 8 means that can't be)
+or declare failure and communicate with the NTP server without NTS protections?  should the server send the TLS "Close notify" alert
+after sending the empty algorithms list?
+
+   Server implementations of NTS extension fields for NTPv4 (Section 5)
+   MUST support AEAD_AES_SIV_CMAC_256
+
+Does this apply to the client as well?  If so, is it advisable for
+the client to always include that algorithm?  Is it mandatory for the
+client to include that algorithm?
+
+Section 4.1.6 page 13
+
+   Clients MUST NOT send records of this type.
+What does the server do if the client does?  Send an Error and if
+so with what code?
+
+                                              Servers MUST send at
+   least one record of this type
+What does the client do if the server does not?  Send a new request?
+
+Section 4.1.7 page 13
+
+                                           Servers MUST NOT
+   send more than one record of this type.
+What does the client do if the server does?  Choose the first?
+Drop the response and retry the request?  Close the TLS channel?
+Randomly pick one?
+
+   When this record is sent by the client, it indicates that the client
+   wishes to associate with the specified NTP server.
+What if the client wishes to associate with more than one NTP server?
+(that's recommended practice, so likely.)  Does that mean multiple
+requests to the NTS-KE server under the same TLS channel?  [Section 4
+intro page 8 makes that sound impossible.] does it mean opening
+multiple TLS channels to the NTS-KE server?
+
+Section 4.2 page 14
+
+Inputs to the exporter function are
+   to be constructed in a manner specific to the negotiated Next
+   Protocol. However, all protocols which utilize NTS-KE MUST conform
+   to the following two rules:
+
+So must all protocols with utilize NTS-KE be time protocols?
+
+There are requirements here about what a Next Protocol must provide.
+The cookie construction is another.  Should there be a statement
+about what a Next Protocol spec must include?
+
+Section 5.7 page 20 (nit)
+
+   already sent, it SHOULD initiate a re-run the NTS-KE protocol.  The
+
+"initiate a re-run of the NTS-KE protocol" or "SHOULD re-run the NTS-KE
+protocol"
+
+Section 5.7 page 21
+
+                Figure 5: NTS Time Synchronization Messages
+The caption should be "NTS-protected NTP Time Synchronization Messages".
+The exchange in the figure is of NTP messages, not NTS messages.
+
+
+                                                              In
+   general, however, the server MUST discard any unauthenticated
+   extension fields 
+
+I am not sure what "In general, ... the server MUST" could mean, 
+but given that later text says
+
+        Servers MAY implement exceptions to this requirement for
+   particular extension fields if their specification explicitly
+   provides for such.
+
+I figure this means something like:
+
+   The server MUST discard any unauthenticated extension fields,
+   UNLESS an exception is implemented for specific extension fields
+   whose specification explicitly provides for unauthenticated
+   transmission.
+
+Maybe.
+
+Section 5.7 page 22
+
+                                                              In
+   general, however, the client MUST discard any unauthenticated
+   extension fields and process the packet as though they were not
+   present.  Clients MAY implement exceptions to this requirement for
+   particular extension fields if their specification explicitly
+   provides for such.
+
+Same complaint as on page 21 about "In general, ... the client
+MUST discard..... and "MAY implement exceptions"
+
+Section 5.7 page 23
+
+   If the server is unable to validate the cookie or authenticate the
+   request, it SHOULD respond with a Kiss-o'-Death (KoD) packet
+
+....
+
+                       A client MAY automatically re-run the NTS-KE
+   protocol upon forced disassociation from an NTP server.
+
+Is there a suggestion there that the server may force a disassociation
+from the NTP server after sending the NTS NAK?  (I don't know what
+force that would be, NTP doesn't really have a session-connection-
+channel-state on the server side.)
+
+Section 6 page 24
+
+This section uses "should" a lot, not SHOULD, in cases where it seems
+to be describing recommended optional behavior and sometimes when it
+is describing required behavior.  
+Perhaps that is because this is non-normative text, but distinguishing
+between the required behavior and optional behavior in this text
+is desirable, so I suggest deciding which uses of "should" are really
+RFC21119 requirements language and make it SHOULD, MUST, SHALL, etc.
+
+   This section is non-normative.  It gives a suggested way for servers
+   to construct NTS cookies.  
+and manage the server (NTS-KE and NTP) keys
+
+   Servers should select an AEAD algorithm which they will use to
+   encrypt and authenticate cookies.
+NTS-KE encrypt cookies with this algorithm, NTP servers authenticate 
+cookies with this algorithm, so in this case "servers" means both of 
+them, right?
+And both must make the same choice, right?
+(And this is one of the places where it really sounds like you mean 
+MUST or SHALL.) 
+
+              Servers should additionally choose a non-secret, unique
+   value `I` as key-identifier for `K`.
+   ...
+   of this approach is to use HKDF [RFC5869] to derive new keys, using
+   the key's predecessor as Input Keying Material and its key identifier
+   as a salt.
+RFC5869 says the salt is random.  Should the text about choosing the “non-secret, unique” identifier mention random / unpredictable as well?
+
+   Servers should periodically (e.g., once daily) generate a new pair
+   ...
+                       Immediately following each such key rotation,
+   servers should securely erase any keys generated two or more rotation
+   periods prior.
+Does this mean that a client's cookies to its chosen NTP server will
+no longer be usable after two daily rotations?  (This presumes it does
+no polls in those two days, because any new response would provide
+a new cookie.) Must it go back to forming a TLS channel and an NTS-KE exchange?  If the NTS-KE server gives it a cookie for a different NTP 
+server, won't its time synchronization process revert to unsynchronized?
+
+Section 7.6 page 28
+
+   Applications for new entries SHALL specify the contents of the
+   Description, Set Critical Bit, and Reference fields as well as which
+"Set Critical Bit" is not a field in the registry entries' field 
+descriptions above and not included in the table below.
+
+Section 9.2
+
+                                          In addition to dropping
+   packets and attacks such as those described in Section 9.5, an on-
+   path attacker can send spoofed kiss-o'-death replies, which are not
+   authenticated, in response to NTP requests.  This could result in
+   significantly increased load on the NTS-KE server.
+
+Why?  I presume this text means that the KoD is a NTS-NAK and client 
+who sees the NTS-NAK would restart the whole process with the 
+NTS-KE server.  That is optional behavior in Section 5.7 page 23, 
+and then only "upon forced disassociation" from the server, which 
+the text does not require of the NTP server that sent an NTS-NAK.
+
+Section 9.4 page 36
+
+      error less than NTP_PHASE_MAX.  In this case, the clock SHOULD be
+Is there a reference for the "NTP_PHASE_MAX"? It is not in RFC5905.
+A web search finds only hits in this draft and in various *nx man
+pages as being a "kernel constant"
+
+Section 9.4 page 37
+
+                                                          take care not
+      to cause an inadvertent denial-of-service attack on the NTS-KE
+      server, for example by picking a random time in the week preceding
+      certificate expiry to perform the new handshake.
+
+This order makes it sound like the example is about the attack, not the
+way to "take care not to cause".
+
+Appendix A
+
+(I wasn't going to note this nit, but since you have a list...)
+
+NTS NAK should be on this list.
+
+Actually, NTS NAK is not defined before it is used.  In Section 5.7, page 23
+it says "NTS negative-acknowledgment (NAK)" but it does not say
+"NTS NAK".  So a search for the acronym does not find its definition.
+
+
