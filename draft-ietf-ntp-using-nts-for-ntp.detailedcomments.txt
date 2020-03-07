@@ -11,6 +11,24 @@ Section 1.2, p 6
 The cookies are for one server, what are "the indicated NTP servers"
 (plural).
 
+----------
+DISCUSSION
+
+	This appears to be a valid comment
+
+SUGGESTED REPLY
+
+	Language will be changed:
+	
+	OLD
+	Time synchronization proceeds with one of the indicated NTP servers ...
+	
+	NEW
+	Time synchronization proceeds with the indicated NTP server ...
+
+----------
+
+
 Section 4, p 8
 
    in the TLS-protected channel.  Then, the server SHALL send a single
@@ -26,6 +44,25 @@ Is there a single request and single response, or plural requests
 and responses?  If there are many, do they have to have the same
 Next Protocol?
 
+
+----------
+DISCUSSION
+
+	I suppose the plural for request and response in the sentence 
+	"Requests and non-error responses each SHALL  ..." is the problem
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+	Requests and non-error responses each SHALL  ...
+	
+	NEW
+	Request and non-error response each SHALL  ...
+
+----------
+
 Section 4, page 9
 
       unrecognized Record Type MUST ignore the record if the Critical
@@ -33,11 +70,49 @@ Section 4, page 9
 If it is an error, what then?  The server can reply with an Error record
 type, if so, what would the code be?  What would the client do?
 
+----------
+DISCUSSION
+
+	The error handling is described in 4.1.3. We could add a reference
+	to this section
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+	... treat it as an error if the Critical Bit is 1.
+	
+	NEW
+	... treat it as an error if the Critical Bit is 1 (cf. Sec. 4.1.3).
+
+----------
+
+
    significant bit of the first octet.  In C, given a network buffer
 
 There is a bit called "C" discussed on this page, took me aback a bit.
 Probably not a problem, but if there's an opportunity to say "In the C 
 language", maybe you should.
+
+----------
+DISCUSSION
+
+	I have no strong opinion on that. We could do:
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+	In C, given a network buffer ...
+	
+	NEW
+	In C language, given a network buffer ...
+
+----------
+
+
 
 Section 4.1.2 page 11
 
@@ -49,6 +124,35 @@ Section 4.1.2 page 11
 It is clear that the server in "server's response" is the NTS-KE server,
 but I believe that the server in "server is willing and able to speak" is
 the NTP server that the client will eventually contact.  Right?
+
+----------
+DISCUSSION
+
+	I suggest to make the language more precise in order to deal with this
+	comment.
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+	Protocol IDs listed in the server's response MUST comprise a subset
+    of those listed in the request and denote those protocols which the
+    server is willing and able to speak using the key material
+    established through this NTS-KE session.
+	
+	
+	NEW
+	Protocol IDs listed in the NTS-KE server's response MUST comprise a subset
+    of those listed in the request and denote those protocols which the
+    NTP server is willing and able to speak using the key material
+    established through this NTS-KE session.
+
+----------
+
+
+
+
 
                         The request MUST list at least one protocol,
    but the response MAY be empty.
@@ -68,6 +172,27 @@ which makes retries unlikely.]
 Protocol ID 0 is the only defined protocol now, but is it MTI for
 the server to support Protocol ID 0 always? 
 
+
+----------
+DISCUSSION
+
+	I'm currently not sure how to treat this. Is that an error which 
+	deserves an error code definition in Sec. 4.1.3?
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+
+	
+	
+	NEW
+
+
+----------
+
+
 Section 4.1.3 page 11
 
    Clients MUST NOT include Error records in their request.
@@ -77,6 +202,27 @@ TLS "Close notify" alert, what? If responding with Error, what code -
 Bad Request or Internal Error?  (I'm not sure format errors fit in the 
 Bad Request description, tho' they certainly fit the name.)
 
+----------
+DISCUSSION
+
+	Seems to be a valid question. We could require that the server responses
+	with an error code. But this might be used to misuse the server. I tend to 
+	request that the server must drop those messages. Opinions?
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+
+	
+	
+	NEW
+
+
+----------
+
+
                                                   If clients
    receive a server response which includes an Error record, they MUST
    discard any negotiated key material and MUST NOT proceed to the Next
@@ -84,17 +230,96 @@ Bad Request description, tho' they certainly fit the name.)
 
 Does "negotiated key material" mean the TLS negotiated material?
 
+----------
+DISCUSSION
+
+	Yes. Suggest to make the language more precise. Opinions?
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+    ... discard any negotiated key material and MUST NOT ...
+	
+	
+	NEW
+    ... discard any key material negotiated during the initial TLS
+    exchange and MUST NOT ...
+
+----------
+
 Does the client retry with a new request? (next paragraph would seem to 
 indicate retries are possible with modification, Section 4 intro pg 8 
 makes retries sound impossible.)
 
+----------
+DISCUSSION
+
+	Currently I don't see which paragraph implies that the client 
+	can retry the request. What do I miss?
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+
+	
+	
+	NEW
+
+
+----------
+
 If the client is discarding the TLS negotiated materials, does the client close the TLS channel and start over from the beginning?  That Section 4
 intro page 8 makes it sound like the client will be forced start over.
+
+----------
+DISCUSSION
+
+	Any opinion on that?
+
+SUGGESTED REPLY
+
+	Change language to:
+	
+	OLD
+
+	
+	
+	NEW
+
+
+----------
+
 
    The following error codes are defined:
 
 In all these cases, what does the server do after it sends the Error
 code?
+
+
+----------
+DISCUSSION
+
+	I understood that the server SHALL send a TLS "Close notify". Correct?
+    Shall we add a paragraph at the end of Sec. 4.1.3 which states that the server shall send
+	a TLS "Close notify". On the other side Paragraph 4 at page 8 states explicitly 
+	that the server shall send a TLS "Close notify" anyway.
+
+SUGGESTED REPLY
+
+ 
+		
+	OLD
+
+	
+	
+	NEW
+    
+
+----------
 
 Section 4.1.5, page 12
 
@@ -106,6 +331,30 @@ If it is empty, what does the client do?  retry with a new request?
 or declare failure and communicate with the NTP server without NTS protections?  should the server send the TLS "Close notify" alert
 after sending the empty algorithms list?
 
+----------
+DISCUSSION
+
+	I would argue that this should not be specified by the protocol.
+	
+
+SUGGESTED REPLY
+    The server will send a TLS "Close notify" anyway. Because of the empty record
+    the client will not be able to establish a NTS protected association with the
+    server. In this case the client is responsible how to proceed. Either 
+    retry the whole procedure with a different AEAD algorithm (if it is able to), or 
+    proceed with unprotected plain NTP packets, or giving up and trying a different
+    NTP server.  We do think that this should not be specified in the protocol.
+ 
+		
+	OLD
+
+	
+	
+	NEW
+    
+
+----------
+
    Server implementations of NTS extension fields for NTPv4 (Section 5)
    MUST support AEAD_AES_SIV_CMAC_256
 
@@ -113,11 +362,51 @@ Does this apply to the client as well?  If so, is it advisable for
 the client to always include that algorithm?  Is it mandatory for the
 client to include that algorithm?
 
+
+----------
+DISCUSSION
+
+	
+
+SUGGESTED REPLY
+	This does not apply to the client.
+ 
+		
+	OLD
+
+	
+	
+	NEW
+    
+
+----------
+
+
 Section 4.1.6 page 13
 
    Clients MUST NOT send records of this type.
 What does the server do if the client does?  Send an Error and if
 so with what code?
+
+
+----------
+DISCUSSION
+	
+	Any suggestions?
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+
+	
+	
+	NEW
+    
+
+----------
 
                                               Servers MUST send at
    least one record of this type
@@ -131,6 +420,26 @@ What does the client do if the server does?  Choose the first?
 Drop the response and retry the request?  Close the TLS channel?
 Randomly pick one?
 
+----------
+DISCUSSION
+	
+	Any suggestions?
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+
+	
+	
+	NEW
+    
+
+----------
+
+
    When this record is sent by the client, it indicates that the client
    wishes to associate with the specified NTP server.
 What if the client wishes to associate with more than one NTP server?
@@ -138,6 +447,26 @@ What if the client wishes to associate with more than one NTP server?
 requests to the NTS-KE server under the same TLS channel?  [Section 4
 intro page 8 makes that sound impossible.] does it mean opening
 multiple TLS channels to the NTS-KE server?
+
+----------
+DISCUSSION
+	
+	I would argue that the client would associate with different NTS-KE servers.
+	Opinions?
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+
+	
+	
+	NEW
+    
+
+----------
 
 Section 4.2 page 14
 
@@ -152,6 +481,26 @@ There are requirements here about what a Next Protocol must provide.
 The cookie construction is another.  Should there be a statement
 about what a Next Protocol spec must include?
 
+
+----------
+DISCUSSION
+	
+	Any suggestions?
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+
+	
+	
+	NEW
+    
+
+----------
+
 Section 5.7 page 20 (nit)
 
    already sent, it SHOULD initiate a re-run the NTS-KE protocol.  The
@@ -159,12 +508,49 @@ Section 5.7 page 20 (nit)
 "initiate a re-run of the NTS-KE protocol" or "SHOULD re-run the NTS-KE
 protocol"
 
+----------
+DISCUSSION
+	
+	I prefer the second option
+	
+
+SUGGESTED REPLY
+	Thanks for the hint. We will change to:
+ 
+		
+	OLD
+    ... already sent, it SHOULD initiate a re-run the NTS-KE protocol.
+	
+	
+	NEW
+    ... already sent, it SHOULD re-run the NTS-KE protocol.
+
+----------
+
 Section 5.7 page 21
 
                 Figure 5: NTS Time Synchronization Messages
 The caption should be "NTS-protected NTP Time Synchronization Messages".
 The exchange in the figure is of NTP messages, not NTS messages.
 
+----------
+DISCUSSION
+	
+	A valid comment
+	
+
+SUGGESTED REPLY
+	We will adjust the caption accordingly.
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
 
                                                               In
    general, however, the server MUST discard any unauthenticated
@@ -183,6 +569,26 @@ I figure this means something like:
    UNLESS an exception is implemented for specific extension fields
    whose specification explicitly provides for unauthenticated
    transmission.
+   
+   
+----------
+DISCUSSION
+	
+	I prefer Sandra's formulation. I suggest to adopt it.
+	
+
+SUGGESTED REPLY
+	We will adopt your proposed formulation.
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
 
 Maybe.
 
@@ -197,6 +603,33 @@ Section 5.7 page 22
 
 Same complaint as on page 21 about "In general, ... the client
 MUST discard..... and "MAY implement exceptions"
+
+
+----------
+DISCUSSION
+	
+	I prefer Sandra's formulation. I suggest to adopt it.
+	
+
+SUGGESTED REPLY
+	We will adopt your proposed formulation.
+ 
+		
+	OLD
+   In general, however, the client MUST discard any unauthenticated
+   extension fields and process the packet as though they were not
+   present.  Clients MAY implement exceptions to this requirement for
+   particular extension fields if their specification explicitly
+   provides for such.
+	
+	
+	NEW
+    The client MUST discard any unauthenticated extension fields,
+    UNLESS an exception is implemented for specific extension fields
+    whose specification explicitly provides for unauthenticated
+    transmission.
+
+----------
 
 Section 5.7 page 23
 
@@ -213,6 +646,25 @@ from the NTP server after sending the NTS NAK?  (I don't know what
 force that would be, NTP doesn't really have a session-connection-
 channel-state on the server side.)
 
+----------
+DISCUSSION
+	
+	I don't understand this question. Any suggestions?
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
+
 Section 6 page 24
 
 This section uses "should" a lot, not SHOULD, in cases where it seems
@@ -222,6 +674,26 @@ Perhaps that is because this is non-normative text, but distinguishing
 between the required behavior and optional behavior in this text
 is desirable, so I suggest deciding which uses of "should" are really
 RFC21119 requirements language and make it SHOULD, MUST, SHALL, etc.
+
+----------
+DISCUSSION
+	
+	I suppose that other reviewer will complain if we use requirements
+	language in a non-normative section. Any opinion?
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
 
    This section is non-normative.  It gives a suggested way for servers
    to construct NTS cookies.  
@@ -236,6 +708,25 @@ And both must make the same choice, right?
 (And this is one of the places where it really sounds like you mean 
 MUST or SHALL.) 
 
+----------
+DISCUSSION
+	
+	
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
+
               Servers should additionally choose a non-secret, unique
    value `I` as key-identifier for `K`.
    ...
@@ -244,6 +735,25 @@ MUST or SHALL.)
    as a salt.
 RFC5869 says the salt is random.  Should the text about choosing the “non-secret, unique” identifier mention random / unpredictable as well?
 
+----------
+DISCUSSION
+	
+	
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
+  
    Servers should periodically (e.g., once daily) generate a new pair
    ...
                        Immediately following each such key rotation,
@@ -255,12 +765,53 @@ no polls in those two days, because any new response would provide
 a new cookie.) Must it go back to forming a TLS channel and an NTS-KE exchange?  If the NTS-KE server gives it a cookie for a different NTP 
 server, won't its time synchronization process revert to unsynchronized?
 
+----------
+DISCUSSION
+	I'm somewhat reluctant to change the language here. A client which will not
+	connect for a period of more than two days is ver unlikely. Maybe we could increase 
+	the number rotation periods after which the keys are erased?
+	
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
+
 Section 7.6 page 28
 
    Applications for new entries SHALL specify the contents of the
    Description, Set Critical Bit, and Reference fields as well as which
 "Set Critical Bit" is not a field in the registry entries' field 
 descriptions above and not included in the table below.
+
+
+----------
+DISCUSSION
+	This seems true. Solution?
+	
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
 
 Section 9.2
 
@@ -276,12 +827,51 @@ NTS-KE server.  That is optional behavior in Section 5.7 page 23,
 and then only "upon forced disassociation" from the server, which 
 the text does not require of the NTP server that sent an NTS-NAK.
 
+----------
+DISCUSSION
+	Maybe the language in 9.2 should describe more detailed why a KoD 
+	results in a increased load on the NTS-KE server? 
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
+
 Section 9.4 page 36
 
       error less than NTP_PHASE_MAX.  In this case, the clock SHOULD be
 Is there a reference for the "NTP_PHASE_MAX"? It is not in RFC5905.
 A web search finds only hits in this draft and in various *nx man
 pages as being a "kernel constant"
+
+----------
+DISCUSSION
+	Does anyone of you have a good reference for this? 
+	
+	
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
 
 Section 9.4 page 37
 
@@ -293,6 +883,29 @@ Section 9.4 page 37
 This order makes it sound like the example is about the attack, not the
 way to "take care not to cause".
 
+----------
+DISCUSSION
+	I remember that we had a detailed discussion on this topic. For me
+	this still sound sensible. Suggestions?
+	
+	
+	
+
+SUGGESTED REPLY
+	
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
+
+
+
 Appendix A
 
 (I wasn't going to note this nit, but since you have a list...)
@@ -302,5 +915,25 @@ NTS NAK should be on this list.
 Actually, NTS NAK is not defined before it is used.  In Section 5.7, page 23
 it says "NTS negative-acknowledgment (NAK)" but it does not say
 "NTS NAK".  So a search for the acronym does not find its definition.
+
+----------
+DISCUSSION
+	This sounds resonable to me.
+	
+	
+	
+
+SUGGESTED REPLY
+	We will include NTS NAK in Appendix A.
+ 
+		
+	OLD
+    
+	
+	
+	NEW
+    
+
+----------
 
 
