@@ -1189,11 +1189,11 @@ Client -----+---------------------------------+----------------->
           which MAY appear prior to the NTS Authenticator and Encrypted Extension
           Fields extension field (therefore authenticated but not encrypted),
           within it (therefore encrypted and authenticated), or after it
-          (therefore neither encrypted nor authenticated). In general, however,
-          the client MUST discard any unauthenticated extension fields and process
-          the packet as though they were not present. Clients MAY implement
-          exceptions to this requirement for particular extension fields if their
-          specification explicitly provides for such.
+          (therefore neither encrypted nor authenticated).
+          The client MUST discard any unauthenticated extension
+          fields, UNLESS an exception is implemented for specific
+          extension fields whose specification explicitly provides for
+          unauthenticated transmission.
         </t>
         <t>
           Upon receiving an NTS-protected response, the client MUST verify that
