@@ -277,7 +277,7 @@
           connect to the NTS-KE server again.
         </t>
         <t>
-          Time synchronization proceeds with one of the indicated NTP servers
+          Time synchronization proceeds with the indicated NTP server
           over the NTP UDP port. The client sends the server an NTP client
           packet which includes several extension fields. Included among these
           fields are a cookie (previously provided by the key exchange server)
