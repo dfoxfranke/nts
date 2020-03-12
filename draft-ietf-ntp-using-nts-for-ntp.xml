@@ -1206,8 +1206,8 @@ Client -----+---------------------------------+----------------->
           If the server is unable to validate the cookie or authenticate the
           request, it SHOULD respond with a Kiss-o'-Death (KoD) packet (see
           <xref target="RFC5905">RFC 5905, Section 7.4</xref>) with kiss code
-          &quot;NTSN&quot;, meaning &quot;NTS negative-acknowledgment
-          (NAK)&quot;. It MUST NOT include any NTS Cookie or NTS Authenticator and
+          &quot;NTSN&quot;, meaning &quot;NTS NAK&quot; (NTS negative-acknowledgment).
+          It MUST NOT include any NTS Cookie or NTS Authenticator and
           Encrypted Extension Fields extension fields.
         </t>
         <t>
@@ -2214,6 +2214,7 @@ NTS Authenticator    0x0404]]
           <t hangText="NTP   "><xref target="RFC5905">Network Time Protocol
             </xref></t>
           <t hangText="NTS   ">Network Time Security</t>
+          <t hangText="NTS NAK">NTS negative-acknowledgment</t>
           <t hangText="NTS-KE">Network Time Security Key Exchange</t>
           <t hangText="PRF   ">Pseudorandom Function</t>
           <t hangText="S2C   ">Server-to-client</t>
