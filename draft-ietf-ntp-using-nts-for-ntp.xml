@@ -545,8 +545,8 @@ Client -----+---------------------------------+----------------->
           <t>
             Clients MUST NOT include Error records in their request. If clients
             receive a server response which includes an Error record, they MUST
-            discard any negotiated key material and MUST NOT proceed to the Next
-            Protocol.
+            discard any key material negotiated during the initial TLS exchange
+            and MUST NOT proceed to the Next Protocol.
           </t>
           <t>
             The following error codes are defined:
