@@ -1052,7 +1052,7 @@ Client -----+---------------------------------+----------------->
         <t>
           To protect the client's privacy, the client SHOULD avoid reusing
           a cookie. If the client does not have any cookies that it has not
-          already sent, it SHOULD initiate a re-run the NTS-KE protocol. The
+          already sent, it SHOULD initiate a re-run of the NTS-KE protocol. The
           client MAY reuse cookies in order to prioritize resilience over
           unlinkability. Which of the two that should be prioritized in any
           particular case is dependent on the application and the user's
