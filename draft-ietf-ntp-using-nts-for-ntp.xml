@@ -560,9 +560,10 @@ Client -----+---------------------------------+----------------->
               </t>
               <t>
                 Error code 1 means &quot;Bad Request&quot;. The server MUST
-                respond with this error if, upon the expiration of an
-                implementation-defined timeout, it has not yet received a
-                complete and syntactically well-formed request from the client.
+                respond with this error if the request is not complete
+                and syntactically well-formed, or, upon the expiration
+                of an implementation-defined timeout, it has not yet
+                received such a request.
               </t>
               <t>
                 Error code 2 means &quot;Internal Server Error&quot;. The server
