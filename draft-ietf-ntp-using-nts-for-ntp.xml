@@ -1088,7 +1088,7 @@ Client -----+---------------------------------+----------------->
           fragmentation.
         </t>
         <figure anchor="fig_NTSTimeSyncMessage"
-          title="NTS Time Synchronization Messages">
+          title="NTS-protected NTP Time Synchronization Messages">
           <artwork><![CDATA[
                 +---------------------------------------+
                 | - Verify time request message         |
