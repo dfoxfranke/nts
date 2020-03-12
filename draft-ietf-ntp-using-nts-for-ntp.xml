@@ -520,13 +520,15 @@ Client -----+---------------------------------+----------------->
             Critical Bit MUST be set.
           </t>
           <t>
+
             The Protocol IDs listed in the client's NTS Next Protocol
             Negotiation record denote those protocols which the client wishes to
             speak using the key material established through this NTS-KE
-            session. The Protocol IDs listed in the server's response MUST
-            comprise a subset of those listed in the request and denote those
-            protocols which the server is willing and able to speak using the
-            key material established through this NTS-KE session. The client MAY
+            session. Protocol IDs listed in the NTS-KE server's response MUST
+            comprise a subset of those listed in the request and
+            denote those protocols which the NTP server is willing and
+            able to speak using the key material established through
+            this NTS-KE session. The client MAY
             proceed with one or more of them. The request MUST list at least one
             protocol, but the response MAY be empty.
           </t>
