@@ -421,7 +421,7 @@
             C (Critical Bit): Determines the disposition of unrecognized Record
             Types. Implementations which receive a record with an unrecognized
             Record Type MUST ignore the record if the Critical Bit is 0 and MUST
-            treat it as an error if the Critical Bit is 1.
+            treat it as an error if the Critical Bit is 1 (see <xref target="nts-error"/>).
           </t>
           <t>
             Record Type Number: A 15-bit integer in network byte order. The
