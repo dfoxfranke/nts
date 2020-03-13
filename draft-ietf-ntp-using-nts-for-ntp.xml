@@ -668,6 +668,9 @@ Client -----+---------------------------------+----------------->
             one non-ASCII character, it is an internationalized domain name
             and an A-LABEL MUST be used as defined in
             section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
+            If the record contains a domain name, the recipient MUST treat it
+            as a fully qualified domain name (FQDN), e.g. by making sure it
+            ends with a dot.
           </t>
           <t>
             When NTPv4 is negotiated as a Next Protocol and this
