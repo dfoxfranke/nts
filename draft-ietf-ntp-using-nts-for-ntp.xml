@@ -668,7 +668,8 @@ Client -----+---------------------------------+----------------->
             IPv6 Text Representation" as specified in
             <xref target="RFC5952">RFC 5952</xref>, and MUST NOT include zone
             identifiers <xref target="RFC6874"/>. If a label contains at least
-            one non-ASCII character, an A-LABEL MUST be used as defined in
+            one non-ASCII character, it is an Internationalized Domain Name
+            and an A-LABEL MUST be used as defined in
             section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
           </t>
           <t>
