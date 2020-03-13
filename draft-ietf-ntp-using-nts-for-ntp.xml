@@ -310,7 +310,7 @@
                                                      |              |
                                                  +-> | NTP Server 1 |
                                                  |   |              |
-                           Shared cookie         |   +--------------+
+                           Shared cookie,        |   +--------------+
 +---------------+      encryption parameters     |   +--------------+
 |               |    (Implementation dependent)  |   |              |
 | NTS-KE Server | <------------------------------+-> | NTP Server 2 |
