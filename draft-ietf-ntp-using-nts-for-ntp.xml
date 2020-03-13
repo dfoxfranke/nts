@@ -204,6 +204,12 @@
 	      numbers of clients without having to retain any
 	      client-specific state.
 	    </t>
+	    <t>
+	      Time accuracy: The encryption and authentication used
+	      when actually transferring time can be relatively
+	      lightweight, for performance, and predictable, for time
+	      accuracy.
+	    </t>
 	  </list>
 	</t>
       </section>
