@@ -664,7 +664,9 @@ Client -----+---------------------------------+----------------->
             address, or a fully qualified domain name (FQDN). IPv4 addresses
             MUST be in dotted decimal notation. IPv6 addresses MUST conform to
             the "Text Representation of Addresses" as specified in
-            <xref target="RFC4291">RFC 4291</xref> and MUST NOT include zone
+            <xref target="RFC4291">RFC 4291</xref> and "A Recommendation for
+            IPv6 Text Representation" as specified in
+            <xref target="RFC5952">RFC 5952</xref>, and MUST NOT include zone
             identifiers <xref target="RFC6874"/>. If a label contains at least
             one non-ASCII character, an A-LABEL MUST be used as defined in
             section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
@@ -2147,6 +2149,7 @@ NTS Authenticator    0x0404]]
       <?rfc include='reference.RFC.5705.xml'?>
       <?rfc include='reference.RFC.5890.xml'?>
       <?rfc include='reference.RFC.5905.xml'?>
+      <?rfc include='reference.RFC.5952.xml'?>
       <?rfc include='reference.RFC.6125.xml'?>
       <?rfc include='reference.RFC.6335.xml'?>
       <?rfc include='reference.RFC.6874.xml'?>
