@@ -442,7 +442,7 @@
       </t>
       <t>
         For clarity regarding bit-endianness: the Critical Bit is the
-        most-significant bit of the first octet. In C, given a network buffer
+        most-significant bit of the first octet. In the C programming language, given a network buffer
         `unsigned char b[]` containing an NTS-KE record, the critical bit is
         `b[0] &gt;&gt; 7` while the record type is
         `((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
