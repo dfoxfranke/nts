@@ -655,7 +655,8 @@ Client -----+---------------------------------+----------------->
             the "Text Representation of Addresses" as specified in
             <xref target="RFC4291">RFC 4291</xref> and MUST NOT include zone
             identifiers <xref target="RFC6874"/>. If a label contains at least
-            one non-ASCII character, an A-LABEL MUST be used as defined in
+            one non-ASCII character, it is an internationalized domain name
+            and an A-LABEL MUST be used as defined in
             section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
           </t>
           <t>
