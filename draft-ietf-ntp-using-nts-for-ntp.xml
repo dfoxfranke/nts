@@ -1266,8 +1266,8 @@ Client -----+---------------------------------+----------------->
       <t>
         Servers should periodically (e.g., once daily) generate a new pair (I,K)
         and immediately switch to using these values for all newly-generated
-        cookies. Immediately following each such key rotation, servers should
-        securely erase any keys generated two or more rotation periods prior.
+        cookies. Following each such key rotation, servers should
+        securely erase any previously generated keys that should now be expired.
         Servers should continue to accept any cookie generated using keys that
         they have not yet erased, even if those keys are no longer current.
         Erasing old keys provides for forward secrecy, limiting the scope of
