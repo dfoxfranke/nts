@@ -1041,8 +1041,9 @@ Client -----+---------------------------------+----------------->
           <list>
             <t>
               Exactly one Unique Identifier extension field which MUST be
-              authenticated, MUST NOT be encrypted, and whose contents MUST NOT
-              duplicate those of any previous request.
+              authenticated, MUST NOT be encrypted, and whose contents MUST be
+              the output of a cryptographically secure random number generator.
+              <xref target="RFC4086"/>
             </t>
             <t>
               Exactly one NTS Cookie extension field which MUST be authenticated
@@ -2023,15 +2024,6 @@ NTS Authenticator    0x0404]]
           Usage of multiple time sources, or multiple network paths to a given
           time source <xref target="Shpiner"/>, may also serve to mitigate delay
           attacks if the adversary is in control of only some of the paths.
-        </t>
-      </section>
-      <section title="Random Number Generation">
-        <t>
-          At various points in NTS, the generation of cryptographically secure
-          random numbers is required. Whenever this draft specifies the use of
-          random numbers, cryptographically secure random number generation MUST
-          be used. <xref target="RFC4086">RFC 4086</xref> contains guidelines
-          concerning this topic.
         </t>
       </section>
       <section title="NTS Stripping">
