@@ -276,7 +276,7 @@
           connect to the NTS-KE server again.
         </t>
         <t>
-          Time synchronization proceeds with one of the indicated NTP servers
+          Time synchronization proceeds with the indicated NTP server
           over the NTP UDP port. The client sends the server an NTP client
           packet which includes several extension fields. Included among these
           fields are a cookie (previously provided by the key exchange server)
@@ -387,7 +387,7 @@
       <t>
         The client's request and the server's response each SHALL consist of a
         sequence of records formatted according to
-        <xref target="ntske-record"/>. Requests and non-error responses each
+        <xref target="ntske-record"/>. The request and a non-error respons each
         SHALL include exactly one NTS Next Protocol Negotiation record. The
         sequence SHALL be terminated by a &quot;End of Message&quot; record. The
         requirement that all NTS-KE messages be terminated by an End of Message
@@ -420,7 +420,7 @@
             C (Critical Bit): Determines the disposition of unrecognized Record
             Types. Implementations which receive a record with an unrecognized
             Record Type MUST ignore the record if the Critical Bit is 0 and MUST
-            treat it as an error if the Critical Bit is 1.
+            treat it as an error if the Critical Bit is 1 (see <xref target="nts-error"/>).
           </t>
           <t>
             Record Type Number: A 15-bit integer in network byte order. The
@@ -441,7 +441,7 @@
       </t>
       <t>
         For clarity regarding bit-endianness: the Critical Bit is the
-        most-significant bit of the first octet. In C, given a network buffer
+        most-significant bit of the first octet. In the C language, given a network buffer
         `unsigned char b[]` containing an NTS-KE record, the critical bit is
         `b[0] &gt;&gt; 7` while the record type is
         `((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
@@ -519,15 +519,19 @@ Client -----+---------------------------------+----------------->
             Critical Bit MUST be set.
           </t>
           <t>
+
             The Protocol IDs listed in the client's NTS Next Protocol
             Negotiation record denote those protocols which the client wishes to
             speak using the key material established through this NTS-KE
-            session. The Protocol IDs listed in the server's response MUST
-            comprise a subset of those listed in the request and denote those
-            protocols which the server is willing and able to speak using the
-            key material established through this NTS-KE session. The client MAY
+            session. Protocol IDs listed in the NTS-KE server's response MUST
+            comprise a subset of those listed in the request and
+            denote those protocols which the NTP server is willing and
+            able to speak using the key material established through
+            this NTS-KE session. The client MAY
             proceed with one or more of them. The request MUST list at least one
             protocol, but the response MAY be empty.
+            An empty response signals that none of the protocols in the
+            request can be used with this NTP server.
           </t>
         </section>
 
@@ -540,8 +544,8 @@ Client -----+---------------------------------+----------------->
           <t>
             Clients MUST NOT include Error records in their request. If clients
             receive a server response which includes an Error record, they MUST
-            discard any negotiated key material and MUST NOT proceed to the Next
-            Protocol.
+            discard any key material negotiated during the initial TLS exchange
+            and MUST NOT proceed to the Next Protocol.
           </t>
           <t>
             The following error codes are defined:
@@ -555,9 +559,10 @@ Client -----+---------------------------------+----------------->
               </t>
               <t>
                 Error code 1 means &quot;Bad Request&quot;. The server MUST
-                respond with this error if, upon the expiration of an
-                implementation-defined timeout, it has not yet received a
-                complete and syntactically well-formed request from the client.
+                respond with this error if the request is not complete
+                and syntactically well-formed, or, upon the expiration
+                of an implementation-defined timeout, it has not yet
+                received such a request.
               </t>
               <t>
                 Error code 2 means &quot;Internal Server Error&quot;. The server
@@ -1046,7 +1051,7 @@ Client -----+---------------------------------+----------------->
         <t>
           To protect the client's privacy, the client SHOULD avoid reusing
           a cookie. If the client does not have any cookies that it has not
-          already sent, it SHOULD initiate a re-run the NTS-KE protocol. The
+          already sent, it SHOULD initiate a re-run of the NTS-KE protocol. The
           client MAY reuse cookies in order to prioritize resilience over
           unlinkability. Which of the two that should be prioritized in any
           particular case is dependent on the application and the user's
@@ -1082,7 +1087,7 @@ Client -----+---------------------------------+----------------->
           fragmentation.
         </t>
         <figure anchor="fig_NTSTimeSyncMessage"
-          title="NTS Time Synchronization Messages">
+          title="NTS-protected NTP Time Synchronization Messages">
           <artwork><![CDATA[
                 +---------------------------------------+
                 | - Verify time request message         |
@@ -1127,11 +1132,11 @@ Client -----+---------------------------------+----------------->
           which MAY appear prior to the NTS Authenticator and Encrypted Extension
           Fields extension fields (therefore authenticated but not encrypted),
           within it (therefore encrypted and authenticated), or after it
-          (therefore neither encrypted nor authenticated). In general, however,
-          the server MUST discard any unauthenticated extension fields and process
-          the packet as though they were not present. Servers MAY implement
-          exceptions to this requirement for particular extension fields if their
-          specification explicitly provides for such.
+          (therefore neither encrypted nor authenticated).
+          The server MUST discard any unauthenticated extension
+          fields, UNLESS an exception is implemented for specific
+          extension fields whose specification explicitly provides for
+          unauthenticated transmission.
         </t>
         <t>
           Upon receiving an NTS-protected request, the server SHALL (through some
@@ -1183,11 +1188,11 @@ Client -----+---------------------------------+----------------->
           which MAY appear prior to the NTS Authenticator and Encrypted Extension
           Fields extension field (therefore authenticated but not encrypted),
           within it (therefore encrypted and authenticated), or after it
-          (therefore neither encrypted nor authenticated). In general, however,
-          the client MUST discard any unauthenticated extension fields and process
-          the packet as though they were not present. Clients MAY implement
-          exceptions to this requirement for particular extension fields if their
-          specification explicitly provides for such.
+          (therefore neither encrypted nor authenticated).
+          The client MUST discard any unauthenticated extension
+          fields, UNLESS an exception is implemented for specific
+          extension fields whose specification explicitly provides for
+          unauthenticated transmission.
         </t>
         <t>
           Upon receiving an NTS-protected response, the client MUST verify that
@@ -1200,8 +1205,8 @@ Client -----+---------------------------------+----------------->
           If the server is unable to validate the cookie or authenticate the
           request, it SHOULD respond with a Kiss-o'-Death (KoD) packet (see
           <xref target="RFC5905">RFC 5905, Section 7.4</xref>) with kiss code
-          &quot;NTSN&quot;, meaning &quot;NTS negative-acknowledgment
-          (NAK)&quot;. It MUST NOT include any NTS Cookie or NTS Authenticator and
+          &quot;NTSN&quot;, meaning &quot;NTS NAK&quot; (NTS negative-acknowledgment).
+          It MUST NOT include any NTS Cookie or NTS Authenticator and
           Encrypted Extension Fields extension fields.
         </t>
         <t>
@@ -1265,8 +1270,9 @@ Client -----+---------------------------------+----------------->
       <t>
         Servers should periodically (e.g., once daily) generate a new pair (I,K)
         and immediately switch to using these values for all newly-generated
-        cookies. Immediately following each such key rotation, servers should
-        securely erase any keys generated two or more rotation periods prior.
+        cookies. Following each such key rotation, servers should securely
+        erase any prevoiusly generated keys that should now be expired, e.g.
+        two or more rotation periods prior.
         Servers should continue to accept any cookie generated using keys that
         they have not yet erased, even if those keys are no longer current.
         Erasing old keys provides for forward secrecy, limiting the scope of
@@ -1466,7 +1472,7 @@ NTS Authenticator    0x0404]]
         </t>
         <t>
           Applications for new entries SHALL specify the contents of the
-          Description, Set Critical Bit, and Reference fields as well as which
+          Description and Reference fields as well as which
           of the above ranges the Record Type Number should be allocated from.
           Applicants MAY request a specific Record Type Number and such requests
           MAY be granted at the registrar's discretion.
@@ -2207,6 +2213,7 @@ NTS Authenticator    0x0404]]
           <t hangText="NTP   "><xref target="RFC5905">Network Time Protocol
             </xref></t>
           <t hangText="NTS   ">Network Time Security</t>
+          <t hangText="NTS NAK">NTS negative-acknowledgment</t>
           <t hangText="NTS-KE">Network Time Security Key Exchange</t>
           <t hangText="PRF   ">Pseudorandom Function</t>
           <t hangText="S2C   ">Server-to-client</t>
