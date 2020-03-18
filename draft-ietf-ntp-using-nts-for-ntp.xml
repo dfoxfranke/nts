@@ -1090,7 +1090,7 @@ Client -----+---------------------------------+----------------->
           senders can include a cookie and seven placeholders and
           still have packet size fall comfortably below 1280 octets if
           no non-NTS-related extensions are used; 1280 octets is the
-          minimum prescribed MTU for IPv6 and is in practice also safe
+          minimum prescribed MTU for IPv6 and is generally safe
           for avoiding IPv4 fragmentation. Nonetheless,
           senders SHOULD include fewer cookies and placeholders than
           otherwise indicated if doing so is necessary to prevent
