@@ -826,10 +826,10 @@ Client -----+---------------------------------+----------------->
         <t>
           Always included among the authenticated or authenticated-and-encrypted
           extension fields are a cookie extension field and a unique identifier
-          extension field. The purpose of the cookie extension field is to
-          enable the server to offload storage of session state onto the client.
-          The purpose of the unique identifier extension field is to protect the
-          client from replay attacks.
+          extension field, as described in Section 5.7. The purpose of the
+          cookie extension field is to enable the server to offload storage of
+          session state onto the client. The purpose of the unique identifier
+          extension field is to protect the client from replay attacks.
         </t>
       </section>
 
