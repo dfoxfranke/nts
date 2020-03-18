@@ -2139,6 +2139,7 @@ NTS Authenticator    0x0404]]
       <?rfc include="reference.RFC.5280.xml'?>
       <?rfc include='reference.RFC.5297.xml'?>
       <?rfc include='reference.RFC.5705.xml'?>
+      <?rfc include='reference.RFC.5869.xml'?>
       <?rfc include='reference.RFC.5890.xml'?>
       <?rfc include='reference.RFC.5905.xml'?>
       <?rfc include='reference.RFC.6125.xml'?>
@@ -2155,7 +2156,6 @@ NTS Authenticator    0x0404]]
       <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-04.xml'?>
       <?rfc include='reference.RFC.4086.xml'?>
       <?rfc include='reference.RFC.5077.xml'?>
-      <?rfc include='reference.RFC.5869.xml'?>
       <?rfc include='reference.RFC.7384.xml'?>
       <?rfc include='reference.RFC.8573.xml'?>
       <reference anchor="Mizrahi" target="">
