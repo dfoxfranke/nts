@@ -918,14 +918,14 @@ Client -----+---------------------------------+----------------->
             </t>
             <t>
               Nonce: A nonce as required by the negotiated AEAD Algorithm. The
-              field is zero-padded to a word (four octets) boundary.
+              end of the field is zero-padded to a word (four octets) boundary.
             </t>
             <t>
               Ciphertext: The output of the negotiated AEAD Algorithm. The
               structure of this field is determined by the negotiated algorithm,
               but it typically contains an authentication tag in addition to the
-              actual ciphertext. The field is zero-padded to a word (four
-              octets) boundary.
+              actual ciphertext. The end of the field is zero-padded to a word
+              (four octets) boundary.
             </t>
             <t>
               Additional Padding: Clients which use a nonce length shorter than
