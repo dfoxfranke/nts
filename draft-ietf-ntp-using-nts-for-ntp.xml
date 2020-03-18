@@ -203,6 +203,13 @@
 	      numbers of clients without having to retain any
 	      client-specific state.
 	    </t>
+	    <t>
+	      Performance: NTS must not significantly degrade the
+	      quality of the time transfer. The encryption and
+	      authentication used when actually transferring time
+	      should be lightweight (see <xref target="RFC7384">RFC
+	      7384, Section 5.7</xref>).
+	    </t>
 	  </list>
 	</t>
       </section>
