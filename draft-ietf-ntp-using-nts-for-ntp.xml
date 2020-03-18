@@ -159,7 +159,7 @@
 
 	  <list style="symbols">
 	    <t>
-        Identity: Through the use of the X.509 public key infrastructure,
+        Identity: Through the use of a X.509 public key infrastructure,
         implementations may cryptographically establish the identity of
         the parties they are communicating with.
 	    </t>
