@@ -658,7 +658,7 @@ Client -----+---------------------------------+----------------->
           <t>
             The NTPv4 Server Negotiation record has a Record Type number of 6.
             Its body consists of an
-            <xref target="ANSI.X3-4.1986">ASCII-encoded</xref> string. The
+            <xref target="RFC0020">ASCII-encoded</xref> string. The
             contents of the string SHALL be either an IPv4 address, an IPv6
             address, or a fully qualified domain name (FQDN). IPv4 addresses
             MUST be in dotted decimal notation. IPv6 addresses MUST conform to
@@ -2130,7 +2130,6 @@ NTS Authenticator    0x0404]]
 
   <back>
     <references title="Normative References">
-      <?rfc include='reference.ANSI.X3-4.1986.xml'?>
       <reference anchor="IANA-AEAD" target="https://www.iana.org/assignments/aead-parameters/">
         <front>
           <title>
@@ -2142,6 +2141,7 @@ NTS Authenticator    0x0404]]
           <date />
         </front>
       </reference>
+      <?rfc include='reference.RFC.0020.xml'?>
       <?rfc include='reference.RFC.2119.xml'?>
       <?rfc include='reference.RFC.4291.xml'?>
       <?rfc include='reference.RFC.5116.xml'?>
