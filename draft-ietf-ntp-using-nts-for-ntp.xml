@@ -2180,7 +2180,7 @@ NTS Authenticator    0x0404]]
         </front>
 
         <seriesInfo name="in Proceedings of"
-                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6"/>
+                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6 DOI&nbsp;10.1109/ISPCS.2012.6336612"/>
       </reference>
 
       <reference anchor="Shpiner">
@@ -2201,7 +2201,7 @@ NTS Authenticator    0x0404]]
         </front>
 
         <seriesInfo name="in Proceedings of"
-                    value="IEEE International Symposium on Precision Clock Synchronization for Measurement, Control and Communication (ISPCS)"/>
+                    value="IEEE International Symposium on Precision Clock Synchronization for Measurement, Control and Communication (ISPCS) DOI&nbsp;10.1109/ISPCS.2013.6644754"/>
       </reference>
     </references>
 
