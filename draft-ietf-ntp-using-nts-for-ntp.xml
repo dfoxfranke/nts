@@ -10,7 +10,7 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-23"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-24"
      ipr="trust200902" submissionType="IETF">
   <front>
     <title abbrev="NTS4NTP">Network Time Security for the Network Time
@@ -110,7 +110,7 @@
       </address>
     </author>
 
-    <date day="3" month="March" year="2020"/>
+    <date day="18" month="March" year="2020"/>
 
     <area>Internet Area</area>
 
@@ -2106,13 +2106,14 @@ NTS Authenticator    0x0404]]
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
       Bellovin, Patrik F&auml;ltstr&ouml;m (Faltstrom), Scott Fluhrer,
-      Sharon Goldberg, Russ Housley, Martin Langer, Miroslav Lichvar,
-      Aanchal Malhotra, Dave Mills, Danny Mayer, Karen O'Donoghue,
-      Eric K. Rescorla, Stephen Roettger, Kurt Roeckx, Kyle Rose, Rich
-      Salz, Brian Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn,
-      Joachim Str&ouml;mbergsson (Strombergsson), Martin Thomson,
-      Richard Welty, and Christer Weinigel for contributions to this
-      document and comments on the design of NTS.</t>
+      Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Martin
+      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Dave Mills,
+      Sandra Murphy, Danny Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen
+      Roettger, Kurt Roeckx, Dan Romascanu, Kyle Rose, Rich Salz, Brian
+      Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
+      Str&ouml;mbergsson (Strombergsson), Martin Thomson, &Eacute;ric (Eric)
+      Vyncke, Richard Welty, Christer Weinigel, and Magnus Westerlund for
+      contributions to this document and comments on the design of NTS.</t>
     </section>
   </middle>
 
