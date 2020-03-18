@@ -1890,7 +1890,7 @@ NTS Authenticator    0x0404]]
         </t>
         <t>
           NTS users should also consider that they are not fully protected
-          against DDoS attacks by on-path adversaries. In addition to dropping
+          against DoS attacks by on-path adversaries. In addition to dropping
           packets and attacks such as those described in
           <xref target="DelayAttack"/>, an on-path attacker can send spoofed
           kiss-o'-death replies, which are not authenticated, in response to NTP
@@ -2213,6 +2213,7 @@ NTS Authenticator    0x0404]]
           <t hangText="ALPN  "><xref target="RFC7301">Application-Layer Protocol
             Negotiation</xref></t>
           <t hangText="C2S   ">Client-to-server</t>
+          <t hangText="DoS   ">Denial-of-Service</t>
           <t hangText="DDoS  ">Distributed Denial-of-Service</t>
           <t hangText="EF    "><xref target="RFC5905">Extension Field</xref></t>
           <t hangText="HKDF  "><xref target="RFC5869">Hashed Message
