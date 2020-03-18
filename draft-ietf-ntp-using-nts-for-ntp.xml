@@ -1187,10 +1187,9 @@ Client -----+---------------------------------+----------------->
           Fields extension field (therefore authenticated but not encrypted),
           within it (therefore encrypted and authenticated), or after it
           (therefore neither encrypted nor authenticated).
-          The client MUST discard any unauthenticated extension
-          fields, UNLESS an exception is implemented for specific
-          extension fields whose specification explicitly provides for
-          unauthenticated transmission.
+          The client MUST discard any unauthenticated extension fields.
+          Future specifications of extension fields MAY provide exceptions to
+          this rule.
         </t>
         <t>
           Upon receiving an NTS-protected response, the client MUST verify that
