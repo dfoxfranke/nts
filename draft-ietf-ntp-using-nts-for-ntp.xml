@@ -669,8 +669,7 @@ Client -----+---------------------------------+----------------->
             and an A-LABEL MUST be used as defined in
             section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
             If the record contains a domain name, the recipient MUST treat it
-            as a fully qualified domain name (FQDN), e.g. by making sure it
-            ends with a dot.
+            as a FQDN, e.g. by making sure it ends with a dot.
           </t>
           <t>
             When NTPv4 is negotiated as a Next Protocol and this
@@ -690,6 +689,15 @@ Client -----+---------------------------------+----------------->
             with, but honoring the client's preference is
             OPTIONAL. The client MUST NOT send more than one record of
             this type.
+          </t>
+          <t>
+            If the client has sent a record of this type, the NTS-KE server
+            SHOULD reply with the same record if it is valid and the server is
+            able to supply cookies for it. If the client has not sent any
+            record of this type, the NTS-KE server SHOULD respond with either
+            an NTP server address in the same family as the NTS-KE session or
+            a FQDN that can be resolved to an address in that family, if such
+            alternatives are available.
           </t>
           <t>
             Servers MAY set the Critical Bit on records of this type;
