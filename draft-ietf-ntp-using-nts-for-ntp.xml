@@ -1219,8 +1219,7 @@ Client -----+---------------------------------+----------------->
         </t>
         <t>
           If the NTP server has previously responded with authentic NTS-protected
-          NTP packets (i.e., packets containing the NTS Authenticator and
-          Encrypted Extension Fields extension field), the client MUST verify that
+          NTP packets, the client MUST verify that
           any KoD packets received from the server contain the Unique Identifier
           extension field and that the Unique Identifier matches that of an
           outstanding request. If this check fails, the packet MUST be discarded
