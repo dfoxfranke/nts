@@ -2145,7 +2145,6 @@ NTS Authenticator    0x0404]]
       <?rfc include='reference.RFC.6874.xml'?>
       <?rfc include='reference.RFC.7301.xml'?>
       <?rfc include='reference.RFC.7525.xml'?>
-      <?rfc include='reference.RFC.7507.xml'?>
       <?rfc include='reference.RFC.7822.xml'?>
       <?rfc include='reference.RFC.8174.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
@@ -2218,8 +2217,6 @@ NTS Authenticator    0x0404]]
           <t hangText="NTS-KE">Network Time Security Key Exchange</t>
           <t hangText="PRF   ">Pseudorandom Function</t>
           <t hangText="S2C   ">Server-to-client</t>
-          <t hangText="SCSV  "><xref target="RFC7507">Signaling Cipher Suite
-            Value</xref></t>
           <t hangText="TLS   "><xref target="RFC8446">Transport Layer
             Security</xref></t>
         </list>
