@@ -1381,7 +1381,7 @@ Client -----+---------------------------------+----------------->
 
           <c>EXPORTER-network- time-security/1</c>
           <c>Y</c>
-          <c>Y</c>
+          <c>N</c>
           <c>[[this memo]], <xref target="key-extraction"/></c>
           <c/>
         </texttable>
