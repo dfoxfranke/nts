@@ -387,7 +387,7 @@
       <t>
         The client's request and the server's response each SHALL consist of a
         sequence of records formatted according to
-        <xref target="ntske-record"/>. The request and a non-error respons each
+        <xref target="ntske-record"/>. The request and a non-error response each
         SHALL include exactly one NTS Next Protocol Negotiation record. The
         sequence SHALL be terminated by a &quot;End of Message&quot; record. The
         requirement that all NTS-KE messages be terminated by an End of Message
