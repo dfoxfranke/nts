@@ -530,8 +530,6 @@ Client -----+---------------------------------+----------------->
             this NTS-KE session. The client MAY
             proceed with one or more of them. The request MUST list at least one
             protocol, but the response MAY be empty.
-            An empty response signals that none of the protocols in the
-            request can be used with this NTP server.
           </t>
         </section>
 
