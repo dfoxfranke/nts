@@ -1047,7 +1047,7 @@ Client -----+---------------------------------+----------------->
             <t>
               Exactly one NTS Cookie extension field which MUST be authenticated
               and MUST NOT be encrypted. The cookie MUST be one which has been
-              previously provided to the client; either from the key exchange
+              previously provided to the client, either from the key exchange
               server during the NTS-KE handshake or from the NTP server in
               response to a previous NTS-protected NTP request.
             </t>
