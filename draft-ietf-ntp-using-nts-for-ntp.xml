@@ -893,8 +893,8 @@ Client -----+---------------------------------+----------------->
           serves to ensure that the response will not be larger than the
           request, in order to improve timekeeping precision and prevent DDoS
           amplification. The contents of the NTS Cookie Placeholder extension
-          field's body are undefined and, aside from checking its length, MUST
-          be ignored by the server.
+          field's body SHOULD be all zeros and, aside from checking its length,
+          MUST be ignored by the server.
         </t>
       </section>
 
