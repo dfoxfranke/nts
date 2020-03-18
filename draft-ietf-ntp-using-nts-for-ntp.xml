@@ -2069,8 +2069,8 @@ NTS Authenticator    0x0404]]
         <t>The unlinkability objective only holds for time synchronization
         traffic, as opposed to key exchange traffic. This implies that it
         cannot be guaranteed for devices that function not only as time
-        clients, but also as time servers (because the latter can be
-        externally triggered to send authentication data). </t>
+        clients, but also as time servers (because the latter can be externally
+        triggered to send linkable data, such as the TLS certificate).</t>
 
         <t>It should also be noted that it could be possible to link devices
         that operate as time servers from their time synchronization traffic,
