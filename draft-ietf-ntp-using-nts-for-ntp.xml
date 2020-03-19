@@ -1487,13 +1487,6 @@ NTS Authenticator    0x0404]]
           </list>
         </t>
         <t>
-          Applications for new entries SHALL specify the contents of the
-          Description and Reference fields as well as which
-          of the above ranges the Record Type Number should be allocated from.
-          Applicants MAY request a specific Record Type Number and such requests
-          MAY be granted at the registrar's discretion.
-        </t>
-        <t>
           The initial contents of this registry SHALL be as follows:
         </t>
         <texttable>
