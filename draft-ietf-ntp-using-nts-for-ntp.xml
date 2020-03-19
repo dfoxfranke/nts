@@ -388,8 +388,10 @@
         an application-layer protocol of &quot;ntske/1&quot;. Immediately
         following a successful handshake, the client SHALL send a single request
         as Application Data encapsulated in the TLS-protected channel. Then, the
-        server SHALL send a single response followed by a TLS
-        &quot;Close notify&quot; alert and then discard the channel state.
+        server SHALL send a single response. After sending their respective
+        request and response, the client and server SHALL send TLS
+        &quot;close_notify&quot; alerts in accordance with the TLS version in
+        use, see <xref target="RFC8446">RFC 8446 Section 6.1</xref>.
       </t>
       <t>
         The client's request and the server's response each SHALL consist of a
