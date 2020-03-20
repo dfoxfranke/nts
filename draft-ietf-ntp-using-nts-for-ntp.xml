@@ -160,11 +160,11 @@
 	  <list style="symbols">
 	    <t>
         Identity: Through the use of a X.509 public key infrastructure,
-        implementations may cryptographically establish the identity of
+        implementations can cryptographically establish the identity of
         the parties they are communicating with.
 	    </t>
 	    <t>
-	      Authentication: Implementations may cryptographically
+	      Authentication: Implementations can cryptographically
 	      verify that any time synchronization packets are
 	      authentic, i.e., that they were produced by an
 	      identified party and have not been modified in transit.
@@ -176,12 +176,12 @@
 	      fields.
 	    </t>
 	    <t>
-	      Replay prevention: Client implementations may detect when
+	      Replay prevention: Client implementations can detect when
 	      a received time synchronization packet is a replay of
 	      a previous packet.
 	    </t>
 	    <t>
-	      Request-response consistency: Client implementations may
+	      Request-response consistency: Client implementations can
 	      verify that a time synchronization packet received from
 	      a server was sent in response to a particular request from
 	      the client.
@@ -194,12 +194,12 @@
 	    </t>
 	    <t>
               Non-amplification: Implementations (especially server
-              implementations) may avoid acting as distributed
+              implementations) can avoid acting as distributed
               denial-of-service (DDoS) amplifiers by never responding to a
               request with a packet larger than the request packet.
 	    </t>
 	    <t>
-	      Scalability: Server implementations may serve large
+	      Scalability: Server implementations can serve large
 	      numbers of clients without having to retain any
 	      client-specific state.
 	    </t>
