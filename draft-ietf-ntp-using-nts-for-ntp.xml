@@ -10,7 +10,7 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-23"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-25"
      ipr="trust200902" submissionType="IETF">
   <front>
     <title abbrev="NTS4NTP">Network Time Security for the Network Time
@@ -20,14 +20,13 @@
       <organization abbrev="Akamai">Akamai Technologies</organization>
       <address>
         <postal>
-          <street>150 Broadway</street>
+          <street>145 Broadway</street>
           <city>Cambridge</city>
           <region>MA</region>
           <code>02142</code>
           <country>United States</country>
         </postal>
         <email>dafranke@akamai.com</email>
-        <uri>https://www.dfranke.us</uri>
       </address>
     </author>
 
@@ -111,7 +110,7 @@
       </address>
     </author>
 
-    <date day="3" month="March" year="2020"/>
+    <date day="19" month="March" year="2020"/>
 
     <area>Internet Area</area>
 
@@ -160,7 +159,7 @@
 
 	  <list style="symbols">
 	    <t>
-        Identity: Through the use of the X.509 public key infrastructure,
+        Identity: Through the use of a X.509 public key infrastructure,
         implementations may cryptographically establish the identity of
         the parties they are communicating with.
 	    </t>
@@ -203,6 +202,13 @@
 	      Scalability: Server implementations may serve large
 	      numbers of clients without having to retain any
 	      client-specific state.
+	    </t>
+	    <t>
+	      Performance: NTS must not significantly degrade the
+	      quality of the time transfer. The encryption and
+	      authentication used when actually transferring time
+	      should be lightweight (see <xref target="RFC7384">RFC
+	      7384, Section 5.7</xref>).
 	    </t>
 	  </list>
 	</t>
@@ -267,7 +273,7 @@
           NTS-KE server on the NTS TCP port and the two parties perform a TLS
           handshake. Via the TLS channel, the parties negotiate some additional
           protocol parameters and the server sends the client a supply of
-          cookies along with an IP address to the NTP server
+          cookies along with an address of an NTP server
           for which the cookies are valid. The parties use
           <xref target="RFC5705">TLS key export</xref> to extract key material
           which will be used in the next phase of the protocol. This negotiation
@@ -277,7 +283,7 @@
           connect to the NTS-KE server again.
         </t>
         <t>
-          Time synchronization proceeds with one of the indicated NTP servers
+          Time synchronization proceeds with the indicated NTP server
           over the NTP UDP port. The client sends the server an NTP client
           packet which includes several extension fields. Included among these
           fields are a cookie (previously provided by the key exchange server)
@@ -382,13 +388,15 @@
         an application-layer protocol of &quot;ntske/1&quot;. Immediately
         following a successful handshake, the client SHALL send a single request
         as Application Data encapsulated in the TLS-protected channel. Then, the
-        server SHALL send a single response followed by a TLS
-        &quot;Close notify&quot; alert and then discard the channel state.
+        server SHALL send a single response. After sending their respective
+        request and response, the client and server SHALL send TLS
+        &quot;close_notify&quot; alerts in accordance with the TLS version in
+        use, see <xref target="RFC8446">RFC 8446 Section 6.1</xref>.
       </t>
       <t>
         The client's request and the server's response each SHALL consist of a
         sequence of records formatted according to
-        <xref target="ntske-record"/>. Requests and non-error responses each
+        <xref target="ntske-record"/>. The request and a non-error response each
         SHALL include exactly one NTS Next Protocol Negotiation record. The
         sequence SHALL be terminated by a &quot;End of Message&quot; record. The
         requirement that all NTS-KE messages be terminated by an End of Message
@@ -421,7 +429,7 @@
             C (Critical Bit): Determines the disposition of unrecognized Record
             Types. Implementations which receive a record with an unrecognized
             Record Type MUST ignore the record if the Critical Bit is 0 and MUST
-            treat it as an error if the Critical Bit is 1.
+            treat it as an error if the Critical Bit is 1 (see <xref target="nts-error"/>).
           </t>
           <t>
             Record Type Number: A 15-bit integer in network byte order. The
@@ -442,7 +450,8 @@
       </t>
       <t>
         For clarity regarding bit-endianness: the Critical Bit is the
-        most-significant bit of the first octet. In C, given a network buffer
+        most-significant bit of the first octet. In the C programming language,
+        given a network buffer
         `unsigned char b[]` containing an NTS-KE record, the critical bit is
         `b[0] &gt;&gt; 7` while the record type is
         `((b[0] &amp; 0x7f) &lt;&lt; 8) + b[1]`.
@@ -520,13 +529,15 @@ Client -----+---------------------------------+----------------->
             Critical Bit MUST be set.
           </t>
           <t>
+
             The Protocol IDs listed in the client's NTS Next Protocol
             Negotiation record denote those protocols which the client wishes to
             speak using the key material established through this NTS-KE
-            session. The Protocol IDs listed in the server's response MUST
-            comprise a subset of those listed in the request and denote those
-            protocols which the server is willing and able to speak using the
-            key material established through this NTS-KE session. The client MAY
+            session. Protocol IDs listed in the NTS-KE server's response MUST
+            comprise a subset of those listed in the request and
+            denote those protocols which the NTP server is willing and
+            able to speak using the key material established through
+            this NTS-KE session. The client MAY
             proceed with one or more of them. The request MUST list at least one
             protocol, but the response MAY be empty.
           </t>
@@ -541,8 +552,8 @@ Client -----+---------------------------------+----------------->
           <t>
             Clients MUST NOT include Error records in their request. If clients
             receive a server response which includes an Error record, they MUST
-            discard any negotiated key material and MUST NOT proceed to the Next
-            Protocol.
+            discard any key material negotiated during the initial TLS exchange
+            and MUST NOT proceed to the Next Protocol.
           </t>
           <t>
             The following error codes are defined:
@@ -556,9 +567,10 @@ Client -----+---------------------------------+----------------->
               </t>
               <t>
                 Error code 1 means &quot;Bad Request&quot;. The server MUST
-                respond with this error if, upon the expiration of an
-                implementation-defined timeout, it has not yet received a
-                complete and syntactically well-formed request from the client.
+                respond with this error if the request is not complete
+                and syntactically well-formed, or, upon the expiration
+                of an implementation-defined timeout, it has not yet
+                received such a request.
               </t>
               <t>
                 Error code 2 means &quot;Internal Server Error&quot;. The server
@@ -648,15 +660,18 @@ Client -----+---------------------------------+----------------->
           <t>
             The NTPv4 Server Negotiation record has a Record Type number of 6.
             Its body consists of an
-            <xref target="ANSI.X3-4.1986">ASCII-encoded</xref> string. The
+            <xref target="RFC0020">ASCII-encoded</xref> string. The
             contents of the string SHALL be either an IPv4 address, an IPv6
             address, or a fully qualified domain name (FQDN). IPv4 addresses
             MUST be in dotted decimal notation. IPv6 addresses MUST conform to
             the "Text Representation of Addresses" as specified in
             <xref target="RFC4291">RFC 4291</xref> and MUST NOT include zone
             identifiers <xref target="RFC6874"/>. If a label contains at least
-            one non-ASCII character, an A-LABEL MUST be used as defined in
+            one non-ASCII character, it is an internationalized domain name
+            and an A-LABEL MUST be used as defined in
             section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
+            If the record contains a domain name, the recipient MUST treat it
+            as a FQDN, e.g. by making sure it ends with a dot.
           </t>
           <t>
             When NTPv4 is negotiated as a Next Protocol and this
@@ -676,6 +691,15 @@ Client -----+---------------------------------+----------------->
             with, but honoring the client's preference is
             OPTIONAL. The client MUST NOT send more than one record of
             this type.
+          </t>
+          <t>
+            If the client has sent a record of this type, the NTS-KE server
+            SHOULD reply with the same record if it is valid and the server is
+            able to supply cookies for it. If the client has not sent any
+            record of this type, the NTS-KE server SHOULD respond with either
+            an NTP server address in the same family as the NTS-KE session or
+            a FQDN that can be resolved to an address in that family, if such
+            alternatives are available.
           </t>
           <t>
             Servers MAY set the Critical Bit on records of this type;
@@ -812,10 +836,10 @@ Client -----+---------------------------------+----------------->
         <t>
           Always included among the authenticated or authenticated-and-encrypted
           extension fields are a cookie extension field and a unique identifier
-          extension field. The purpose of the cookie extension field is to
-          enable the server to offload storage of session state onto the client.
-          The purpose of the unique identifier extension field is to protect the
-          client from replay attacks.
+          extension field, as described in Section 5.7. The purpose of the
+          cookie extension field is to enable the server to offload storage of
+          session state onto the client. The purpose of the unique identifier
+          extension field is to protect the client from replay attacks.
         </t>
       </section>
 
@@ -879,8 +903,8 @@ Client -----+---------------------------------+----------------->
           serves to ensure that the response will not be larger than the
           request, in order to improve timekeeping precision and prevent DDoS
           amplification. The contents of the NTS Cookie Placeholder extension
-          field's body are undefined and, aside from checking its length, MUST
-          be ignored by the server.
+          field's body SHOULD be all zeros and, aside from checking its length,
+          MUST be ignored by the server.
         </t>
       </section>
 
@@ -904,14 +928,14 @@ Client -----+---------------------------------+----------------->
             </t>
             <t>
               Nonce: A nonce as required by the negotiated AEAD Algorithm. The
-              field is zero-padded to a word (four octets) boundary.
+              end of the field is zero-padded to a word (four octets) boundary.
             </t>
             <t>
               Ciphertext: The output of the negotiated AEAD Algorithm. The
               structure of this field is determined by the negotiated algorithm,
               but it typically contains an authentication tag in addition to the
-              actual ciphertext. The field is zero-padded to a word (four
-              octets) boundary.
+              actual ciphertext. The end of the field is zero-padded to a word
+              (four octets) boundary.
             </t>
             <t>
               Additional Padding: Clients which use a nonce length shorter than
@@ -1027,13 +1051,14 @@ Client -----+---------------------------------+----------------->
           <list>
             <t>
               Exactly one Unique Identifier extension field which MUST be
-              authenticated, MUST NOT be encrypted, and whose contents MUST NOT
-              duplicate those of any previous request.
+              authenticated, MUST NOT be encrypted, and whose contents MUST be
+              the output of a cryptographically secure random number generator.
+              <xref target="RFC4086"/>
             </t>
             <t>
               Exactly one NTS Cookie extension field which MUST be authenticated
               and MUST NOT be encrypted. The cookie MUST be one which has been
-              previously provided to the client; either from the key exchange
+              previously provided to the client, either from the key exchange
               server during the NTS-KE handshake or from the NTP server in
               response to a previous NTS-protected NTP request.
             </t>
@@ -1047,7 +1072,7 @@ Client -----+---------------------------------+----------------->
         <t>
           To protect the client's privacy, the client SHOULD avoid reusing
           a cookie. If the client does not have any cookies that it has not
-          already sent, it SHOULD initiate a re-run the NTS-KE protocol. The
+          already sent, it SHOULD initiate a re-run of the NTS-KE protocol. The
           client MAY reuse cookies in order to prioritize resilience over
           unlinkability. Which of the two that should be prioritized in any
           particular case is dependent on the application and the user's
@@ -1076,14 +1101,14 @@ Client -----+---------------------------------+----------------->
           senders can include a cookie and seven placeholders and
           still have packet size fall comfortably below 1280 octets if
           no non-NTS-related extensions are used; 1280 octets is the
-          minimum prescribed MTU for IPv6 and is in practice also safe
+          minimum prescribed MTU for IPv6 and is generally safe
           for avoiding IPv4 fragmentation. Nonetheless,
           senders SHOULD include fewer cookies and placeholders than
           otherwise indicated if doing so is necessary to prevent
           fragmentation.
         </t>
         <figure anchor="fig_NTSTimeSyncMessage"
-          title="NTS Time Synchronization Messages">
+          title="NTS-protected NTP Time Synchronization Messages">
           <artwork><![CDATA[
                 +---------------------------------------+
                 | - Verify time request message         |
@@ -1128,11 +1153,10 @@ Client -----+---------------------------------+----------------->
           which MAY appear prior to the NTS Authenticator and Encrypted Extension
           Fields extension fields (therefore authenticated but not encrypted),
           within it (therefore encrypted and authenticated), or after it
-          (therefore neither encrypted nor authenticated). In general, however,
-          the server MUST discard any unauthenticated extension fields and process
-          the packet as though they were not present. Servers MAY implement
-          exceptions to this requirement for particular extension fields if their
-          specification explicitly provides for such.
+          (therefore neither encrypted nor authenticated).
+          The server MUST discard any unauthenticated extension
+          fields. Future specifications of extension fields MAY provide
+          exceptions to this rule.
         </t>
         <t>
           Upon receiving an NTS-protected request, the server SHALL (through some
@@ -1184,11 +1208,10 @@ Client -----+---------------------------------+----------------->
           which MAY appear prior to the NTS Authenticator and Encrypted Extension
           Fields extension field (therefore authenticated but not encrypted),
           within it (therefore encrypted and authenticated), or after it
-          (therefore neither encrypted nor authenticated). In general, however,
-          the client MUST discard any unauthenticated extension fields and process
-          the packet as though they were not present. Clients MAY implement
-          exceptions to this requirement for particular extension fields if their
-          specification explicitly provides for such.
+          (therefore neither encrypted nor authenticated).
+          The client MUST discard any unauthenticated extension fields.
+          Future specifications of extension fields MAY provide exceptions to
+          this rule.
         </t>
         <t>
           Upon receiving an NTS-protected response, the client MUST verify that
@@ -1201,14 +1224,13 @@ Client -----+---------------------------------+----------------->
           If the server is unable to validate the cookie or authenticate the
           request, it SHOULD respond with a Kiss-o'-Death (KoD) packet (see
           <xref target="RFC5905">RFC 5905, Section 7.4</xref>) with kiss code
-          &quot;NTSN&quot;, meaning &quot;NTS negative-acknowledgment
-          (NAK)&quot;. It MUST NOT include any NTS Cookie or NTS Authenticator and
+          &quot;NTSN&quot;, meaning &quot;NTS NAK&quot; (NTS negative-acknowledgment).
+          It MUST NOT include any NTS Cookie or NTS Authenticator and
           Encrypted Extension Fields extension fields.
         </t>
         <t>
           If the NTP server has previously responded with authentic NTS-protected
-          NTP packets (i.e., packets containing the NTS Authenticator and
-          Encrypted Extension Fields extension field), the client MUST verify that
+          NTP packets, the client MUST verify that
           any KoD packets received from the server contain the Unique Identifier
           extension field and that the Unique Identifier matches that of an
           outstanding request. If this check fails, the packet MUST be discarded
@@ -1266,8 +1288,14 @@ Client -----+---------------------------------+----------------->
       <t>
         Servers should periodically (e.g., once daily) generate a new pair (I,K)
         and immediately switch to using these values for all newly-generated
+<<<<<<< HEAD
         cookies. Following each such key rotation, servers should
         securely erase any prevoiusly generated keys that should now be expired.
+=======
+        cookies. Following each such key rotation, servers should securely
+        erase any prevoiusly generated keys that should now be expired, e.g.
+        two or more rotation periods prior.
+>>>>>>> upstream/master
         Servers should continue to accept any cookie generated using keys that
         they have not yet erased, even if those keys are no longer current.
         Erasing old keys provides for forward secrecy, limiting the scope of
@@ -1464,13 +1492,6 @@ NTS Authenticator    0x0404]]
             <t>1024&ndash;16383: Specification Required</t>
             <t>16384&ndash;32767: Private and Experimental Use</t>
           </list>
-        </t>
-        <t>
-          Applications for new entries SHALL specify the contents of the
-          Description, Set Critical Bit, and Reference fields as well as which
-          of the above ranges the Record Type Number should be allocated from.
-          Applicants MAY request a specific Record Type Number and such requests
-          MAY be granted at the registrar's discretion.
         </t>
         <t>
           The initial contents of this registry SHALL be as follows:
@@ -1878,7 +1899,7 @@ NTS Authenticator    0x0404]]
         </t>
         <t>
           NTS users should also consider that they are not fully protected
-          against DDoS attacks by on-path adversaries. In addition to dropping
+          against DoS attacks by on-path adversaries. In addition to dropping
           packets and attacks such as those described in
           <xref target="DelayAttack"/>, an on-path attacker can send spoofed
           kiss-o'-death replies, which are not authenticated, in response to NTP
@@ -2013,15 +2034,6 @@ NTS Authenticator    0x0404]]
           attacks if the adversary is in control of only some of the paths.
         </t>
       </section>
-      <section title="Random Number Generation">
-        <t>
-          At various points in NTS, the generation of cryptographically secure
-          random numbers is required. Whenever this draft specifies the use of
-          random numbers, cryptographically secure random number generation MUST
-          be used. <xref target="RFC4086">RFC 4086</xref> contains guidelines
-          concerning this topic.
-        </t>
-      </section>
       <section title="NTS Stripping">
         <t>
           Implementers must be aware of the possibility of "NTS stripping"
@@ -2065,8 +2077,8 @@ NTS Authenticator    0x0404]]
         <t>The unlinkability objective only holds for time synchronization
         traffic, as opposed to key exchange traffic. This implies that it
         cannot be guaranteed for devices that function not only as time
-        clients, but also as time servers (because the latter can be
-        externally triggered to send authentication data). </t>
+        clients, but also as time servers (because the latter can be externally
+        triggered to send linkable data, such as the TLS certificate).</t>
 
         <t>It should also be noted that it could be possible to link devices
         that operate as time servers from their time synchronization traffic,
@@ -2104,19 +2116,19 @@ NTS Authenticator    0x0404]]
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
       Bellovin, Patrik F&auml;ltstr&ouml;m (Faltstrom), Scott Fluhrer,
-      Sharon Goldberg, Russ Housley, Martin Langer, Miroslav Lichvar,
-      Aanchal Malhotra, Dave Mills, Danny Mayer, Karen O'Donoghue,
-      Eric K. Rescorla, Stephen Roettger, Kurt Roeckx, Kyle Rose, Rich
-      Salz, Brian Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn,
-      Joachim Str&ouml;mbergsson (Strombergsson), Martin Thomson,
-      Richard Welty, and Christer Weinigel for contributions to this
-      document and comments on the design of NTS.</t>
+      Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Martin
+      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Dave Mills,
+      Sandra Murphy, Danny Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen
+      Roettger, Kurt Roeckx, Dan Romascanu, Kyle Rose, Rich Salz, Brian
+      Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
+      Str&ouml;mbergsson (Strombergsson), Martin Thomson, &Eacute;ric (Eric)
+      Vyncke, Richard Welty, Christer Weinigel, and Magnus Westerlund for
+      contributions to this document and comments on the design of NTS.</t>
     </section>
   </middle>
 
   <back>
     <references title="Normative References">
-      <?rfc include='reference.ANSI.X3-4.1986.xml'?>
       <reference anchor="IANA-AEAD" target="https://www.iana.org/assignments/aead-parameters/">
         <front>
           <title>
@@ -2128,11 +2140,14 @@ NTS Authenticator    0x0404]]
           <date />
         </front>
       </reference>
+      <?rfc include='reference.RFC.0020.xml'?>
       <?rfc include='reference.RFC.2119.xml'?>
       <?rfc include='reference.RFC.4291.xml'?>
       <?rfc include='reference.RFC.5116.xml'?>
+      <?rfc include="reference.RFC.5280.xml'?>
       <?rfc include='reference.RFC.5297.xml'?>
       <?rfc include='reference.RFC.5705.xml'?>
+      <?rfc include='reference.RFC.5869.xml'?>
       <?rfc include='reference.RFC.5890.xml'?>
       <?rfc include='reference.RFC.5905.xml'?>
       <?rfc include='reference.RFC.6125.xml'?>
@@ -2140,7 +2155,6 @@ NTS Authenticator    0x0404]]
       <?rfc include='reference.RFC.6874.xml'?>
       <?rfc include='reference.RFC.7301.xml'?>
       <?rfc include='reference.RFC.7525.xml'?>
-      <?rfc include='reference.RFC.7507.xml'?>
       <?rfc include='reference.RFC.7822.xml'?>
       <?rfc include='reference.RFC.8174.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
@@ -2150,8 +2164,6 @@ NTS Authenticator    0x0404]]
       <?rfc include='reference.I-D.draft-ietf-ntp-data-minimization-04.xml'?>
       <?rfc include='reference.RFC.4086.xml'?>
       <?rfc include='reference.RFC.5077.xml'?>
-      <?rfc include="reference.RFC.5280.xml'?>
-      <?rfc include='reference.RFC.5869.xml'?>
       <?rfc include='reference.RFC.7384.xml'?>
       <?rfc include='reference.RFC.8573.xml'?>
       <reference anchor="Mizrahi" target="">
@@ -2167,7 +2179,7 @@ NTS Authenticator    0x0404]]
         </front>
 
         <seriesInfo name="in Proceedings of"
-                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6"/>
+                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6 DOI&nbsp;10.1109/ISPCS.2012.6336612"/>
       </reference>
 
       <reference anchor="Shpiner">
@@ -2188,7 +2200,7 @@ NTS Authenticator    0x0404]]
         </front>
 
         <seriesInfo name="in Proceedings of"
-                    value="IEEE International Symposium on Precision Clock Synchronization for Measurement, Control and Communication (ISPCS)"/>
+                    value="IEEE International Symposium on Precision Clock Synchronization for Measurement, Control and Communication (ISPCS) DOI&nbsp;10.1109/ISPCS.2013.6644754"/>
       </reference>
     </references>
 
@@ -2200,6 +2212,7 @@ NTS Authenticator    0x0404]]
           <t hangText="ALPN  "><xref target="RFC7301">Application-Layer Protocol
             Negotiation</xref></t>
           <t hangText="C2S   ">Client-to-server</t>
+          <t hangText="DoS   ">Denial-of-Service</t>
           <t hangText="DDoS  ">Distributed Denial-of-Service</t>
           <t hangText="EF    "><xref target="RFC5905">Extension Field</xref></t>
           <t hangText="HKDF  "><xref target="RFC5869">Hashed Message
@@ -2208,11 +2221,10 @@ NTS Authenticator    0x0404]]
           <t hangText="NTP   "><xref target="RFC5905">Network Time Protocol
             </xref></t>
           <t hangText="NTS   ">Network Time Security</t>
+          <t hangText="NTS NAK">NTS negative-acknowledgment</t>
           <t hangText="NTS-KE">Network Time Security Key Exchange</t>
           <t hangText="PRF   ">Pseudorandom Function</t>
           <t hangText="S2C   ">Server-to-client</t>
-          <t hangText="SCSV  "><xref target="RFC7507">Signaling Cipher Suite
-            Value</xref></t>
           <t hangText="TLS   "><xref target="RFC8446">Transport Layer
             Security</xref></t>
         </list>
