@@ -1870,7 +1870,7 @@ NTS Authenticator    0x0404]]
           <xref target="RFC8573">RFC 8573</xref>.
         </t>
       </section>
-      <section title="Key compromise">
+      <section title="Key Compromise">
         <t>
           If the <xref target="suggested-format-for-nts-cookies">Suggested Format
           for NTS Cookies</xref> in this draft is used, an attacker which have
