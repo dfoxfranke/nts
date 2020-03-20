@@ -753,7 +753,7 @@ Client -----+---------------------------------+----------------->
           <list>
             <t>
               The disambiguating label string MUST be
-              &quot;EXPORTER-network-time-security/1&quot;.
+              &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
               The per-association context value MUST be provided and MUST begin
@@ -779,7 +779,7 @@ Client -----+---------------------------------+----------------->
           <list>
             <t>
               The disambiguating label string (for PRF) or label (for HKDF)
-              SHALL be &quot;EXPORTER-network-time-security/1&quot;.
+              SHALL be &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
               The context value SHALL consist of the following five octets:
@@ -1395,7 +1395,7 @@ Client -----+---------------------------------+----------------->
           <ttcol>Reference</ttcol>
           <ttcol>Note</ttcol>
 
-          <c>EXPORTER-network- time-security/1</c>
+          <c>EXPORTER-network-time-security</c>
           <c>Y</c>
           <c>Y</c>
           <c>[[this memo]], <xref target="key-extraction"/></c>
