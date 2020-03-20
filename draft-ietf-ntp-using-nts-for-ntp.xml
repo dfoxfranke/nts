@@ -1219,6 +1219,8 @@ Client -----+---------------------------------+----------------->
           the packet is authentic under the S2C key associated with that request.
           If either of these checks fails, the packet MUST be discarded without
           further processing.
+          This means that a client will only accept an NTS-protected response to
+          an NTS-protected request.
         </t>
         <t>
           If the server is unable to validate the cookie or authenticate the
