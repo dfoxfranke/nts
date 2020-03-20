@@ -1872,8 +1872,9 @@ NTS Authenticator    0x0404]]
       </section>
       <section title="Key Compromise">
         <t>
-          If the <xref target="suggested-format-for-nts-cookies">suggested format
-          for NTS cookies in of this draft</xref> is used, an attacker who has gained
+          If the suggested format
+          for NTS cookies in <xref target="suggested-format-for-nts-cookies" />
+          of this draft is used, an attacker who has gained
           access to the secret cookie encryption key `K` can impersonate
           the NTP server, including generating new cookies.
           NTP and NTS-KE server operators SHOULD remove compromised keys as soon
