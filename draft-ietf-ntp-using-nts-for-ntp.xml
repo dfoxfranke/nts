@@ -1395,7 +1395,7 @@ Client -----+---------------------------------+----------------->
           <ttcol>Reference</ttcol>
           <ttcol>Note</ttcol>
 
-          <c>EXPORTER-network-time-security</c>
+          <c>EXPORTER-network- time-security</c>
           <c>Y</c>
           <c>Y</c>
           <c>[[this memo]], <xref target="key-extraction"/></c>
