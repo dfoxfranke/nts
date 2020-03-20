@@ -2045,7 +2045,7 @@ NTS Authenticator    0x0404]]
       <section title="NTS Stripping">
         <t>
           Implementers must be aware of the possibility of "NTS stripping"
-          attacks, where an attacker tricks clients into reverting to plain
+          attacks, where an attacker tries to trick clients into reverting to plain
           NTP. Naive client implementations might, for example, revert
           automatically to plain NTP if the NTS-KE handshake fails. A man-in-the-middle
           attacker can easily cause this to happen. Even clients that already
