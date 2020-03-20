@@ -1870,6 +1870,20 @@ NTS Authenticator    0x0404]]
           <xref target="RFC8573">RFC 8573</xref>.
         </t>
       </section>
+      <section title="Key compromise">
+        <t>
+          If the <xref target="suggested-format-for-nts-cookies">Suggested Format
+          for NTS Cookies</xref> in this draft is used, an attacker which have
+          gained access to the secret cookie encyption key `K` can impersonate
+          the NTP server, including generating new cookies.
+          NTP and NTS-KE server operators are expected to remove compromised keys
+          as soon as the compromise is discovered. This would cause the NTP servers
+          to respond with NTS NAK, thus forcing key renegotiation. This does not
+          protect against MITM attacks where the attacker has access to a compromised
+          cookie encryption key. If another cookie scheme is used, there is likely
+          similar considerations to make for that particular scheme.
+        </t>
+      </section>
       <section title="Sensitivity to DDoS Attacks">
         <t>
           The introduction of NTS brings with it the introduction of asymmetric
