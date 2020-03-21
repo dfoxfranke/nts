@@ -1963,12 +1963,12 @@ NTS Authenticator    0x0404]]
           successfully present an expired certificate:
           <list>
             <t>
-              Check whether the system time is in fact unreliable. If the system
-              clock has previously been synchronized since last boot, then on
-              operating systems which implement a kernel-based phase-locked-loop
-              API, a call to ntp_gettime() should show a maximum error less than
-              NTP_PHASE_MAX. In this case, the clock SHOULD be considered
-              reliable and certificates can be strictly validated.
+              Check whether the system time is in fact unreliable. If the
+              system clock has previously been synchronized since last boot,
+              then on operating systems which implement the ntp_adjtime()
+              system call, it will return a value other than TIME_ERROR. In
+              this case, the clock SHOULD be considered reliable and
+              certificates can be strictly validated.
             </t>
             <t>
               Allow the system administrator to specify that certificates should
