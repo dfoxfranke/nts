@@ -1237,9 +1237,10 @@ Client -----+---------------------------------+----------------->
           without further processing. If this check passes, the client MUST comply
           with <xref target="RFC5905">RFC 5905, Section 7.4</xref> where required.
           A client MAY automatically re-run the NTS-KE protocol upon forced
-          disassociation from an NTP server. In that case, it MUST be able to
-          detect and stop looping between the NTS-KE and NTP servers by rate 
-          limiting the retries using e.g. exponential retry intervals.
+          disassociation from an NTP server. In that case, it MUST avoid quickly
+          looping between the NTS-KE and NTP servers by rate limiting the
+          retries using, for example, exponential retry intervals. A reasonable
+          maximum retry interval could be 7 days, depending on the application.
         </t>
         <t>
           Upon reception of the NTS NAK kiss code, the client SHOULD wait until
@@ -2123,14 +2124,15 @@ NTS Authenticator    0x0404]]
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
       Bellovin, Scott Fluhrer, Patrik F&auml;ltstr&ouml;m (Faltstrom),
-      Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Martin
-      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Danny Mayer,
-      Dave Mills, Sandra Murphy, Hal Murray, Karen O'Donoghue, Eric K.
-      Rescorla, Kurt Roeckx, Stephen Roettger, Dan Romascanu, Kyle Rose, Rich
-      Salz, Brian Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
-      Str&ouml;mbergsson (Strombergsson), Martin Thomson, &Eacute;ric (Eric)
-      Vyncke, Richard Welty, Christer Weinigel, and Magnus Westerlund for
-      contributions to this document and comments on the design of NTS.</t>
+      Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Mirja
+      K&uuml;hlewind (Kuehlewind), Martin Langer, Barry Leiba, Miroslav Lichvar,
+      Aanchal Malhotra, Danny Mayer, Dave Mills, Sandra Murphy, Hal Murray,
+      Karen O'Donoghue, Eric K. Rescorla, Kurt Roeckx, Stephen Roettger, Dan
+      Romascanu, Kyle Rose, Rich Salz, Brian Sniffen, Susan Sons, Douglas
+      Stebila, Harlan Stenn, Joachim Str&ouml;mbergsson (Strombergsson), Martin
+      Thomson, &Eacute;ric (Eric) Vyncke, Richard Welty, Christer Weinigel, and
+      Magnus Westerlund for contributions to this document and comments on the
+      design of NTS.</t>
     </section>
   </middle>
 
