@@ -160,11 +160,11 @@
 	  <list style="symbols">
 	    <t>
         Identity: Through the use of a X.509 public key infrastructure,
-        implementations may cryptographically establish the identity of
+        implementations can cryptographically establish the identity of
         the parties they are communicating with.
 	    </t>
 	    <t>
-	      Authentication: Implementations may cryptographically
+	      Authentication: Implementations can cryptographically
 	      verify that any time synchronization packets are
 	      authentic, i.e., that they were produced by an
 	      identified party and have not been modified in transit.
@@ -176,12 +176,12 @@
 	      fields.
 	    </t>
 	    <t>
-	      Replay prevention: Client implementations may detect when
+	      Replay prevention: Client implementations can detect when
 	      a received time synchronization packet is a replay of
 	      a previous packet.
 	    </t>
 	    <t>
-	      Request-response consistency: Client implementations may
+	      Request-response consistency: Client implementations can
 	      verify that a time synchronization packet received from
 	      a server was sent in response to a particular request from
 	      the client.
@@ -194,12 +194,12 @@
 	    </t>
 	    <t>
               Non-amplification: Implementations (especially server
-              implementations) may avoid acting as distributed
+              implementations) can avoid acting as distributed
               denial-of-service (DDoS) amplifiers by never responding to a
               request with a packet larger than the request packet.
 	    </t>
 	    <t>
-	      Scalability: Server implementations may serve large
+	      Scalability: Server implementations can serve large
 	      numbers of clients without having to retain any
 	      client-specific state.
 	    </t>
@@ -359,7 +359,7 @@
         backward-compatibility concerns exist to justify using
         obsolete, insecure, or otherwise broken TLS features or
         versions. Implementations MUST conform with <xref
-        target="RFC7525"/> or with a later revision of BCP
+        target="RFC7525">RFC 7525</xref> or with a later revision of BCP
         195. In particular, failure to use cipher suites that provide forward
         secrecy will make all negotiated NTS keys recoverable by anyone
         that gains access to the NTS-KE server's private key.
@@ -753,7 +753,7 @@ Client -----+---------------------------------+----------------->
           <list>
             <t>
               The disambiguating label string MUST be
-              &quot;EXPORTER-network-time-security/1&quot;.
+              &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
               The per-association context value MUST be provided and MUST begin
@@ -779,7 +779,7 @@ Client -----+---------------------------------+----------------->
           <list>
             <t>
               The disambiguating label string (for PRF) or label (for HKDF)
-              SHALL be &quot;EXPORTER-network-time-security/1&quot;.
+              SHALL be &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
               The context value SHALL consist of the following five octets:
@@ -1029,8 +1029,8 @@ Client -----+---------------------------------+----------------->
           than mandated by the above paragraph. Theoretically, it
           could be necessary to do so in order to bring the extension
           field to the minimum length required by <xref
-          target="RFC7822"/>. This should never happen in practice
-          because any reasonable AEAD algorithm will have a nonce and
+          target="RFC7822">RFC 7822</xref>. This should never happen in
+          practice because any reasonable AEAD algorithm will have a nonce and
           an authenticator long enough to bring the extension field to
           its required length already.  Nonetheless, implementers are
           advised to explicitly handle this case and ensure that the
@@ -1288,9 +1288,8 @@ Client -----+---------------------------------+----------------->
       <t>
         Servers should periodically (e.g., once daily) generate a new pair (I,K)
         and immediately switch to using these values for all newly-generated
-        cookies. Following each such key rotation, servers should securely
-        erase any prevoiusly generated keys that should now be expired, e.g.
-        two or more rotation periods prior.
+        cookies. Following each such key rotation, servers should
+        securely erase any previously generated keys that should now be expired.
         Servers should continue to accept any cookie generated using keys that
         they have not yet erased, even if those keys are no longer current.
         Erasing old keys provides for forward secrecy, limiting the scope of
@@ -1390,7 +1389,7 @@ Client -----+---------------------------------+----------------->
           <ttcol>Reference</ttcol>
           <ttcol>Note</ttcol>
 
-          <c>EXPORTER-network- time-security/1</c>
+          <c>EXPORTER-network- time-security</c>
           <c>Y</c>
           <c>Y</c>
           <c>[[this memo]], <xref target="key-extraction"/></c>
@@ -1870,6 +1869,21 @@ NTS Authenticator    0x0404]]
           <xref target="RFC8573">RFC 8573</xref>.
         </t>
       </section>
+      <section title="Key Compromise">
+        <t>
+          If the suggested format
+          for NTS cookies in <xref target="suggested-format-for-nts-cookies" />
+          of this draft is used, an attacker who has gained
+          access to the secret cookie encryption key `K` can impersonate
+          the NTP server, including generating new cookies.
+          NTP and NTS-KE server operators SHOULD remove compromised keys as soon
+          as the compromise is discovered. This will cause the NTP servers to
+          respond with NTS NAK, thus forcing key renegotiation. Note that this
+          measure does not protect against MITM attacks where the attacker has access
+          to a compromised cookie encryption key. If another cookie scheme is used,
+          there are likely similar considerations for that particular scheme.
+        </t>
+      </section>
       <section title="Sensitivity to DDoS Attacks">
         <t>
           The introduction of NTS brings with it the introduction of asymmetric
@@ -1888,9 +1902,7 @@ NTS Authenticator    0x0404]]
           the NTS-KE and NTP servers, a successful DDoS attack on an NTS-KE
           server separated from the NTP service it supports will not affect NTP
           users that have already performed initial authentication, AEAD key
-          extraction, and cookie exchange. <!--Furthermore, as noted in
-          <xref target="usage-of-ntp-pools"/>, NTP-KE capacity is easier to
-          scale up and down than NTP server capacity.-->
+          extraction, and cookie exchange.
         </t>
         <t>
           NTS users should also consider that they are not fully protected
@@ -2110,12 +2122,12 @@ NTS Authenticator    0x0404]]
 
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
-      Bellovin, Patrik F&auml;ltstr&ouml;m (Faltstrom), Scott Fluhrer,
+      Bellovin, Scott Fluhrer, Patrik F&auml;ltstr&ouml;m (Faltstrom),
       Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Martin
-      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Dave Mills,
-      Sandra Murphy, Danny Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen
-      Roettger, Kurt Roeckx, Dan Romascanu, Kyle Rose, Rich Salz, Brian
-      Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
+      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Danny Mayer,
+      Dave Mills, Sandra Murphy, Hal Murray, Karen O'Donoghue, Eric K.
+      Rescorla, Kurt Roeckx, Stephen Roettger, Dan Romascanu, Kyle Rose, Rich
+      Salz, Brian Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
       Str&ouml;mbergsson (Strombergsson), Martin Thomson, &Eacute;ric (Eric)
       Vyncke, Richard Welty, Christer Weinigel, and Magnus Westerlund for
       contributions to this document and comments on the design of NTS.</t>
@@ -2174,7 +2186,7 @@ NTS Authenticator    0x0404]]
         </front>
 
         <seriesInfo name="in Proceedings of"
-                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6 DOI&nbsp;10.1109/ISPCS.2012.6336612"/>
+                    value="Precision Clock Synchronization for Measurement Control and Communication, ISPCS 2012, pp. 1-6, DOI&nbsp;10.1109/ISPCS.2012.6336612"/>
       </reference>
 
       <reference anchor="Shpiner">
@@ -2195,7 +2207,7 @@ NTS Authenticator    0x0404]]
         </front>
 
         <seriesInfo name="in Proceedings of"
-                    value="IEEE International Symposium on Precision Clock Synchronization for Measurement, Control and Communication (ISPCS) DOI&nbsp;10.1109/ISPCS.2013.6644754"/>
+                    value="IEEE International Symposium on Precision Clock Synchronization for Measurement, Control and Communication (ISPCS), DOI&nbsp;10.1109/ISPCS.2013.6644754"/>
       </reference>
     </references>
 
