@@ -359,7 +359,7 @@
         backward-compatibility concerns exist to justify using
         obsolete, insecure, or otherwise broken TLS features or
         versions. Implementations MUST conform with <xref
-        target="RFC7525"/> or with a later revision of BCP
+        target="RFC7525">RFC 7525</xref> or with a later revision of BCP
         195. In particular, failure to use cipher suites that provide forward
         secrecy will make all negotiated NTS keys recoverable by anyone
         that gains access to the NTS-KE server's private key.
@@ -1029,8 +1029,8 @@ Client -----+---------------------------------+----------------->
           than mandated by the above paragraph. Theoretically, it
           could be necessary to do so in order to bring the extension
           field to the minimum length required by <xref
-          target="RFC7822"/>. This should never happen in practice
-          because any reasonable AEAD algorithm will have a nonce and
+          target="RFC7822">RFC 7822</xref>. This should never happen in
+          practice because any reasonable AEAD algorithm will have a nonce and
           an authenticator long enough to bring the extension field to
           its required length already.  Nonetheless, implementers are
           advised to explicitly handle this case and ensure that the
