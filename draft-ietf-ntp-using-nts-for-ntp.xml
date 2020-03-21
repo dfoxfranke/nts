@@ -1276,7 +1276,7 @@ Client -----+---------------------------------+----------------->
         <xref target="RFC5297">AEAD_AES_SIV_CMAC_256</xref> which resists
         accidental nonce reuse. It need not be the same as the one that was
         negotiated with the client. Servers should randomly generate and store a
-        master AEAD key `K`. Servers should additionally choose a non-secret,
+        secret master AEAD key `K`. Servers should additionally choose a non-secret,
         unique value `I` as key-identifier for `K`.
       </t>
       <t>
