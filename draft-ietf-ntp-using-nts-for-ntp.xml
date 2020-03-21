@@ -360,17 +360,12 @@
         obsolete, insecure, or otherwise broken TLS features or
         versions. Implementations MUST conform with <xref
         target="RFC7525">RFC 7525</xref> or with a later revision of BCP
-        195. In particular, failure to use cipher suites that provide forward
-        secrecy will make all negotiated NTS keys recoverable by anyone
-        that gains access to the NTS-KE server's private key.
-        Furthermore:
+        195.
       </t>
       <t>
-        Implementations MUST NOT negotiate TLS versions earlier than
-        1.2, SHOULD negotiate TLS 1.3 <xref target="RFC8446"/> or
-        later when possible, and MAY refuse to negotiate any TLS
-        version which has been superseded by a later supported
-        version.
+        Implementations MUST NOT negotiate TLS versions earlier than 1.3
+        <xref target="RFC8446"/> and MAY refuse to negotiate any TLS version
+        which has been superseded by a later supported version.
       </t>
       <t>
         Use of the <xref target="RFC7301">Application-Layer Protocol
@@ -390,8 +385,8 @@
         as Application Data encapsulated in the TLS-protected channel. Then, the
         server SHALL send a single response. After sending their respective
         request and response, the client and server SHALL send TLS
-        &quot;close_notify&quot; alerts in accordance with the TLS version in
-        use, see <xref target="RFC8446">RFC 8446 Section 6.1</xref>.
+        &quot;close_notify&quot; alerts in accordance with
+        <xref target="RFC8446">RFC 8446, Section 6.1</xref>.
       </t>
       <t>
         The client's request and the server's response each SHALL consist of a
@@ -741,19 +736,17 @@ Client -----+---------------------------------+----------------->
       <section title="Key Extraction (generally)" anchor="key-extraction">
         <t>
           Following a successful run of the NTS-KE protocol, key material SHALL
-          be extracted using <xref target="RFC5705">the TLS pseudorandom
-          function (PRF)</xref> for TLS version 1.2, or
-          <xref target="RFC5869">the HMAC-based Extract-and-Expand Key
-          Derivation Function (HKDF)</xref> in accordance with
-          <xref target="RFC8446">RFC 8446, Section 7.5</xref> for TLS version 1.3.
+          be extracted using <xref target="RFC5869">the HMAC-based
+          Extract-and-Expand Key Derivation Function (HKDF)</xref> in
+          accordance with <xref target="RFC8446">RFC 8446, Section 7.5</xref>.
 
           Inputs to the exporter function are to be constructed in a manner
           specific to the negotiated Next Protocol. However, all protocols which
           utilize NTS-KE MUST conform to the following two rules:
           <list>
             <t>
-              The disambiguating label string MUST be
-              &quot;EXPORTER-network-time-security&quot;.
+              The <xref target="RFC5705">disambiguating label string</xref> MUST
+              be &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
               The per-association context value MUST be provided and MUST begin
@@ -772,13 +765,12 @@ Client -----+---------------------------------+----------------->
           Following a successful run of the NTS-KE protocol wherein Protocol
           ID 0 (NTPv4) is selected as a Next Protocol, two AEAD keys SHALL be
           extracted: a client-to-server (C2S) key and a server-to-client (S2C)
-          key. These keys SHALL be computed with the PRF defined in
-          <xref target="RFC5705">RFC 5705</xref> for TLS version 1.2, or
-          the HKDF defined in <xref target="RFC8446">RFC 8446, Section 7.5</xref>
-          for TLS version 1.3, using the following inputs.
+          key. These keys SHALL be computed with the HKDF defined in
+          <xref target="RFC8446">RFC 8446, Section 7.5</xref> using the
+          following inputs.
           <list>
             <t>
-              The disambiguating label string (for PRF) or label (for HKDF)
+              The <xref target="RFC5705">disambiguating label string</xref>
               SHALL be &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
@@ -1214,11 +1206,12 @@ Client -----+---------------------------------+----------------->
           this rule.
         </t>
         <t>
-          Upon receiving an NTS-protected response, the client MUST verify that
-          the Unique Identifier matches that of an outstanding request, and that
-          the packet is authentic under the S2C key associated with that request.
-          If either of these checks fails, the packet MUST be discarded without
-          further processing.
+          The client MUST NOT accept unprotected responses to NTS-protected
+          requests. In particular, upon receiving an NTS-protected response, the
+          client MUST verify that the Unique Identifier matches that of an
+          outstanding request, and that the packet is authentic under the S2C
+          key associated with that request. If either of these checks fails, the
+          packet MUST be discarded without further processing.
         </t>
         <t>
           If the server is unable to validate the cookie or authenticate the
@@ -1237,9 +1230,10 @@ Client -----+---------------------------------+----------------->
           without further processing. If this check passes, the client MUST comply
           with <xref target="RFC5905">RFC 5905, Section 7.4</xref> where required.
           A client MAY automatically re-run the NTS-KE protocol upon forced
-          disassociation from an NTP server. In that case, it MUST be able to
-          detect and stop looping between the NTS-KE and NTP servers by rate 
-          limiting the retries using e.g. exponential retry intervals.
+          disassociation from an NTP server. In that case, it MUST avoid quickly
+          looping between the NTS-KE and NTP servers by rate limiting the
+          retries using, for example, exponential retry intervals. A reasonable
+          maximum retry interval could be 7 days, depending on the application.
         </t>
         <t>
           Upon reception of the NTS NAK kiss code, the client SHOULD wait until
@@ -1963,12 +1957,12 @@ NTS Authenticator    0x0404]]
           successfully present an expired certificate:
           <list>
             <t>
-              Check whether the system time is in fact unreliable. If the system
-              clock has previously been synchronized since last boot, then on
-              operating systems which implement a kernel-based phase-locked-loop
-              API, a call to ntp_gettime() should show a maximum error less than
-              NTP_PHASE_MAX. In this case, the clock SHOULD be considered
-              reliable and certificates can be strictly validated.
+              Check whether the system time is in fact unreliable. If the
+              system clock has previously been synchronized since last boot,
+              then on operating systems which implement the ntp_adjtime()
+              system call, it will return a value other than TIME_ERROR. In
+              this case, the clock SHOULD be considered reliable and
+              certificates can be strictly validated.
             </t>
             <t>
               Allow the system administrator to specify that certificates should
@@ -2044,7 +2038,7 @@ NTS Authenticator    0x0404]]
       <section title="NTS Stripping">
         <t>
           Implementers must be aware of the possibility of "NTS stripping"
-          attacks, where an attacker tricks clients into reverting to plain
+          attacks, where an attacker attempts to trick clients into reverting to plain
           NTP. Naive client implementations might, for example, revert
           automatically to plain NTP if the NTS-KE handshake fails. A man-in-the-middle
           attacker can easily cause this to happen. Even clients that already
@@ -2123,14 +2117,15 @@ NTS Authenticator    0x0404]]
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
       Bellovin, Scott Fluhrer, Patrik F&auml;ltstr&ouml;m (Faltstrom),
-      Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Martin
-      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Danny Mayer,
-      Dave Mills, Sandra Murphy, Hal Murray, Karen O'Donoghue, Eric K.
-      Rescorla, Kurt Roeckx, Stephen Roettger, Dan Romascanu, Kyle Rose, Rich
-      Salz, Brian Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
-      Str&ouml;mbergsson (Strombergsson), Martin Thomson, &Eacute;ric (Eric)
-      Vyncke, Richard Welty, Christer Weinigel, and Magnus Westerlund for
-      contributions to this document and comments on the design of NTS.</t>
+      Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Mirja
+      K&uuml;hlewind (Kuehlewind), Martin Langer, Barry Leiba, Miroslav Lichvar,
+      Aanchal Malhotra, Danny Mayer, Dave Mills, Sandra Murphy, Hal Murray,
+      Karen O'Donoghue, Eric K. Rescorla, Kurt Roeckx, Stephen Roettger, Dan
+      Romascanu, Kyle Rose, Rich Salz, Brian Sniffen, Susan Sons, Douglas
+      Stebila, Harlan Stenn, Joachim Str&ouml;mbergsson (Strombergsson), Martin
+      Thomson, &Eacute;ric (Eric) Vyncke, Richard Welty, Christer Weinigel, and
+      Magnus Westerlund for contributions to this document and comments on the
+      design of NTS.</t>
     </section>
   </middle>
 
@@ -2230,7 +2225,6 @@ NTS Authenticator    0x0404]]
           <t hangText="NTS   ">Network Time Security</t>
           <t hangText="NTS NAK">NTS negative-acknowledgment</t>
           <t hangText="NTS-KE">Network Time Security Key Exchange</t>
-          <t hangText="PRF   ">Pseudorandom Function</t>
           <t hangText="S2C   ">Server-to-client</t>
           <t hangText="TLS   "><xref target="RFC8446">Transport Layer
             Security</xref></t>
