@@ -2125,12 +2125,12 @@ NTS Authenticator    0x0404]]
 
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>The authors would like to thank Richard Barnes, Steven
-      Bellovin, Patrik F&auml;ltstr&ouml;m (Faltstrom), Scott Fluhrer,
+      Bellovin, Scott Fluhrer, Patrik F&auml;ltstr&ouml;m (Faltstrom),
       Sharon Goldberg, Russ Housley, Benjamin Kaduk, Suresh Krishnan, Martin
-      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Dave Mills,
-      Sandra Murphy, Danny Mayer, Karen O'Donoghue, Eric K. Rescorla, Stephen
-      Roettger, Kurt Roeckx, Dan Romascanu, Kyle Rose, Rich Salz, Brian
-      Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
+      Langer, Barry Leiba, Miroslav Lichvar, Aanchal Malhotra, Danny Mayer,
+      Dave Mills, Sandra Murphy, Hal Murray, Karen O'Donoghue, Eric K.
+      Rescorla, Kurt Roeckx, Stephen Roettger, Dan Romascanu, Kyle Rose, Rich
+      Salz, Brian Sniffen, Susan Sons, Douglas Stebila, Harlan Stenn, Joachim
       Str&ouml;mbergsson (Strombergsson), Martin Thomson, &Eacute;ric (Eric)
       Vyncke, Richard Welty, Christer Weinigel, and Magnus Westerlund for
       contributions to this document and comments on the design of NTS.</t>
