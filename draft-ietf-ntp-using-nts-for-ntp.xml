@@ -1902,9 +1902,7 @@ NTS Authenticator    0x0404]]
           the NTS-KE and NTP servers, a successful DDoS attack on an NTS-KE
           server separated from the NTP service it supports will not affect NTP
           users that have already performed initial authentication, AEAD key
-          extraction, and cookie exchange. <!--Furthermore, as noted in
-          <xref target="usage-of-ntp-pools"/>, NTP-KE capacity is easier to
-          scale up and down than NTP server capacity.-->
+          extraction, and cookie exchange.
         </t>
         <t>
           NTS users should also consider that they are not fully protected
