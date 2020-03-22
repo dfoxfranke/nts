@@ -372,6 +372,15 @@
         Negotiation Extension</xref> is integral to NTS and support for
         it is REQUIRED for interoperability.
       </t>
+      <t>
+        Implementations MUST follow the rules in <xref target="RFC5280">
+        RFC 5280</xref> and <xref target="RFC6125">RFC 6125</xref> for the
+        representation and verification of application service identity. Use of
+        the <xref target="RFC6125">DNS-ID identifier type</xref> is RECOMMENDED.
+        <xref target="sec-cert-verification" /> of this memo discusses
+        particular considerations for certificate verification in the context of
+        NTS.
+      </t>
     </section>
 
     <section title="The NTS Key Establishment Protocol" anchor="nts-ke">
@@ -1938,7 +1947,8 @@ NTS Authenticator    0x0404]]
         </t>
       </section>
 
-      <section title="Initial Verification of Server Certificates">
+      <section title="Initial Verification of Server Certificates"
+          anchor="sec-cert-verification">
         <t>
           NTS's security goals are undermined if the client fails to verify that
           the X.509 certificate chain presented by the NTS-KE server is valid
