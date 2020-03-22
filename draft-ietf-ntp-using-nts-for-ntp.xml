@@ -1215,12 +1215,12 @@ Client -----+---------------------------------+----------------->
           this rule.
         </t>
         <t>
-          The client MUST NOT accept unprotected responses to NTS-protected
-          requests. In particular, upon receiving an NTS-protected response, the
-          client MUST verify that the Unique Identifier matches that of an
-          outstanding request, and that the packet is authentic under the S2C
-          key associated with that request. If either of these checks fails, the
-          packet MUST be discarded without further processing.
+          Upon receiving an NTS-protected response, the client MUST verify that
+          the Unique Identifier matches that of an outstanding request, and that
+          the packet is authentic under the S2C key associated with that
+          request. If either of these checks fails, the packet MUST be discarded
+          without further processing. In particular, the client MUST discard
+          unprotected responses to NTS-protected requests.
         </t>
         <t>
           If the server is unable to validate the cookie or authenticate the
