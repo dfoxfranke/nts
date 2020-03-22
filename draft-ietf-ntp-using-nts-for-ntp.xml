@@ -1957,12 +1957,10 @@ NTS Authenticator    0x0404]]
           successfully present an expired certificate:
           <list>
             <t>
-              Check whether the system time is in fact unreliable. If the
-              system clock has previously been synchronized since last boot,
-              then on operating systems which implement the ntp_adjtime()
-              system call, it will return a value other than TIME_ERROR. In
-              this case, the clock SHOULD be considered reliable and
-              certificates can be strictly validated.
+              Check whether the system time is in fact unreliable. On systems
+              with the ntp_adjtime() system call, a return code other than
+              TIME_ERROR indicates that some trusted software has already set
+              the time and certificates can be strictly validated.
             </t>
             <t>
               Allow the system administrator to specify that certificates should
