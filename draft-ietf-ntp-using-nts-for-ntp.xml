@@ -286,7 +286,7 @@
           Time synchronization proceeds with the indicated NTP server
           over the NTP UDP port. The client sends the server an NTP client
           packet which includes several extension fields. Included among these
-          fields are a cookie (previously provided by the key exchange server)
+          fields are a cookie (previously provided by the key establishment server)
           and an authentication tag, computed using key material extracted from
           the NTS-KE handshake.  The NTP server uses the cookie to recover this
           key material and send back an authenticated response. The response
@@ -469,11 +469,11 @@
         of the body.
       </t>
       <t>
-        <xref target="fig_NTSKeyExchange"/> provides a schematic overview of the
-        key exchange. It displays the protocol steps to be performed by the NTS
+        <xref target="fig_NTSKeyEstablishment"/> provides a schematic overview of the
+        key establishment. It displays the protocol steps to be performed by the NTS
         client and server and record types to be exchanged.
       </t>
-      <figure anchor="fig_NTSKeyExchange" title="NTS Key Exchange Messages">
+      <figure anchor="fig_NTSKeyEstablishment" title="NTS Key Establishment Messages">
         <artwork><![CDATA[
                 +---------------------------------------+
                 | - Verify client request message.      |
@@ -1059,7 +1059,7 @@ Client -----+---------------------------------+----------------->
             <t>
               Exactly one NTS Cookie extension field which MUST be authenticated
               and MUST NOT be encrypted. The cookie MUST be one which has been
-              previously provided to the client, either from the key exchange
+              previously provided to the client, either from the key establishment
               server during the NTS-KE handshake or from the NTP server in
               response to a previous NTS-protected NTP request.
             </t>
@@ -1352,7 +1352,7 @@ Client -----+---------------------------------+----------------->
             <t>Transport Protocol: tcp</t>
             <t>Assignee: IESG &lt;iesg@ietf.org&gt;</t>
             <t>Contact: IETF Chair &lt;chair@ietf.org&gt;</t>
-            <t>Description: Network Time Security Key Exchange</t>
+            <t>Description: Network Time Security Key Establishment</t>
             <t>Reference: [[this memo]]</t>
             <t>Port Number: [[TBD1]], selected by IANA from the User Port
               range</t>
@@ -2084,7 +2084,7 @@ NTS Authenticator    0x0404]]
         </t>
 
         <t>The unlinkability objective only holds for time synchronization
-        traffic, as opposed to key exchange traffic. This implies that it
+        traffic, as opposed to key establishment traffic. This implies that it
         cannot be guaranteed for devices that function not only as time
         clients, but also as time servers (because the latter can be externally
         triggered to send linkable data, such as the TLS certificate).</t>
@@ -2232,7 +2232,7 @@ NTS Authenticator    0x0404]]
             </xref></t>
           <t hangText="NTS   ">Network Time Security</t>
           <t hangText="NTS NAK">NTS negative-acknowledgment</t>
-          <t hangText="NTS-KE">Network Time Security Key Exchange</t>
+          <t hangText="NTS-KE">Network Time Security Key Establishment</t>
           <t hangText="S2C   ">Server-to-client</t>
           <t hangText="TLS   "><xref target="RFC8446">Transport Layer
             Security</xref></t>
