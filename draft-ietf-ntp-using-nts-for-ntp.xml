@@ -561,7 +561,8 @@ Client -----+---------------------------------+----------------->
             Clients MUST NOT include Error records in their request. If clients
             receive a server response which includes an Error record, they MUST
             discard any key material negotiated during the initial TLS exchange
-            and MUST NOT proceed to the Next Protocol.
+            and MUST NOT proceed to the Next Protocol. Requirements for retry
+            intervals are described in <xref target="nts-ke-retry" />.
           </t>
           <t>
             The following error codes are defined:
@@ -578,12 +579,13 @@ Client -----+---------------------------------+----------------->
                 respond with this error if the request is not complete
                 and syntactically well-formed, or, upon the expiration
                 of an implementation-defined timeout, it has not yet
-                received such a request.
+                received such a request. The client SHOULD NOT retry its
+                request without modification.
               </t>
               <t>
                 Error code 2 means &quot;Internal Server Error&quot;. The server
                 MUST respond with this error if it is unable to respond properly
-                due to an internal condition.
+                due to an internal condition. The client MAY retry its request.
               </t>
             </list>
           </t>
