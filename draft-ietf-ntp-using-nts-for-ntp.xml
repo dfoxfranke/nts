@@ -375,11 +375,15 @@
       <t>
         Implementations MUST follow the rules in <xref target="RFC5280">
         RFC 5280</xref> and <xref target="RFC6125">RFC 6125</xref> for the
-        representation and verification of application service identity. Use of
-        the <xref target="RFC6125">DNS-ID identifier type</xref> is RECOMMENDED.
-        <xref target="sec-cert-verification" /> of this memo discusses
-        particular considerations for certificate verification in the context of
-        NTS.
+        representation and verification of the application's service identity.
+        When NTS-KE service discovery (out of scope for this document)
+        produces one or more host names, use of the
+        <xref target="RFC6125">DNS-ID identifier type</xref> is RECOMMENDED;
+        specifications for service discovery mechanisms can provide additional
+        guidance for certificate validation based on the results of
+        discovery. <xref target="sec-cert-verification" /> of this memo
+        discusses particular considerations for certificate verification in
+        the context of NTS.
       </t>
     </section>
 
