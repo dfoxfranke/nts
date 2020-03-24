@@ -561,7 +561,8 @@ Client -----+---------------------------------+----------------->
             Clients MUST NOT include Error records in their request. If clients
             receive a server response which includes an Error record, they MUST
             discard any key material negotiated during the initial TLS exchange
-            and MUST NOT proceed to the Next Protocol.
+            and MUST NOT proceed to the Next Protocol. Requirements for retry
+            intervals are described in <xref target="nts-ke-retry" />.
           </t>
           <t>
             The following error codes are defined:
@@ -578,12 +579,13 @@ Client -----+---------------------------------+----------------->
                 respond with this error if the request is not complete
                 and syntactically well-formed, or, upon the expiration
                 of an implementation-defined timeout, it has not yet
-                received such a request.
+                received such a request. The client SHOULD NOT retry its
+                request without modification.
               </t>
               <t>
                 Error code 2 means &quot;Internal Server Error&quot;. The server
                 MUST respond with this error if it is unable to respond properly
-                due to an internal condition.
+                due to an internal condition. The client MAY retry its request.
               </t>
             </list>
           </t>
@@ -744,7 +746,35 @@ Client -----+---------------------------------+----------------->
             clients SHOULD NOT.
           </t>
         </section>
-      </section>      
+      </section>
+
+      <section title="Retry Intervals" anchor="nts-ke-retry">
+        <t>
+          A mechanism for not unnecessarily overloading the NTS-KE server is
+          REQUIRED when retrying the key establishment process due to protocol,
+          communication, or other errors. The exact workings of this will be
+          dependent on the application and operational experience gathered over
+          time. Until such experience is available, this memo provides the
+          following suggestion.
+        </t>
+        <t>
+          Clients SHOULD use exponential backoff, with an initial and minimum
+          retry interval of 10 seconds, a maximum retry interval of 5 days, and
+          a base of 1.5. Thus, the minimum interval in seconds, t, for the nth
+          retry is calculated with
+          <list style="empty">
+            <t>
+              t = min(10 * 1.5^(n-1), 432000).
+            </t>
+          </list>
+        </t>
+        <t>
+          Clients MUST NOT reset the retry interval until they have performed
+          a successful key establishment with the NTS-KE server, followed by a
+          successful use of the negotiated next protocol with the keys and data
+          established during that transaction.
+        </t>
+      </section>
 
       <section title="Key Extraction (generally)" anchor="key-extraction">
         <t>
@@ -1242,11 +1272,13 @@ Client -----+---------------------------------+----------------->
           outstanding request. If this check fails, the packet MUST be discarded
           without further processing. If this check passes, the client MUST comply
           with <xref target="RFC5905">RFC 5905, Section 7.4</xref> where required.
+        </t>
+        <t>
           A client MAY automatically re-run the NTS-KE protocol upon forced
           disassociation from an NTP server. In that case, it MUST avoid quickly
           looping between the NTS-KE and NTP servers by rate limiting the
-          retries using, for example, exponential retry intervals. A reasonable
-          maximum retry interval could be 7 days, depending on the application.
+          retries. Requirements for retry intervals in NTS-KE are described in
+          <xref target="nts-ke-retry" />.
         </t>
         <t>
           Upon reception of the NTS NAK kiss code, the client SHOULD wait until
@@ -1266,7 +1298,7 @@ Client -----+---------------------------------+----------------->
           is able to resume the NTP session without performing renewed NTS-KE
           negotiation.
         </t>
-      </section>      
+      </section>
     </section>
 
     <section title="Suggested Format for NTS Cookies"
