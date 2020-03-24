@@ -753,7 +753,7 @@ Client -----+---------------------------------+----------------->
           communication, or other errors. The exact workings of this will be
           dependent on the application and operational experience gathered over
           time. Until such experience is available, this memo provides the
-          following suggestions.
+          following suggestion.
         </t>
         <t>
           Clients SHOULD use exponential backoff, with an initial and minimum
@@ -762,13 +762,9 @@ Client -----+---------------------------------+----------------->
           retry is calculated with
           <list style="empty">
             <t>
-              t = min(10 * 1.5^(n-1), 604800).
+              t = min(10 * 1.5^(n-1), 432000).
             </t>
           </list>
-          Clients MUST NOT reset the retry interval until they have performed
-          a successful key establishment with an NTS-KE server, followed by a
-          successful NTP request and response exchange using the cookies
-          received.
         </t>
       </section>
 
@@ -1268,11 +1264,16 @@ Client -----+---------------------------------+----------------->
           outstanding request. If this check fails, the packet MUST be discarded
           without further processing. If this check passes, the client MUST comply
           with <xref target="RFC5905">RFC 5905, Section 7.4</xref> where required.
+        </t>
+        <t>
           A client MAY automatically re-run the NTS-KE protocol upon forced
           disassociation from an NTP server. In that case, it MUST avoid quickly
           looping between the NTS-KE and NTP servers by rate limiting the
           retries. Requirements for retry intervals in NTS-KE are described in
-          <xref target="nts-ke-retry" />.
+          <xref target="nts-ke-retry" />. Clients MUST NOT reset the retry
+          interval until they have performed a successful key establishment with
+          an NTS-KE server, followed by a successful NTP request and response
+          exchange using the cookies received.
         </t>
         <t>
           Upon reception of the NTS NAK kiss code, the client SHOULD wait until
