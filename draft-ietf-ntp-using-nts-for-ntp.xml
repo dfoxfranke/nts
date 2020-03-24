@@ -766,6 +766,12 @@ Client -----+---------------------------------+----------------->
             </t>
           </list>
         </t>
+        <t>
+          Clients MUST NOT reset the retry interval until they have performed
+          a successful key establishment with the NTS-KE server, followed by a
+          successful use of the negotiated next protocol with the keys and data
+          established during that transaction.
+        </t>
       </section>
 
       <section title="Key Extraction (generally)" anchor="key-extraction">
@@ -1270,10 +1276,7 @@ Client -----+---------------------------------+----------------->
           disassociation from an NTP server. In that case, it MUST avoid quickly
           looping between the NTS-KE and NTP servers by rate limiting the
           retries. Requirements for retry intervals in NTS-KE are described in
-          <xref target="nts-ke-retry" />. Clients MUST NOT reset the retry
-          interval until they have performed a successful key establishment with
-          an NTS-KE server, followed by a successful NTP request and response
-          exchange using the cookies received.
+          <xref target="nts-ke-retry" />.
         </t>
         <t>
           Upon reception of the NTS NAK kiss code, the client SHOULD wait until
