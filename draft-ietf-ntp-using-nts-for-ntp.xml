@@ -260,9 +260,9 @@
             <t>
               The &quot;NTS Key Establishment&quot; protocol (NTS-KE) is a
               mechanism for establishing key material for use with the NTS
-              Extension Fields for NTPv4. It uses TLS to exchange keys, provide
+              Extension Fields for NTPv4. It uses TLS to establish keys, provide
               the client with an initial supply of cookies, and negotiate some
-              additional protocol options. After this exchange, the TLS channel
+              additional protocol options. After this, the TLS channel
               is closed with no per-client state remaining on the server side.
             </t>
           </list>
