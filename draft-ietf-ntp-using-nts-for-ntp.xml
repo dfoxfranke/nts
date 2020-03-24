@@ -1876,7 +1876,7 @@ NTS Authenticator    0x0404]]
           <xref target="RFC8573">RFC 8573</xref>.
         </t>
       </section>
-      <section title="Key Compromise">
+      <section title="Cookie Encryption Key Compromise">
         <t>
           If the suggested format
           for NTS cookies in <xref target="suggested-format-for-nts-cookies" />
