@@ -2221,24 +2221,24 @@ NTS Authenticator    0x0404]]
     <section title="Terms and Abbreviations">
       <t>
         <list style="hanging">
-          <t hangText="AEAD  "><xref target="RFC5116">Authenticated Encryption
+          <t hangText="AEAD   "><xref target="RFC5116">Authenticated Encryption
             with Associated Data</xref></t>
-          <t hangText="ALPN  "><xref target="RFC7301">Application-Layer Protocol
+          <t hangText="ALPN   "><xref target="RFC7301">Application-Layer Protocol
             Negotiation</xref></t>
-          <t hangText="C2S   ">Client-to-server</t>
-          <t hangText="DoS   ">Denial-of-Service</t>
-          <t hangText="DDoS  ">Distributed Denial-of-Service</t>
-          <t hangText="EF    "><xref target="RFC5905">Extension Field</xref></t>
-          <t hangText="HKDF  "><xref target="RFC5869">Hashed Message
+          <t hangText="C2S    ">Client-to-server</t>
+          <t hangText="DoS    ">Denial-of-Service</t>
+          <t hangText="DDoS   ">Distributed Denial-of-Service</t>
+          <t hangText="EF     "><xref target="RFC5905">Extension Field</xref></t>
+          <t hangText="HKDF   "><xref target="RFC5869">Hashed Message
             Authentication Code-based Key Derivation Function</xref></t>
-          <t hangText="KoD   "><xref target="RFC5905">Kiss-o'-Death</xref></t>
-          <t hangText="NTP   "><xref target="RFC5905">Network Time Protocol
+          <t hangText="KoD    "><xref target="RFC5905">Kiss-o'-Death</xref></t>
+          <t hangText="NTP    "><xref target="RFC5905">Network Time Protocol
             </xref></t>
-          <t hangText="NTS   ">Network Time Security</t>
+          <t hangText="NTS    ">Network Time Security</t>
           <t hangText="NTS NAK">NTS negative-acknowledgment</t>
-          <t hangText="NTS-KE">Network Time Security Key Establishment</t>
-          <t hangText="S2C   ">Server-to-client</t>
-          <t hangText="TLS   "><xref target="RFC8446">Transport Layer
+          <t hangText="NTS-KE ">Network Time Security Key Establishment</t>
+          <t hangText="S2C    ">Server-to-client</t>
+          <t hangText="TLS    "><xref target="RFC8446">Transport Layer
             Security</xref></t>
         </list>
       </t>
