@@ -10,10 +10,10 @@
 <?rfc inline="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-27"
+<rfc category="std" docName="draft-ietf-ntp-using-nts-for-ntp-28"
      ipr="trust200902" submissionType="IETF">
   <front>
-    <title abbrev="NTS4NTP">Network Time Security for the Network Time
+    <title abbrev="Network Time Security for NTP">Network Time Security for the Network Time
     Protocol</title>
 
     <author fullname="Daniel Fox Franke" initials="D." surname="Franke">
@@ -110,7 +110,7 @@
       </address>
     </author>
 
-    <date day="24" month="March" year="2020"/>
+    <date day="25" month="March" year="2020"/>
 
     <area>Internet Area</area>
 
@@ -273,7 +273,7 @@
           NTS-KE server on the NTS TCP port and the two parties perform a TLS
           handshake. Via the TLS channel, the parties negotiate some additional
           protocol parameters and the server sends the client a supply of
-          cookies along with an address of an NTP server
+          cookies along with an address and port of an NTP server
           for which the cookies are valid. The parties use
           <xref target="RFC5705">TLS key export</xref> to extract key material
           which will be used in the next phase of the protocol. This negotiation
@@ -283,8 +283,8 @@
           connect to the NTS-KE server again.
         </t>
         <t>
-          Time synchronization proceeds with the indicated NTP server
-          over the NTP UDP port. The client sends the server an NTP client
+          Time synchronization proceeds with the indicated NTP server.
+          The client sends the server an NTP client
           packet which includes several extension fields. Included among these
           fields are a cookie (previously provided by the key establishment server)
           and an authentication tag, computed using key material extracted from
@@ -486,7 +486,8 @@
                 |   - Include Record Types:             |
                 |       o NTS Next Protocol Negotiation |
                 |       o AEAD Algorithm Negotiation    |
-                |       o NTP Server Negotiation        |
+                |       o <NTPv4 Server Negotiation>    |
+                |       o <NTPv4 Port Negotiation>      |
                 |       o New Cookie for NTPv4          |
                 |       o <New Cookie for NTPv4>        |
                 |       o End of Message                |
@@ -508,10 +509,11 @@ Client -----+---------------------------------+----------------->
 |- Generate KE request message.    |   |- Verify server response|
 | - Include Record Types:          |   |  message.              |
 |  o NTS Next Protocol Negotiation |   |- Extract cookie(s).    |
-|  o AEAD Algorithm Negotiation    |   |                        |
-|  o <NTP Server Negotiation>      |   |                        |
-|  o End of Message                |   |                        |
-+----------------------------------+   +------------------------+]]>
+|  o AEAD Algorithm Negotiation    |   +------------------------+
+|  o <NTPv4 Server Negotiation>    |
+|  o <NTPv4 Port Negotiation>      |
+|  o End of Message                |
++----------------------------------+]]>
         </artwork>
       </figure>
 
@@ -679,7 +681,7 @@ Client -----+---------------------------------+----------------->
             identifiers <xref target="RFC6874"/>. If a label contains at least
             one non-ASCII character, it is an internationalized domain name
             and an A-LABEL MUST be used as defined in
-            section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
+            Section 2.3.2.1 of <xref target="RFC5890">RFC 5890</xref>.
             If the record contains a domain name, the recipient MUST treat it
             as a FQDN, e.g. by making sure it ends with a dot.
           </t>
@@ -760,7 +762,7 @@ Client -----+---------------------------------+----------------->
         <t>
           Clients SHOULD use exponential backoff, with an initial and minimum
           retry interval of 10 seconds, a maximum retry interval of 5 days, and
-          a base of 1.5. Thus, the minimum interval in seconds, t, for the nth
+          a base of 1.5. Thus, the minimum interval in seconds, `t`, for the nth
           retry is calculated with
           <list style="empty">
             <t>
@@ -792,9 +794,9 @@ Client -----+---------------------------------+----------------->
               be &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
-              The per-association context value MUST be provided and MUST begin
-              with the two-octet Protocol ID which was negotiated as a Next
-              Protocol.
+              The <xref target="RFC5705">per-association context value</xref>
+              MUST be provided and MUST begin with the two-octet Protocol ID
+              which was negotiated as a Next Protocol.
             </t>
           </list>
         </t>
@@ -817,7 +819,8 @@ Client -----+---------------------------------+----------------->
               SHALL be &quot;EXPORTER-network-time-security&quot;.
             </t>
             <t>
-              The context value SHALL consist of the following five octets:
+              The <xref target="RFC5705">per-association context value</xref>
+              SHALL consist of the following five octets:
               <list>
                 <t>
                   The first two octets SHALL be zero (the Protocol ID for
@@ -885,7 +888,8 @@ Client -----+---------------------------------+----------------->
           cryptographically strong means of detecting replayed packets. It has a
           Field Type of [[TBD2]]. When the extension field is included in a
           client packet (mode 3), its body SHALL consist of a string of octets
-          generated uniformly at random. The string MUST be at least 32 octets
+          generated by a <xref target="RFC4086">cryptographically secure random
+          number generator</xref>. The string MUST be at least 32 octets
           long. When the extension field is included in a server packet
           (mode 4), its body SHALL contain the same octet string as was provided
           in the client packet to which the server is responding. All server
@@ -1325,7 +1329,7 @@ Client -----+---------------------------------+----------------->
         unique value `I` as key-identifier for `K`.
       </t>
       <t>
-        Servers should periodically (e.g., once daily) generate a new pair (I,K)
+        Servers should periodically (e.g., once daily) generate a new pair `(I,K)`
         and immediately switch to using these values for all newly-generated
         cookies. Following each such key rotation, servers should
         securely erase any previously generated keys that should now be expired.
